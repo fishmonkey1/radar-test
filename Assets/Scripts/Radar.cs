@@ -7,7 +7,8 @@ public class Radar : MonoBehaviour
 
     [SerializeField] Transform radar;
     [SerializeField] float rotationsPerMinute = 10.0f;
-    [SerializeField] public float secondsShownOnMap = 3;
+    [SerializeField] public float secondsShownOnMap = 3f;
+    [SerializeField] public float disappearTimerMax = 3f;
 
     private List<Collider> colliderList;
 
@@ -72,7 +73,7 @@ public class Radar : MonoBehaviour
 
     private IEnumerator colliderList_WaitThenRemove(Collider collider)
     {
-        yield return new WaitForSeconds(secondsShownOnMap);
+        yield return new WaitForSeconds(disappearTimerMax);
         colliderList.Remove(collider);
     }
 
