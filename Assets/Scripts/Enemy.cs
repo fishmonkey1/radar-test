@@ -10,36 +10,35 @@ using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
-    [SerializeField] private float Radius = 20;
-    [SerializeField] private bool Debug_Bool;
+    [SerializeField] private float NextMoveRadius = 20;
 
     NavMeshAgent Agent;
 
-    public Dictionary<string, float> status;
+    public Dictionary<string, float> statusDict;
 
-    Vector3 next_pos;
+    Vector3 nextPosition;
 
     private void Start()
     {
         Agent = GetComponent<NavMeshAgent>();
 
-        next_pos = transform.position;
+        nextPosition = transform.position;
 
-        status = new Dictionary<string, float>();
+        statusDict = new Dictionary<string, float>();
 
-        status.Add("color", 0f); // all are green, unless they are red
-        if (GetComponent<Renderer>().material.name == "red (Instance)") status["color"] = 1f;
+        statusDict.Add("color", 0f); // all are green, unless they are red
+        if (GetComponent<Renderer>().material.name == "red (Instance)") statusDict["color"] = 1f;
 
-        status.Add("isVisible", 1f); // so we can set it as invisible to radar
+        statusDict.Add("isVisible", 1f); // so we can set it as invisible to radar in the future
     }
 
     private void Update()
-    {   
+    {
         // move randomly
-        if (Vector3.Distance(next_pos, transform.position) <= 1.5f)
+        if (Vector3.Distance(nextPosition, transform.position) <= 1.5f)
         {
-            next_pos = randomPointsGen.randomPoint(transform.position, Radius);
-            Agent.SetDestination(next_pos);
+            nextPosition = randomPointsGen.randomPoint(transform.position, NextMoveRadius);
+            Agent.SetDestination(nextPosition);
         }
     }
 }
