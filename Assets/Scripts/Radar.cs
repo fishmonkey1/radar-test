@@ -6,42 +6,30 @@ public class Radar : MonoBehaviour
 {
 
     [SerializeField] Transform radar;
+    [SerializeField] GameObject MinimapIcon;
+    [SerializeField] LayerMask layerMask;
     [SerializeField] float rotationsPerMinute = 10.0f;
     [SerializeField] public float secondsShownOnMap = 3f;
     [SerializeField] public float disappearTimerMax = 3f;
 
-    private List<Collider> colliderList;
+    // List to track what the Raycast has collided with
+    // so that we do not get multiple hits on the same object
+    // as it passes over it.
+    private List<Collider> collidedList;
+
+    // Dictionary containing current radar blips
+    // and when placed on radar
+    // so we can fade them
+    private Dictionary<GameObject, float> currentBlipsDict;
 
     private void Awake()
     {
-        colliderList = new List<Collider>();
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-
+        collidedList = new List<Collider>();
+        currentBlipsDict = new Dictionary<GameObject, float>();
     }
 
     void FixedUpdate()
     {
-        // This is just the documentation code I'll get back to this lol
-        // Bit shift the index of the layer (8) to get a bit mask
-        int layerMask = 1 << 8;
-        // This would cast rays only against colliders in layer 8.
-        // But instead we want to collide against everything except layer 8. The ~ operator does this, it inverts a bitmask.
-        layerMask = ~layerMask;
-
-        // wat?
-
-        // Does the ray intersect any objects excluding the player layer
         RaycastHit[] hits;
         hits = Physics.RaycastAll(radar.position, radar.TransformDirection(Vector3.forward), 100f, layerMask);
         Debug.DrawRay(radar.position, radar.TransformDirection(Vector3.forward) * 100f, Color.black);
@@ -53,28 +41,84 @@ public class Radar : MonoBehaviour
 
              if (hit.collider != null)
              {
-                if (!colliderList.Contains(hit.collider))
+                if (!collidedList.Contains(hit.collider)) 
                 {
-                    colliderList.Add(hit.collider);
-                    hit.collider.gameObject.SendMessage("pingOnRadar");
-                    StartCoroutine(colliderList_WaitThenRemove(hit.collider));
+                    collidedList.Add(hit.collider);
+                    var ship = hit.collider.GetComponent<Enemy>();
+                    if (ship != null)
+                    {
+                        Dictionary<string, float> status = ship.status;
+                        
+                        if (status["isVisible"] == 1f) // may be hidden from radar temporarily
+                        {
+                            Vector3 location = hit.collider.transform.position;
+                            pingOnRadar(status, location);
+                        }
+                    }
+
+                    StartCoroutine(collidedList_WaitThenRemove(hit.collider));
                 }
             }
 
             
         }
+
+        // This handles fading for each ping
+        foreach (KeyValuePair<GameObject,float> blip in currentBlipsDict)
+        {   
+
+        }
         
-            
-
         radar.Rotate(0, 6.0f * rotationsPerMinute * Time.deltaTime, 0);
+    }
 
+    private void pingOnRadar(Dictionary<string, float> status, Vector3 location)
+    {
+        GameObject icon;
+        icon = (GameObject)Instantiate(MinimapIcon, location, Quaternion.Euler(new Vector3(90, 0, 0)));
+        if (status["color"] == 0f)
+        {
+            icon.GetComponent<SpriteRenderer>().color = Color.green;
+        } else icon.GetComponent<SpriteRenderer>().color = Color.red;
+
+        icon.SetActive(true);
+        currentBlipsDict.Add(icon,Time.fixedTime);
+
+        StartCoroutine(icon_WaitThenRemove(icon));
 
     }
 
-    private IEnumerator colliderList_WaitThenRemove(Collider collider)
+    private IEnumerator collidedList_WaitThenRemove(Collider collider)
     {
         yield return new WaitForSeconds(disappearTimerMax);
-        colliderList.Remove(collider);
+        collidedList.Remove(collider);
+    }
+
+    private IEnumerator icon_WaitThenRemove(GameObject blip)
+    {
+        yield return new WaitForSeconds(disappearTimerMax);
+        Destroy(blip);
     }
 
 }
+
+/* TODO:
+ * This is yoinked from Enemy.cs to be implemented later
+ * 
+  if (isPinged) // if currently showing on radar
+    { 
+        // increment timer for the ping's duration
+        disappearTimer += Time.deltaTime;
+
+        color.a = Mathf.Lerp(status["fadeTime"], 0f, disappearTimer / status["fadeTime"]);
+        spriteRenderer.color = color; // set new color for ping, based on duration
+
+        // clean up once it is gone
+        if (disappearTimer >= status["fadeTime"])
+        {
+            Destroy(clone);
+            status["isPinged"] = 0f;
+            disappearTimer = 0f;
+        }
+
+    }*/
