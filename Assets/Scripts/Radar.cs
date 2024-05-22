@@ -42,7 +42,7 @@ public class Radar : MonoBehaviour
                 if (!collidedList.Contains(hit.collider))
                 {
                     collidedList.Add(hit.collider);
-                    var ship = hit.collider.GetComponent<Enemy>();
+                    var ship = hit.collider.GetComponent<MoveRandom>(); //this will be Enemy not MoveRandom
                     if (ship != null)
                     {
                         Dictionary<string, float> status = ship.statusDict;
