@@ -123,6 +123,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &27094094 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8687109601607067569, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
+  m_PrefabInstance: {fileID: 687607726}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &36009021
 GameObject:
   m_ObjectHideFlags: 0
@@ -241,6 +246,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &438734258 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3874276035562254469, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
+  m_PrefabInstance: {fileID: 687607726}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &504806539
 GameObject:
   m_ObjectHideFlags: 0
@@ -367,6 +377,10 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 3874276035562254469, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6848301515651613131, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -407,9 +421,41 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7584480826729024162, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
+      propertyPath: radar
+      value: 
+      objectReference: {fileID: 1383037230}
+    - target: {fileID: 7584480826729024162, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
+      propertyPath: radarCamera
+      value: 
+      objectReference: {fileID: 27094094}
+    - target: {fileID: 7584480826729024162, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
+      propertyPath: playerCamera
+      value: 
+      objectReference: {fileID: 1882665728}
+    - target: {fileID: 8178606806573348177, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
+      propertyPath: zoom2_y
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 8178606806573348177, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
+      propertyPath: zoom3_y
+      value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 8178606806573348177, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
+      propertyPath: Player_MinimapIcon
+      value: 
+      objectReference: {fileID: 438734258}
+    - target: {fileID: 8550449110423651400, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 8550449110423651400, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -10
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8687109601607067569, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
+      propertyPath: m_Name
+      value: Radar Camera
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -661,6 +707,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3c98599b5d69ad4fb72bd07a1794444, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1383037230 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3051098778403432392, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
+  m_PrefabInstance: {fileID: 687607726}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1496923850
 GameObject:
   m_ObjectHideFlags: 0
@@ -733,6 +784,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1496923850}
   m_CullTransparentMesh: 1
+--- !u!1 &1882665728 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1527196590102736545, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
+  m_PrefabInstance: {fileID: 687607726}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

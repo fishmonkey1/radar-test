@@ -5,6 +5,7 @@ using UnityEngine;
 public class Radar : MonoBehaviour
 {
     [SerializeField] Transform radar;
+    [SerializeField] public GameObject Player_MinimapIcon;
     [SerializeField] GameObject MinimapIcon;
     [SerializeField] LayerMask layerMask;
     [SerializeField] float rotationsPerMinute = 10.0f;
@@ -19,6 +20,15 @@ public class Radar : MonoBehaviour
     // and when placed on radar
     // so we can fade them
     public Dictionary<GameObject, float> currentBlipsDict;
+
+    // PlayerMove.cs grabs these at runtime.
+    [Header("radar camera Y value zoom settings")]
+    [Tooltip("Default 40")] [SerializeField] public float zoom1_y = 40;
+    [Tooltip("Default 50")] [SerializeField] public float zoom2_y = 50;
+    [Tooltip("Default 60")] [SerializeField] public float zoom3_y = 60;
+
+    public float blipScale = 10; // The prefab has a scale of 10.
+                                 // I probs wouldn't go lower than that
 
     private void Awake()
     {
@@ -98,16 +108,23 @@ public class Radar : MonoBehaviour
 
     private void pingOnRadar(Dictionary<string, float> status, Vector3 location)
     {
-        GameObject icon;
-        icon = (GameObject)Instantiate(MinimapIcon, location, Quaternion.Euler(new Vector3(90, 0, 0)));
+        GameObject blip = (GameObject)Instantiate(MinimapIcon, location, Quaternion.Euler(new Vector3(90, 0, 0)));
+        
+        // Set Color
         if (status["color"] == 0f)
         {
-            icon.GetComponent<SpriteRenderer>().color = Color.green;
+            blip.GetComponent<SpriteRenderer>().color = Color.green;
         }
-        else icon.GetComponent<SpriteRenderer>().color = Color.red;
+        else blip.GetComponent<SpriteRenderer>().color = Color.red;
 
-        icon.SetActive(true);
-        currentBlipsDict.Add(icon, Time.fixedTime);
+        // Set Scale
+        blip.transform.localScale = new Vector3(blipScale, blipScale, blipScale);
+
+        // Set to Visible when ready
+        blip.SetActive(true);
+
+        // Add to currently tracked blips dict
+        currentBlipsDict.Add(blip, Time.fixedTime);
     }
 
     private IEnumerator collidedList_WaitThenRemove(Collider collider) 

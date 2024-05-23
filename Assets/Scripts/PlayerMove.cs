@@ -9,14 +9,31 @@ public class PlayerMove : MonoBehaviour
 	[SerializeField] GameObject radar;
 	[SerializeField] private float speed = 10.0f;
 
+	// Y levels for the radar camera
+	private float zoom1_y;
+	private float zoom2_y;
+	private float zoom3_y;
+
+	private float zoom1_scale;
+	private float zoom2_scale;
+	private float zoom3_scale;
+
 	private int radarZoomLevel; // 1-3, 3 most zoomed out
 
     private void Start()
-    {	
+    {
 		//set radar to most zoomed in level
 		radarCamera.transform.position = new Vector3(0, 40, 0);
 		radarZoomLevel = 1;
-    }
+
+		// get zoom_Y levels from Radar script and calc scaling
+		zoom1_y = radar.GetComponent<Radar>().zoom1_y;
+		zoom2_y = radar.GetComponent<Radar>().zoom2_y;
+		zoom3_y = radar.GetComponent<Radar>().zoom3_y;
+		zoom1_scale = radar.GetComponent<Radar>().blipScale;
+        zoom2_scale = zoom1_scale + (zoom1_scale * (((zoom2_y - zoom1_y) / zoom1_y)));
+		zoom3_scale = zoom1_scale + (zoom1_scale * (((zoom3_y - zoom1_y) / zoom1_y)));
+	}
 
     void Update()
 	{
@@ -51,18 +68,16 @@ public class PlayerMove : MonoBehaviour
 
 		radar icons start scaled at 10 for Y40.
 		Then need to be scaled at 12.5 for Y50.
-		Then need to be scaled at 15 for Y60.
-
-		 */
+		Then need to be scaled at 15 for Y60. */
 
 
 		if (Input.GetKey(KeyCode.Alpha1))
 		{
 			if (radarZoomLevel != 1)
 			{
-				radarCamera.transform.position = new Vector3(0, 40, 0);
+				radarCamera.transform.position = new Vector3(0, zoom1_y, 0);
 				radarZoomLevel = 1;
-				changeRadarIconScale(10f);
+				changeRadarIconScale(zoom1_scale);
 			}
 		}
 
@@ -70,9 +85,9 @@ public class PlayerMove : MonoBehaviour
 		{
 			if (radarZoomLevel != 2)
             {
-                radarCamera.transform.position = new Vector3(0, 50, 0);
+                radarCamera.transform.position = new Vector3(0, zoom2_y, 0);
 				radarZoomLevel = 2;
-				changeRadarIconScale(12.5f);
+				changeRadarIconScale(zoom2_scale);
 			}
         }
 
@@ -80,25 +95,37 @@ public class PlayerMove : MonoBehaviour
 		{
 			if (radarZoomLevel != 3)
             {
-                radarCamera.transform.position = new Vector3(0, 60, 0);
+                radarCamera.transform.position = new Vector3(0, zoom3_y, 0);
 				radarZoomLevel = 3;
-				changeRadarIconScale(15f);
+				changeRadarIconScale(zoom3_scale);
 			}
         }
 
     }
 
-	private void changeRadarIconScale(float newScale)
-    {	
-		// Tell radar to start placing w/ new scale
+	private void calulateScales() // just using this for testing
+    {
+		float perc_2 = ( ( (zoom2_y - zoom1_y) / zoom1_y));
+		float perc_3 = ( ( (zoom3_y - zoom1_y) / zoom1_y));
 
-		// Get currentBlipsDict from Radar
+		zoom2_scale = zoom1_scale + (zoom1_scale * perc_2);
+		zoom3_scale = zoom1_scale + (zoom1_scale * perc_3);
+	}
+
+	private void changeRadarIconScale(float newScale)
+    {
+		// Tell radar to start placing w/ new scale
+		radar.GetComponent<Radar>().blipScale = newScale;
+
+		// Change player scale
+		radar.GetComponent<Radar>().Player_MinimapIcon.transform.localScale = new Vector3(newScale, newScale, newScale);
+
+		// Get currentBlipsDict from Radar, and change all to new scale
 		var currentBlipsDict = radar.GetComponent<Radar>().currentBlipsDict;
 
 		foreach (KeyValuePair<GameObject, float> blip in currentBlipsDict)
 		{
-			var obj = blip.Key;
-			obj.transform.localScale = new Vector3(newScale, newScale, newScale);
+			blip.Key.transform.localScale = new Vector3(newScale, newScale, newScale);
 		}
 	
 	
