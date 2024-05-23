@@ -32,14 +32,16 @@ public class Radar : MonoBehaviour
         hits = Physics.RaycastAll(radar.position, radar.TransformDirection(Vector3.forward), 100f, layerMask);
         Debug.DrawRay(radar.position, radar.TransformDirection(Vector3.forward) * 100f, Color.black);
 
-        // Raycasts, gets ship info, pings radar 
+        // Raycasts, gets ship info, pings radar blip if applicable
         for (int i = 0; i < hits.Length; i++)
         {
             RaycastHit hit = hits[i];
 
             if (hit.collider != null)
             {
-                if (!collidedList.Contains(hit.collider))
+                // we're checking this so we don't
+                // get multiple hits per object as it passes
+                if (!collidedList.Contains(hit.collider)) 
                 {
                     collidedList.Add(hit.collider);
                     var ship = hit.collider.GetComponent<MoveRandom>(); //this will be Enemy not MoveRandom
@@ -47,7 +49,7 @@ public class Radar : MonoBehaviour
                     {
                         Dictionary<string, float> status = ship.statusDict;
 
-                        if (status["isVisible"] == 1f) // may be hidden from radar temporarily
+                        if (status["isVisible"] == 1f) // ship may be hidden from radar temporarily
                         {
                             Vector3 location = hit.collider.transform.position;
                             pingOnRadar(status, location);
@@ -60,7 +62,7 @@ public class Radar : MonoBehaviour
         }
 
 
-        List<GameObject> toDeleteFromDict = new List<GameObject>();
+        List<GameObject> toDeleteFromDict = new List<GameObject>(); 
 
         // This handles fading for each ping
         foreach (KeyValuePair<GameObject, float> blip in currentBlipsDict)
@@ -82,7 +84,7 @@ public class Radar : MonoBehaviour
             }
         }
 
-        // Delete destroyed blip objects from Dictionary (can't remove while iterating)
+        // Delete destroyed blip objects from Dictionary (can't remove while iterating Dict)
         foreach (GameObject blipObject in toDeleteFromDict)
         {
             currentBlipsDict.Remove(blipObject);
