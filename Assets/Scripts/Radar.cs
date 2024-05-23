@@ -5,6 +5,8 @@ using UnityEngine;
 public class Radar : MonoBehaviour
 {
     [SerializeField] Transform radar;
+    [SerializeField] GameObject playerCamera;
+    [SerializeField] GameObject radarCamera;
     [SerializeField] public GameObject Player_MinimapIcon;
     [SerializeField] GameObject MinimapIcon;
     [SerializeField] LayerMask layerMask;
@@ -21,11 +23,16 @@ public class Radar : MonoBehaviour
     // so we can fade them
     public Dictionary<GameObject, float> currentBlipsDict;
 
-    // PlayerMove.cs grabs these at runtime.
     [Header("radar camera Y value zoom settings")]
     [Tooltip("Default 40")] [SerializeField] public float zoom1_y = 40;
     [Tooltip("Default 50")] [SerializeField] public float zoom2_y = 50;
     [Tooltip("Default 60")] [SerializeField] public float zoom3_y = 60;
+
+    private float zoom1_scale;
+    private float zoom2_scale;
+    private float zoom3_scale;
+
+    private int radarZoomLevel; // 1-3, 3 most zoomed out
 
     public float blipScale = 10; // The prefab has a scale of 10.
                                  // I probs wouldn't go lower than that
@@ -34,10 +41,16 @@ public class Radar : MonoBehaviour
     {
         collidedList = new List<Collider>();
         currentBlipsDict = new Dictionary<GameObject, float>();
+
+        zoom1_scale = blipScale;
+        zoom2_scale = zoom1_scale + (zoom1_scale * (((zoom2_y - zoom1_y) / zoom1_y)));
+        zoom3_scale = zoom1_scale + (zoom1_scale * (((zoom3_y - zoom1_y) / zoom1_y)));
     }
 
     void FixedUpdate()
     {
+        changeZoom();
+
         RaycastHit[] hits;
         hits = Physics.RaycastAll(radar.position, radar.TransformDirection(Vector3.forward), 100f, layerMask);
         Debug.DrawRay(radar.position, radar.TransformDirection(Vector3.forward) * 100f, Color.black);
@@ -133,6 +146,61 @@ public class Radar : MonoBehaviour
         collidedList.Remove(collider);
     }
 
+    private void changeZoom()
+    {
+        /* Get % increase of start zoom (Y40) to new zoom.
+           So Y50 would be a 25% increase from Y40, 
+           so we would scale up icons by that much.
+
+           radar icons start scaled at 10 for Y40.
+           Then need to be scaled at 12.5 for Y50.
+           Then need to be scaled at 15 for Y60. */
+
+        if (Input.GetKey(KeyCode.Alpha1))
+        {
+            if (radarZoomLevel != 1)
+            {
+                radarCamera.transform.position = new Vector3(0, zoom1_y, 0);
+                radarZoomLevel = 1;
+                changeRadarIconScale(zoom1_scale);
+            }
+        }
+
+        if (Input.GetKey(KeyCode.Alpha2))
+        {
+            if (radarZoomLevel != 2)
+            {
+                radarCamera.transform.position = new Vector3(0, zoom2_y, 0);
+                radarZoomLevel = 2;
+                changeRadarIconScale(zoom2_scale);
+            }
+        }
+
+        if (Input.GetKey(KeyCode.Alpha3))
+        {
+            if (radarZoomLevel != 3)
+            {
+                radarCamera.transform.position = new Vector3(0, zoom3_y, 0);
+                radarZoomLevel = 3;
+                changeRadarIconScale(zoom3_scale);
+            }
+        }
+    }
+
+    private void changeRadarIconScale(float newScale)
+    {
+        // Tell radar to start placing w/ new scale
+        blipScale = newScale;
+
+        // Change player scale
+        Player_MinimapIcon.transform.localScale = new Vector3(newScale, newScale, newScale);
+
+        foreach (KeyValuePair<GameObject, float> blip in currentBlipsDict)
+        {
+            blip.Key.transform.localScale = new Vector3(newScale, newScale, newScale);
+        }
+
+
+    }
+
 }
-
-

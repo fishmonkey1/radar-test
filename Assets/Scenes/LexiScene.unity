@@ -442,6 +442,14 @@ PrefabInstance:
       value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 8178606806573348177, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
+      propertyPath: radarCamera
+      value: 
+      objectReference: {fileID: 27094094}
+    - target: {fileID: 8178606806573348177, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
+      propertyPath: playerCamera
+      value: 
+      objectReference: {fileID: 1882665728}
+    - target: {fileID: 8178606806573348177, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
       propertyPath: Player_MinimapIcon
       value: 
       objectReference: {fileID: 438734258}
