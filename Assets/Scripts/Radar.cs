@@ -4,14 +4,30 @@ using UnityEngine;
 
 public class Radar : MonoBehaviour
 {
+    [Header("Radar Dependencies")]
     [SerializeField] Transform radar;
     [SerializeField] GameObject playerCamera;
     [SerializeField] GameObject radarCamera;
-    [SerializeField] public GameObject Player_MinimapIcon;
+    [SerializeField] GameObject Player_MinimapIcon;
+    [SerializeField] LineRenderer radarSweepLine;
+    [SerializeField] GameObject SweepLine;
     [SerializeField] GameObject MinimapIcon;
+
+    [Tooltip("The mask the radar is on. Should stay on Minimap")]
     [SerializeField] LayerMask layerMask;
-    [SerializeField] float rotationsPerMinute = 10.0f;
-    [SerializeField] public float disappearTimerMax = 3f;
+
+    [Header("Radar Settings")]
+    [Range(1f, 45f)] [SerializeField] float rotationsPerMinute = 10.0f;
+    [Range(.02f, 5f)] [SerializeField] public float disappearTimerMax = 3f;
+    [Range(.1f, 1f)] [SerializeField] public float sweepLineWidth = .5f;
+    [SerializeField] private Color sweepLineColor;
+    [Range (.1f,1f)][SerializeField] private float sweepLineOpacity = 1f;
+
+    [Header("radar camera Y value zoom settings")]
+    [Header("(just for debug till we find good values)")]
+    [Tooltip("Default 40")] [SerializeField] public float zoom1_y = 40;
+    [Tooltip("Default 50")] [SerializeField] public float zoom2_y = 50;
+    [Tooltip("Default 60")] [SerializeField] public float zoom3_y = 60;
 
     // List to track what the Raycast has collided with
     // so that we do not get multiple hits on the same object
@@ -23,19 +39,14 @@ public class Radar : MonoBehaviour
     // so we can fade them
     public Dictionary<GameObject, float> currentBlipsDict;
 
-    [Header("radar camera Y value zoom settings")]
-    [Tooltip("Default 40")] [SerializeField] public float zoom1_y = 40;
-    [Tooltip("Default 50")] [SerializeField] public float zoom2_y = 50;
-    [Tooltip("Default 60")] [SerializeField] public float zoom3_y = 60;
-
-    private float zoom1_scale;
-    private float zoom2_scale;
-    private float zoom3_scale;
-
-    private int radarZoomLevel; // 1-3, 3 most zoomed out
-
     public float blipScale = 10; // The prefab has a scale of 10.
                                  // I probs wouldn't go lower than that
+
+    private float zoom1_scale; // these are set automatically
+    private float zoom2_scale; // based on initial blipScale and zoom_y
+    private float zoom3_scale; // value at runtime
+
+    private int radarZoomLevel; // 1-3, 3 most zoomed out
 
     private void Awake()
     {
@@ -53,8 +64,11 @@ public class Radar : MonoBehaviour
 
         RaycastHit[] hits;
         hits = Physics.RaycastAll(radar.position, radar.TransformDirection(Vector3.forward), 100f, layerMask);
-        Debug.DrawRay(radar.position, radar.TransformDirection(Vector3.forward) * 100f, Color.black);
 
+        // use for Debug
+        //Debug.DrawRay(radar.position, radar.TransformDirection(Vector3.forward) * 100f, Color.black);
+        DrawSweepLine(); // draws line on radar screen
+        
         // Raycasts, gets ship info, pings radar blip if applicable
         for (int i = 0; i < hits.Length; i++)
         {
@@ -202,5 +216,27 @@ public class Radar : MonoBehaviour
 
 
     }
+
+    private void DrawSweepLine()
+    {   
+        // TODO: get a calculated  kength for the line
+        //       I just have it going for 50 units
+
+        // set width
+        radarSweepLine.startWidth = sweepLineWidth;
+        radarSweepLine.endWidth = sweepLineWidth;
+
+        //set opacity
+        sweepLineColor.a = sweepLineOpacity;
+
+        // set color
+        radarSweepLine.startColor = sweepLineColor;
+        radarSweepLine.endColor   = sweepLineColor;
+        
+        // draw the damn thing
+        radarSweepLine.SetPosition(0, transform.position);
+        radarSweepLine.SetPosition(1, radar.TransformDirection(Vector3.forward * 50));
+    }
+
 
 }
