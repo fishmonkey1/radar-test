@@ -18,7 +18,7 @@ public class Radar : MonoBehaviour
     // Dictionary containing current radar blips
     // and when placed on radar
     // so we can fade them
-    private Dictionary<GameObject, float> currentBlipsDict;
+    public Dictionary<GameObject, float> currentBlipsDict;
 
     private void Awake()
     {
