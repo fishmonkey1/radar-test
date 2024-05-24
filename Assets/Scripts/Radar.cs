@@ -21,7 +21,7 @@ public class Radar : MonoBehaviour
     [Range(.02f, 5f)] [SerializeField] public float disappearTimerMax = 3f;
     [Range(.1f, 1f)] [SerializeField] public float sweepLineWidth = .5f;
     [SerializeField] private Color sweepLineColor;
-    [Range (.1f,1f)][SerializeField] private float sweepLineOpacity = 1f;
+    [Range(.1f, 1f)] [SerializeField] private float sweepLineOpacity = 1f;
 
     [Header("radar camera Y value zoom settings")]
     [Header("(just for debug till we find good values)")]
@@ -39,8 +39,8 @@ public class Radar : MonoBehaviour
     // so we can fade them
     public Dictionary<GameObject, float> currentBlipsDict;
 
-    public float blipScale = 10; // The prefab has a scale of 10.
-                                 // I probs wouldn't go lower than that
+    public float blipScale = 10; // The prefab has a scale of 10. I wouldn't go lower than that
+
 
     private float zoom1_scale; // these are set automatically
     private float zoom2_scale; // based on initial blipScale and zoom_y
@@ -66,9 +66,9 @@ public class Radar : MonoBehaviour
         hits = Physics.RaycastAll(radar.position, radar.TransformDirection(Vector3.forward), 100f, layerMask);
 
         // use for Debug
-        //Debug.DrawRay(radar.position, radar.TransformDirection(Vector3.forward) * 100f, Color.black);
+        Debug.DrawRay(radar.position, radar.TransformDirection(Vector3.forward) * 100f, Color.black);
         DrawSweepLine(); // draws line on radar screen
-        
+
         // Raycasts, gets ship info, pings radar blip if applicable
         for (int i = 0; i < hits.Length; i++)
         {
@@ -78,7 +78,7 @@ public class Radar : MonoBehaviour
             {
                 // we're checking this so we don't
                 // get multiple hits per object as it passes
-                if (!collidedList.Contains(hit.collider)) 
+                if (!collidedList.Contains(hit.collider))
                 {
                     collidedList.Add(hit.collider);
                     var ship = hit.collider.GetComponent<MoveRandom>(); //this will be Enemy not MoveRandom
@@ -92,14 +92,14 @@ public class Radar : MonoBehaviour
                             pingOnRadar(status, location);
                         }
                     }
-                    
+
                     StartCoroutine(collidedList_WaitThenRemove(hit.collider)); //I don't love this
                 }
             }
         }
 
 
-        List<GameObject> toDeleteFromDict = new List<GameObject>(); 
+        List<GameObject> toDeleteFromDict = new List<GameObject>();
 
         // This handles fading for each ping
         foreach (KeyValuePair<GameObject, float> blip in currentBlipsDict)
@@ -130,13 +130,13 @@ public class Radar : MonoBehaviour
         }
 
         // Rotate the Radar for next frame's raycast
-        radar.Rotate(0, 6.0f * rotationsPerMinute * Time.deltaTime, 0); 
+        radar.Rotate(0, 6.0f * rotationsPerMinute * Time.deltaTime, 0);
     }
 
     private void pingOnRadar(Dictionary<string, float> status, Vector3 location)
     {
         GameObject blip = (GameObject)Instantiate(MinimapIcon, location, Quaternion.Euler(new Vector3(90, 0, 0)));
-        
+
         // Set Color
         if (status["color"] == 0f)
         {
@@ -154,12 +154,6 @@ public class Radar : MonoBehaviour
         currentBlipsDict.Add(blip, Time.fixedTime);
     }
 
-    private IEnumerator collidedList_WaitThenRemove(Collider collider) 
-    {
-        yield return new WaitForSeconds(disappearTimerMax);
-        collidedList.Remove(collider);
-    }
-
     private void changeZoom()
     {
         /* Get % increase of start zoom (Y40) to new zoom.
@@ -174,7 +168,7 @@ public class Radar : MonoBehaviour
         {
             if (radarZoomLevel != 1)
             {
-                radarCamera.transform.position = new Vector3(0, zoom1_y, 0);
+                radarCamera.transform.position = new Vector3(radarCamera.transform.position.x, zoom1_y, radarCamera.transform.position.z);
                 radarZoomLevel = 1;
                 changeRadarIconScale(zoom1_scale);
             }
@@ -184,7 +178,7 @@ public class Radar : MonoBehaviour
         {
             if (radarZoomLevel != 2)
             {
-                radarCamera.transform.position = new Vector3(0, zoom2_y, 0);
+                radarCamera.transform.position = new Vector3(radarCamera.transform.position.x, zoom2_y, radarCamera.transform.position.z);
                 radarZoomLevel = 2;
                 changeRadarIconScale(zoom2_scale);
             }
@@ -194,7 +188,7 @@ public class Radar : MonoBehaviour
         {
             if (radarZoomLevel != 3)
             {
-                radarCamera.transform.position = new Vector3(0, zoom3_y, 0);
+                radarCamera.transform.position = new Vector3(radarCamera.transform.position.x, zoom3_y, radarCamera.transform.position.z); ;
                 radarZoomLevel = 3;
                 changeRadarIconScale(zoom3_scale);
             }
@@ -209,16 +203,15 @@ public class Radar : MonoBehaviour
         // Change player scale
         Player_MinimapIcon.transform.localScale = new Vector3(newScale, newScale, newScale);
 
+        // Change each blip scale to new scale
         foreach (KeyValuePair<GameObject, float> blip in currentBlipsDict)
         {
             blip.Key.transform.localScale = new Vector3(newScale, newScale, newScale);
         }
-
-
     }
 
     private void DrawSweepLine()
-    {   
+    {
         // TODO: get a calculated  kength for the line
         //       I just have it going for 50 units
 
@@ -231,12 +224,17 @@ public class Radar : MonoBehaviour
 
         // set color
         radarSweepLine.startColor = sweepLineColor;
-        radarSweepLine.endColor   = sweepLineColor;
-        
+        radarSweepLine.endColor = sweepLineColor;
+
         // draw the damn thing
-        radarSweepLine.SetPosition(0, transform.position);
-        radarSweepLine.SetPosition(1, radar.TransformDirection(Vector3.forward * 50));
+        radarSweepLine.SetPosition(0, radar.position);
+        radarSweepLine.SetPosition(1, radar.position + radar.TransformDirection(Vector3.forward * 50));
     }
 
+    private IEnumerator collidedList_WaitThenRemove(Collider collider)
+    {
+        yield return new WaitForSeconds(disappearTimerMax);
+        collidedList.Remove(collider);
+    }
 
 }

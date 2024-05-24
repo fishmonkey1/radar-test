@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class randomPointsGen : MonoBehaviour
+public class randomPointsGen
 {
-   
    public static Vector3 randomPoint(Vector3 Start_Point, float Radius)
     {
         Vector3 Dir = Random.insideUnitSphere * Radius;
