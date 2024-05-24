@@ -19,7 +19,7 @@ public class LayerTerrain : MonoBehaviour
      */
 
     [SerializeField]
-    private Biomes biomes;
+    public Biomes biomes;
 
     //Future TODO: Standardize these naming conventions between the ProcGenTiles library and our codebase
     [SerializeField]
@@ -40,22 +40,31 @@ public class LayerTerrain : MonoBehaviour
     [SerializeField]
     private FastNoiseLite noise;
     [SerializeField]
-    private Terrain terrain; //This may become a custom mesh in the future, gotta dig up some code on it
+    public Terrain terrain; //This may become a custom mesh in the future, gotta dig up some code on it
 
     [SerializeField] public GameManager gameManager;
 
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
     private Pathfinding pathfinding;
 
+    
+
     public Dictionary<string, MapLayers> layersDict = new Dictionary<string, MapLayers>();
 
     //public Renderer targetRenderer;
 
-    private float highest_e = -100;
+    public float highest_e = -100;
     private float lowest_e = 100;
 
     public float waterheight_int;
 
+    [SerializeField] public int numberOfTopoLevels;
+
+    [Header("Topo Map Stuff")]
+    [SerializeField] private CreateTopoMap genTopo;
+    [SerializeField] public GameObject topoObject;
+    [SerializeField] public Color topoColor1;
+    [SerializeField] public Color topoColor2;
     // ----------------- DEBUG STUFF
     bool print_debug = false;
     
@@ -108,9 +117,11 @@ public class LayerTerrain : MonoBehaviour
         //biomes.GenerateBiomes();
         CreateTerrainFromHeightmap();
         pathfinding.LandWaterFloodfill(0, 0, biomes);
-        
+
+        genTopo.createTopoTextures(0,0,X,Y, false);
+
         //pathfinding.MarkAllRegions(); // turned off until optimized
-        
+
         if (print_debug)
         {
             Debug.Log($"Number of regions marked: {pathfinding.regionSizes.Keys.Count}");
@@ -128,7 +139,10 @@ public class LayerTerrain : MonoBehaviour
         terrainData.size = new Vector3(X, depth, Y);
         terrainData.heightmapResolution = X + 1;
         terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
+        
+        // For now keep, but will be kicked off to topography script for coloring soon
         ApplyTextures(0,0,terrainData.alphamapHeight, terrainData.alphamapWidth, false);
+        
     }
 
     public void ApplyTextures(int start_x, int start_y, int end_x, int end_y, bool deform)
@@ -185,6 +199,10 @@ public class LayerTerrain : MonoBehaviour
     
     }
        
+   
+   
+
+
     public void ReadNoiseParams(NoiseParams noiseParams) //STAYS
     {
         //Read the noise info from the MapLayer and set all of the FastNoiseLite fields here
