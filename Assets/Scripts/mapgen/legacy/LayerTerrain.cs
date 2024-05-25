@@ -47,7 +47,7 @@ public class LayerTerrain : MonoBehaviour
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
     private Pathfinding pathfinding;
 
-    
+
 
     public Dictionary<string, MapLayers> layersDict = new Dictionary<string, MapLayers>();
 
@@ -61,15 +61,16 @@ public class LayerTerrain : MonoBehaviour
     [SerializeField] public int numberOfTopoLevels;
 
     [Header("Topo Map Stuff")]
-    [SerializeField] private CreateTopoMap genTopo;
+    [SerializeField] public CreateTopoMap genTopo;
     [SerializeField] public GameObject topoObject;
     [SerializeField] public Color topoColor1;
     [SerializeField] public Color topoColor2;
+    [SerializeField] public bool makeTerrainTextureTopo = true;
     // ----------------- DEBUG STUFF
     bool print_debug = false;
-    
 
-    
+
+
 
     public void Awake()
     {
@@ -79,8 +80,8 @@ public class LayerTerrain : MonoBehaviour
     }
 
     public void GenerateBiome() // MOVE
-    {   
-     for (int i = 0; i < moistureLayers.NoisePairs.Count; i++)
+    {
+        for (int i = 0; i < moistureLayers.NoisePairs.Count; i++)
         {
             MapNoisePair pair = moistureLayers.NoisePairs[i];
             if (pair.UseJsonFile)
@@ -118,7 +119,9 @@ public class LayerTerrain : MonoBehaviour
         CreateTerrainFromHeightmap();
         pathfinding.LandWaterFloodfill(0, 0, biomes);
 
-        genTopo.createTopoTextures(0,0,X,Y, false);
+        //genTopo.createTopoTextures(0, 0, X, Y, false);
+        // For now keep, but will be kicked off to topography script for coloring soon
+        ApplyTextures(0, 0, X, Y, false);
 
         //pathfinding.MarkAllRegions(); // turned off until optimized
 
@@ -130,7 +133,7 @@ public class LayerTerrain : MonoBehaviour
                 Debug.Log($"Region {i} contains {pathfinding.regionSizes[i]} tiles");
             }
         }
-        
+
     }
 
     public void CreateTerrainFromHeightmap()
@@ -139,68 +142,90 @@ public class LayerTerrain : MonoBehaviour
         terrainData.size = new Vector3(X, depth, Y);
         terrainData.heightmapResolution = X + 1;
         terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
-        
-        // For now keep, but will be kicked off to topography script for coloring soon
-        ApplyTextures(0,0,terrainData.alphamapHeight, terrainData.alphamapWidth, false);
-        
+
     }
 
     public void ApplyTextures(int start_x, int start_y, int end_x, int end_y, bool deform)
     {
+        //load in textures
+        gameManager.LoadTerrainTextures();
+
         TerrainData terrainData = terrain.terrainData;
-        float[,,] splatmapData = new float[end_x-start_x, end_y-start_y, terrainData.alphamapLayers]; //Black magic fuckery, investigate more later
-        for (int y = start_y; y < end_y; y++)
+        float[,,] splatmapData = new float[end_x - start_x, end_y - start_y, terrainData.alphamapLayers]; //Black magic fuckery, investigate more later
+        
+
+        
+
+        if (makeTerrainTextureTopo)
         {
-            for (int x = start_x; x < end_x; x++)
+            float[] splatWeights = new float[terrainData.alphamapLayers];
+            string name = "";
+            foreach (KeyValuePair<string, int> kvp in gameManager.texturesDict) name = kvp.Key;
+            Debug.Log("texturesDict key: "+name);
+            splatWeights[gameManager.texturesDict[name]] = 1.0f;
+
+            // Loop through each terrain texture
+            for (int i = 0; i < terrainData.alphamapLayers; i++)
             {
-                float elevation = finalMap.GetTile(x, y).ValuesHere[LayersEnum.Elevation];
-                float moisture = finalMap.GetTile(x, y).ValuesHere[LayersEnum.Moisture]; 
-
-                // Setup an array to record the mix of texture weights at this point
-                // TODO: see LoadTextures(), need to make TerrainLayer for each texture, so that it is added to the terrainData as a useable layer.
-                float[] splatWeights = new float[terrainData.alphamapLayers];
-
-                biome(); //sets the biome
-
-                // Work in progress don't @ me
-                void biome()
+                // Assign this point to the splatmap array
+                splatmapData[start_x, start_y, i] = splatWeights[i];
+            }
+        }
+        else
+        {
+            //old way - needs rewrite this is such a stuipid way to do this lmao
+            for (int y = start_y; y < end_y; y++)
+            {
+                for (int x = start_x; x < end_x; x++)
                 {
-                    //if (elevation <= biomes.AllBiomes.values[0].value) { SetTexture("Water"); return; };
-                    if (elevation < biomes.AllBiomes.values[1].value) { SetTexture("Sand"); return; };
+                    float elevation = finalMap.GetTile(x, y).ValuesHere[LayersEnum.Elevation];
+                    float moisture = finalMap.GetTile(x, y).ValuesHere[LayersEnum.Moisture];
 
-                    if (elevation < biomes.AllBiomes.values[2].value) //if in grass band
+                    // Setup an array to record the mix of texture weights at this point
+                    // TODO: see LoadTextures(), need to make TerrainLayer for each texture, so that it is added to the terrainData as a useable layer.
+                    float[] splatWeights = new float[terrainData.alphamapLayers];
+
+                    biome(); //sets the biome
+
+                    // Work in progress don't @ me
+                    void biome()
                     {
-                        if (moisture < .25f)
+                        //if (elevation <= biomes.AllBiomes.values[0].value) { SetTexture("Water"); return; };
+                        if (elevation < biomes.AllBiomes.values[1].value) { SetTexture("Sand"); return; };
+
+                        if (elevation < biomes.AllBiomes.values[2].value) //if in grass band
                         {
-                            SetTexture("Dirt"); return;
+                            if (moisture < .25f)
+                            {
+                                SetTexture("Dirt"); return;
+                            }
+                            SetTexture("Grass"); return; // else set to grass
+                        };
+
+                        if (elevation < biomes.AllBiomes.values[3].value) { SetTexture("Snow"); return; }; //snow
+
+                        void SetTexture(string name)
+                        {
+                            splatWeights[gameManager.texturesDict[name]] = 1.0f;
                         }
-                        SetTexture("Grass"); return; // else set to grass
-                    };
-
-                    if (elevation < biomes.AllBiomes.values[3].value) { SetTexture("Snow"); return; }; //snow
-
-                    void SetTexture(string name)
-                    {
-                        splatWeights[gameManager.texturesDict[name]] = 1.0f;
                     }
-                }
 
-                // Loop through each terrain texture
-                for (int i = 0; i < terrainData.alphamapLayers; i++)
-                {
-                    // Assign this point to the splatmap array
-                    splatmapData[x-start_x, y-start_y, i] = splatWeights[i];
+                    // Loop through each terrain texture
+                    for (int i = 0; i < terrainData.alphamapLayers; i++)
+                    {
+                        // Assign this point to the splatmap array
+                        splatmapData[x - start_x, y - start_y, i] = splatWeights[i];
+                    }
                 }
             }
         }
         terrainData.SetAlphamaps(start_y, start_x, splatmapData); //I have a feeling that this is what is making this function so slow. Need to profile it
 
-        
-    
+
     }
-       
-   
-   
+
+
+
 
 
     public void ReadNoiseParams(NoiseParams noiseParams) //STAYS
@@ -239,7 +264,7 @@ public class LayerTerrain : MonoBehaviour
                     tile.ValuesHere[layer] = noiseValue;
                 else
                     tile.ValuesHere.Add(layer, noiseValue);
- 
+
                 Tile finalTile = finalMap.GetTile(x, y);
 
                 if (finalTile.ValuesHere.ContainsKey(layer))
@@ -273,7 +298,7 @@ public class LayerTerrain : MonoBehaviour
             for (int y = 0; y < Y; y++)
             {
                 Tile finalTile = finalMap.GetTile(x, y);
-                
+
                 // just for debug
                 if (finalTile.ValuesHere[layer] < lowest) lowest = finalTile.ValuesHere[layer];
                 if (finalTile.ValuesHere[layer] > highest) highest = finalTile.ValuesHere[layer];
@@ -297,7 +322,7 @@ public class LayerTerrain : MonoBehaviour
             }
         }
 
-        
+
 
         if (print_debug)
         {
@@ -309,8 +334,8 @@ public class LayerTerrain : MonoBehaviour
     public void UpdateTerrainHeightmap(int xBase, int yBase, float[,] heightmap) //MOVE?
     { //This might need work to instead mark the terrain as dirty until all deform operations are done, and THEN we set the heights
         terrain.terrainData.SetHeights(xBase, yBase, heightmap); //Fuck you SetHeights, why do you pretend like I can update regions with the xBase and yBase when you actually suck?
-                                                                 
-                                                                 //Because fuck you, that's why! >:)
+
+        //Because fuck you, that's why! >:)
     }
 
     public void SerializeNoiseParamsToJson() //MOVE

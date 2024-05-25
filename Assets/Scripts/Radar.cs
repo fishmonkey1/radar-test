@@ -56,6 +56,8 @@ public class Radar : MonoBehaviour
         zoom1_scale = blipScale;
         zoom2_scale = zoom1_scale + (zoom1_scale * (((zoom2_y - zoom1_y) / zoom1_y)));
         zoom3_scale = zoom1_scale + (zoom1_scale * (((zoom3_y - zoom1_y) / zoom1_y)));
+
+        radarCamera.transform.position = new Vector3(radarCamera.transform.position.x, zoom1_y, radarCamera.transform.position.z);
     }
 
     void FixedUpdate()
@@ -69,39 +71,42 @@ public class Radar : MonoBehaviour
         Debug.DrawRay(radar.position, radar.TransformDirection(Vector3.forward) * 100f, Color.black);
         DrawSweepLine(); // draws line on radar screen
 
-        // Raycasts, gets ship info, pings radar blip if applicable
-        for (int i = 0; i < hits.Length; i++)
-        {
-            RaycastHit hit = hits[i];
 
-            if (hit.collider != null)
-            {
-                // we're checking this so we don't
-                // get multiple hits per object as it passes
-                if (!collidedList.Contains(hit.collider))
+        /*        handled by OnTriggerEnter
+                // Raycasts, gets ship info, pings radar blip if applicable
+                for (int i = 0; i < hits.Length; i++)
                 {
-                    collidedList.Add(hit.collider);
-                    var ship = hit.collider.GetComponent<MoveRandom>(); //this will be Enemy not MoveRandom
-                    if (ship != null)
-                    {
-                        Dictionary<string, float> status = ship.statusDict;
+                    RaycastHit hit = hits[i];
 
-                        if (status["isVisible"] == 1f) // ship may be hidden from radar temporarily
+                    if (hit.collider != null)
+                    {
+                        // we're checking this so we don't
+                        // get multiple hits per object as it passes
+                        if (!collidedList.Contains(hit.collider))
                         {
-                            Vector3 location = hit.collider.transform.position;
-                            pingOnRadar(status, location);
+                            collidedList.Add(hit.collider);
+                            var ship = hit.collider.GetComponent<MoveRandom>(); //this will be Enemy not MoveRandom
+                            if (ship != null)
+                            {
+                                Dictionary<string, float> status = ship.statusDict;
+
+                                if (status["isVisible"] == 1f) // ship may be hidden from radar temporarily
+                                {
+                                    Vector3 location = hit.collider.transform.position;
+                                    pingOnRadar(status, location);
+                                }
+                            }
+
+                            StartCoroutine(collidedList_WaitThenRemove(hit.collider)); //I don't love this
                         }
                     }
-
-                    StartCoroutine(collidedList_WaitThenRemove(hit.collider)); //I don't love this
                 }
-            }
-        }
+        */
 
 
-        List<GameObject> toDeleteFromDict = new List<GameObject>();
 
         // This handles fading for each ping
+        List<GameObject> toDeleteFromDict = new List<GameObject>();
         foreach (KeyValuePair<GameObject, float> blip in currentBlipsDict)
         {
             GameObject blipObject = blip.Key;
@@ -132,6 +137,33 @@ public class Radar : MonoBehaviour
         // Rotate the Radar for next frame's raycast
         radar.Rotate(0, 6.0f * rotationsPerMinute * Time.deltaTime, 0);
     }
+
+    void OnTriggerEnter(Collider collider)
+    {
+        //Output the Collider's position
+        //Debug.Log(collider.transform.position);
+
+        // we're checking this so we don't
+        // get multiple hits per object as it passes
+        if (!collidedList.Contains(collider))
+        {
+            collidedList.Add(collider);
+            var ship = collider.GetComponent<MoveRandom>(); //this will be Enemy not MoveRandom
+            if (ship != null)
+            {
+                Dictionary<string, float> status = ship.statusDict;
+
+                if (status["isVisible"] == 1f) // ship may be hidden from radar temporarily
+                {
+                    Vector3 location = collider.transform.position;
+                    pingOnRadar(status, location);
+                }
+            }
+
+            StartCoroutine(collidedList_WaitThenRemove(collider)); //I don't love this
+        }
+    }
+
 
     private void pingOnRadar(Dictionary<string, float> status, Vector3 location)
     {
@@ -164,6 +196,9 @@ public class Radar : MonoBehaviour
            Then need to be scaled at 12.5 for Y50.
            Then need to be scaled at 15 for Y60. */
 
+        // scroll radar w/ mouse wheel
+        radarCamera.transform.position += new Vector3(0, Input.mouseScrollDelta.y *10, 0);
+ 
         if (Input.GetKey(KeyCode.Alpha1))
         {
             if (radarZoomLevel != 1)

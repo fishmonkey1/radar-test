@@ -7,79 +7,73 @@ using UnityEngine.AI;
 
 public class GameManager: MonoBehaviour
 {
-    [SerializeField]
-    private LayerTerrain layerTerrain;
-
-    [SerializeField]
-    private Biomes biomes;
-
-/*    private int X;
-    private int Y;*/
-  
-    [SerializeField]
-    private Terrain terrain; //This may become a custom mesh in the future, gotta dig up some code on it
+    [SerializeField] private LayerTerrain layerTerrain;
+    [SerializeField] private Biomes biomes;
+    [SerializeField] private Terrain terrain;
 
     public Dictionary<string, int> texturesDict = new Dictionary<string, int>();
-
 
     public void Awake()
     {
         if (terrain == null)
             terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
-
-        LoadTextures();
-
+      
         layerTerrain.layersDict.Add(LayersEnum.Elevation, layerTerrain.elevationLayers);
         layerTerrain.layersDict.Add(LayersEnum.Moisture, layerTerrain.moistureLayers);
-
         layerTerrain.GenerateTerrain();
-        
+
     }
 
-    public void LoadTextures()
+    public void LoadTerrainTextures()
     {
-        DirectoryInfo dir = new DirectoryInfo("Assets/Textures_and_Models/Resources/TerrainTextures/png");
-        FileInfo[] info = dir.GetFiles("*.png"); //don't get the meta files
-        int index = 0;
+        DirectoryInfo dir;
         List<TerrainLayer> layers = new List<TerrainLayer>();
-        foreach (FileInfo file in info)
+
+        // need to make topo map first and create layer
+        layerTerrain.genTopo.createTopoTextures(0, 0, layerTerrain.X, layerTerrain.Y, false);
+
+        if (!layerTerrain.makeTerrainTextureTopo)
         {
-            string fileName = Path.GetFileNameWithoutExtension(file.FullName);
+            dir = new DirectoryInfo("Assets/Textures_and_Models/Resources/TerrainTextures/png");
 
-            // Resources.Load() needs a 'Resources' folder, that's where it starts the search.
-            string location_from_Resources_folder = "TerrainTextures/layers/";
-            TerrainLayer texture = Resources.Load<TerrainLayer>(location_from_Resources_folder + fileName);
-            layers.Add(texture);
-            texturesDict.Add(fileName, index);
-            index++;
-        }
-        terrain.terrainData.terrainLayers = layers.ToArray();
-    }
-
-
-/*    public void LoadEnemyBoats()
-    {
-        // keep trying random points 
-        // until we have X (numberOfEnemies) amount of Vector3 points for boats in the enemyBoatLoadPositions list
-        while (enemyBoatLoadPositions.Count < numberOfEnemies)
-        {
-            int randomX = Random.Range(0, X);
-            int randomY = Random.Range(0, Y);
-            Vector3 randomPoint = new Vector3(randomY, waterHeight, randomX);
-
-            if (layerTerrain.finalMap.GetTile(randomX, randomY).ValuesHere["Land"] == 0)
+            FileInfo[] info = dir.GetFiles("*.png"); //don't get the meta files
+            int index = 0;
+            
+            foreach (FileInfo file in info)
             {
-                enemyBoatLoadPositions.Add(randomPoint);
+                string fileName = Path.GetFileNameWithoutExtension(file.FullName);
+
+                // Resources.Load() needs a 'Resources' folder, that's where it starts the search.
+                string location_from_Resources_folder = "TerrainTextures/layers/";
+                TerrainLayer texture = Resources.Load<TerrainLayer>(location_from_Resources_folder + fileName);
+                layers.Add(texture);
+                texturesDict.Add(fileName, index);
+                index++;
             }
-
         }
-
-        for (int i = 0; i < enemyBoatLoadPositions.Count; i++)
+        else
         {
-            Instantiate(enemyBoat, enemyBoatLoadPositions[i], new Quaternion(0, 0, 0, 0), terrain.transform);
+            //layerTerrain.genTopo.createTopoTextures(0, 0, layerTerrain.X, layerTerrain.Y, false);
+            dir = new DirectoryInfo("Assets/Textures_and_Models/Resources/TerrainTextures/topo/layers/");
+            FileInfo[] info = dir.GetFiles("*.terrainlayer"); //don't get the meta files
+            int index = 0;
+            foreach (FileInfo file in info)
+            {   
+                string fileName = Path.GetFileNameWithoutExtension(file.FullName);
+                Debug.Log("file name: "+fileName);
+
+                // Resources.Load() needs a 'Resources' folder, that's where it starts the search.
+                string location_from_Resources_folder = "TerrainTextures/topo/layers/";
+                TerrainLayer texture = Resources.Load<TerrainLayer>(location_from_Resources_folder + fileName);
+                layers.Add(texture);
+
+                texturesDict.Add(fileName, index);
+                index++;
+            }
         }
-    }*/
-
-
+        
+        terrain.terrainData.terrainLayers = layers.ToArray(); //set new layers
+        terrain.terrainData.RefreshPrototypes();
+    }
 }
 

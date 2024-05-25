@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7651620387641101686}
   - component: {fileID: 7483962558241308446}
   - component: {fileID: 7975982934200861989}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: GreenEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -169,5 +169,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33e0f862e290e2e489e9f0ffb7e6fd04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Radius: 10
-  Debug_Bool: 0
+  NextMoveRadius: 20
