@@ -19,15 +19,16 @@ public class Radar : MonoBehaviour
     [Header("Radar Settings")]
     [Range(1f, 45f)] [SerializeField] float rotationsPerMinute = 10.0f;
     [Range(.02f, 5f)] [SerializeField] public float disappearTimerMax = 3f;
-    [Range(.1f, 1f)] [SerializeField] public float sweepLineWidth = .5f;
+    [Range(-50, -1)] [SerializeField] private int sweepLineUnderCameraOffset = -5;
+    [Range(.01f, 1f)] [SerializeField] public float sweepLineWidth = .5f;
     [SerializeField] private Color sweepLineColor;
     [Range(.1f, 1f)] [SerializeField] private float sweepLineOpacity = 1f;
 
     [Header("radar camera Y value zoom settings")]
     [Header("(just for debug till we find good values)")]
-    [Tooltip("Default 40")] [SerializeField] public float zoom1_y = 40;
-    [Tooltip("Default 50")] [SerializeField] public float zoom2_y = 50;
-    [Tooltip("Default 60")] [SerializeField] public float zoom3_y = 60;
+    [Tooltip("Default 75")] [SerializeField] public float zoom1_y = 75;
+    [Tooltip("Default 125")] [SerializeField] public float zoom2_y = 125;
+    [Tooltip("Default 175")] [SerializeField] public float zoom3_y = 175;
 
     // List to track what the Raycast has collided with
     // so that we do not get multiple hits on the same object
@@ -140,18 +141,15 @@ public class Radar : MonoBehaviour
 
     void OnTriggerEnter(Collider collider)
     {
-        //Output the Collider's position
-        //Debug.Log(collider.transform.position);
-
         // we're checking this so we don't
         // get multiple hits per object as it passes
         if (!collidedList.Contains(collider))
         {
             collidedList.Add(collider);
-            var ship = collider.GetComponent<MoveRandom>(); //this will be Enemy not MoveRandom
-            if (ship != null)
+            var enemy = collider.GetComponent<MoveRandom>(); //this will be Enemy not MoveRandom
+            if (enemy != null)
             {
-                Dictionary<string, float> status = ship.statusDict;
+                Dictionary<string, float> status = enemy.statusDict;
 
                 if (status["isVisible"] == 1f) // ship may be hidden from radar temporarily
                 {
@@ -262,8 +260,13 @@ public class Radar : MonoBehaviour
         radarSweepLine.endColor = sweepLineColor;
 
         // draw the damn thing
-        radarSweepLine.SetPosition(0, radar.position);
-        radarSweepLine.SetPosition(1, radar.position + radar.TransformDirection(Vector3.forward * 50));
+        /*  Gonna set it to under the camera instead of on the boat.
+         Vector3 linepos = radarCamera.transform.position + new Vector3(0, sweepLineUnderCameraOffset, 0); //offset to under the radar camera
+         radarSweepLine.SetPosition(0, linepos);
+         radarSweepLine.SetPosition(1, linepos + radar.TransformDirection(Vector3.forward * 50));
+         */
+        radarSweepLine.SetPosition(0, radar.transform.position);
+        radarSweepLine.SetPosition(1, radar.transform.position + radar.TransformDirection(Vector3.forward * 50));
     }
 
     private IEnumerator collidedList_WaitThenRemove(Collider collider)
