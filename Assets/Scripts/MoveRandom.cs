@@ -6,13 +6,14 @@ using UnityEngine.AI;
 // This is causing:
 // 'Can't remove NavMeshAgent because move_random (Script) depends on it' error
 // when trying to destroy itself
-[RequireComponent(typeof(NavMeshAgent))]
+
 
 public class MoveRandom : MonoBehaviour
 {
     [SerializeField] private float NextMoveRadius = 20;
+    [SerializeField] private float speed;
 
-    NavMeshAgent Agent;
+
 
     public Dictionary<string, float> statusDict;
 
@@ -20,7 +21,7 @@ public class MoveRandom : MonoBehaviour
 
     private void Start()
     {
-        Agent = GetComponent<NavMeshAgent>();
+
 
         nextPosition = transform.position;
 
@@ -38,7 +39,10 @@ public class MoveRandom : MonoBehaviour
         if (Vector3.Distance(nextPosition, transform.position) <= 1.5f)
         {
             nextPosition = randomPointsGen.randomPoint(transform.position, NextMoveRadius);
-            Agent.SetDestination(nextPosition);
+            var step = speed * Time.deltaTime; // calculate distance to move
+            transform.position = Vector3.MoveTowards(transform.position, nextPosition, step);
+
+
         }
     }
 }

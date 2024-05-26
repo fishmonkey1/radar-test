@@ -157,7 +157,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layerTerrain: {fileID: 18269053}
   biomes: {fileID: 18269052}
-  ll: {fileID: 18269054}
+  GreenEnemyPrefab: {fileID: 4150585140477163999, guid: df339b76912b51140afb10d5a293bc64, type: 3}
+  RedEnemyPrefab: {fileID: 128191738815701424, guid: 6f2aac000228dfc46818ea9d8e8af776, type: 3}
+  PlayerPrefab: {fileID: 0}
+  numOfGreen: 10
+  numOfRed: 10
 --- !u!4 &18269051
 Transform:
   m_ObjectHideFlags: 0

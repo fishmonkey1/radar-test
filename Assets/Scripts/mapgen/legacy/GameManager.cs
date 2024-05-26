@@ -2,6 +2,7 @@ using UnityEngine;
 
 using System.IO;
 using System.Collections.Generic;
+using UnityEngine.AI;
 
 
 
@@ -10,9 +11,15 @@ public class GameManager: MonoBehaviour
     [SerializeField] private LayerTerrain layerTerrain;
     [SerializeField] private Biomes biomes;
 
-    [SerializeField] private LoadLevel ll;
 
     public Dictionary<string, int> texturesDict = new Dictionary<string, int>();
+    [Header("Enemy Settings")]
+    [SerializeField] GameObject GreenEnemyPrefab;
+    [SerializeField] GameObject RedEnemyPrefab;
+    [SerializeField] GameObject PlayerPrefab;
+    [SerializeField] int numOfGreen = 10;
+    [SerializeField] int numOfRed = 10;
+    public static List<Vector3> enemyLoadPositions = new List<Vector3>();
 
     public void Awake()
     {
@@ -26,7 +33,7 @@ public class GameManager: MonoBehaviour
         layerTerrain.layersDict.Add(LayersEnum.Moisture, layerTerrain.moistureLayers);
         layerTerrain.GenerateTerrain(); // runs all of layerTerrain's stuff
 
-        ll.LoadEnemies(); //spawnb in enemies once terrain is made
+        LoadEnemies(); //spawnb in enemies once terrain is made
         
     }
 
@@ -46,6 +53,8 @@ public class GameManager: MonoBehaviour
         TerrainData terrainData = new TerrainData();
         GameObject terrainGO = Terrain.CreateTerrainGameObject(terrainData);
         GameObject terrainInstance = Instantiate(terrainGO);
+
+        
         layerTerrain.terrain = terrainInstance.GetComponent<Terrain>();
 
         if (layerTerrain.terrain == null)
@@ -110,5 +119,33 @@ public class GameManager: MonoBehaviour
         layerTerrain.terrain.terrainData.terrainLayers = layers.ToArray(); //set new layers
         layerTerrain.terrain.terrainData.RefreshPrototypes();
     }
+
+    public void LoadEnemies()
+    {
+        List<Vector3> points = new List<Vector3>();
+
+        /*while (navmeshPoints.Count < numOfGreen + numOfRed)
+        {
+            NavMeshHit hit;
+            Vector3 randomPoint = new Vector3(Random.Range(0, layerTerrain.X - 1), 1.5f, Random.Range(0, layerTerrain.Y - 1));
+            if (NavMesh.SamplePosition(randomPoint, out hit, 25, 1))
+            {
+                navmeshPoints.Add(hit.position);
+            }
+        }*/
+        Vector3 randomPoint = new Vector3(Random.Range(0, layerTerrain.X - 1), layerTerrain.depth+5, Random.Range(0, layerTerrain.Y - 1));
+        int count = 0;
+        for (int i = 0; i < numOfGreen; i++)
+        {
+            Instantiate(GreenEnemyPrefab, randomPoint, new Quaternion(0, 0, 0, 0));
+            count += 1;
+        }
+        for (int i = 0; i < numOfRed; i++)
+        {
+            Instantiate(RedEnemyPrefab, randomPoint, new Quaternion(0, 0, 0, 0));
+            count += 1;
+        }
+    }
+
 }
 
