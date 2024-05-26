@@ -20,12 +20,6 @@ public class LoadLevel : MonoBehaviour
 
     public static List<Vector3> enemyLoadPositions = new List<Vector3>();
 
-    void Start()
-    {
-        LoadEnemies();
-    }
-
-
     public void LoadEnemies()
     {
         List<Vector3> navmeshPoints = new List<Vector3>();

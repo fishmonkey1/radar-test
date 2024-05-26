@@ -10,8 +10,7 @@ public class GameManager: MonoBehaviour
     [SerializeField] private LayerTerrain layerTerrain;
     [SerializeField] private Biomes biomes;
 
-
-    public Terrain terrain;
+    [SerializeField] private LoadLevel ll;
 
     public Dictionary<string, int> texturesDict = new Dictionary<string, int>();
 
@@ -21,11 +20,13 @@ public class GameManager: MonoBehaviour
         //     terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
 
         Debug.Log("Running GameManager");
-        LoadTerrainPrefab();
+        LoadTerrainPrefab(); // create Terrain obj instance
 
         layerTerrain.layersDict.Add(LayersEnum.Elevation, layerTerrain.elevationLayers);
         layerTerrain.layersDict.Add(LayersEnum.Moisture, layerTerrain.moistureLayers);
-        layerTerrain.GenerateTerrain();
+        layerTerrain.GenerateTerrain(); // runs all of layerTerrain's stuff
+
+        ll.LoadEnemies(); //spawnb in enemies once terrain is made
         
     }
 
@@ -47,11 +48,11 @@ public class GameManager: MonoBehaviour
         GameObject terrainInstance = Instantiate(terrainGO);
         layerTerrain.terrain = terrainInstance.GetComponent<Terrain>();
 
-        if (terrain == null)
+        if (layerTerrain.terrain == null)
         {
             Debug.Log("Unable to create Terrain object.");
         }
-        else Debug.Log("Created Terrain Object:   " + terrain);
+        else Debug.Log("Created Terrain Object:   " + layerTerrain.terrain);
         
 
         
@@ -105,9 +106,9 @@ public class GameManager: MonoBehaviour
                 index++;
             }
         }
-        
-        terrain.terrainData.terrainLayers = layers.ToArray(); //set new layers
-        terrain.terrainData.RefreshPrototypes();
+
+        layerTerrain.terrain.terrainData.terrainLayers = layers.ToArray(); //set new layers
+        layerTerrain.terrain.terrainData.RefreshPrototypes();
     }
 }
 

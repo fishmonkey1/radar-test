@@ -77,6 +77,7 @@ public class LayerTerrain : MonoBehaviour
 
 
         if (terrain == null) Debug.Log("layerTerrain has no terrain obj");//Should already be assigned, but nab it otherwise
+        Debug.Log(terrain);
     }
 
     public void GenerateBiome() // MOVE
@@ -142,7 +143,7 @@ public class LayerTerrain : MonoBehaviour
     public void CreateTerrainFromHeightmap()
     {
         Debug.Log("Creating Terrain Surface From Heightmap");
-        terrainData = gameManager.terrain.terrainData;
+        terrainData = terrain.terrainData;
         terrainData.size = new Vector3(X, depth, Y);
         terrainData.heightmapResolution = X + 1;
         terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<

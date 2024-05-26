@@ -135,6 +135,7 @@ GameObject:
   - component: {fileID: 18269050}
   - component: {fileID: 18269053}
   - component: {fileID: 18269052}
+  - component: {fileID: 18269054}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -156,7 +157,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layerTerrain: {fileID: 18269053}
   biomes: {fileID: 18269052}
-  terrain: {fileID: 0}
+  ll: {fileID: 18269054}
 --- !u!4 &18269051
 Transform:
   m_ObjectHideFlags: 0
@@ -280,6 +281,24 @@ MonoBehaviour:
   topoColor1: {r: 0.8773585, g: 0.85167515, b: 0.55869526, a: 1}
   topoColor2: {r: 0.19215687, g: 0.6392157, b: 0.32941177, a: 1}
   makeTerrainTextureTopo: 0
+--- !u!114 &18269054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 18269049}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3629bb01ffa409047b7f8dc315df9f84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  layerTerrain: {fileID: 0}
+  GreenEnemyPrefab: {fileID: 4150585140477163999, guid: df339b76912b51140afb10d5a293bc64, type: 3}
+  RedEnemyPrefab: {fileID: 128191738815701424, guid: 6f2aac000228dfc46818ea9d8e8af776, type: 3}
+  PlayerPrefab: {fileID: 2205331970571292687, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
+  numOfGreen: 50
+  numOfRed: 50
 --- !u!1 &36009021
 GameObject:
   m_ObjectHideFlags: 0
@@ -343,56 +362,6 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &95131906
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 95131908}
-  - component: {fileID: 95131907}
-  m_Layer: 0
-  m_Name: LoadLevel
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &95131907
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 95131906}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3629bb01ffa409047b7f8dc315df9f84, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  layerTerrain: {fileID: 0}
-  GreenEnemyPrefab: {fileID: 4150585140477163999, guid: df339b76912b51140afb10d5a293bc64, type: 3}
-  RedEnemyPrefab: {fileID: 128191738815701424, guid: 6f2aac000228dfc46818ea9d8e8af776, type: 3}
-  PlayerPrefab: {fileID: 2205331970571292687, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
-  numOfGreen: 50
-  numOfRed: 50
---- !u!4 &95131908
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 95131906}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -7.6335325, y: 0, z: -6.500581}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1035,7 +1004,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 705507995}
-  - {fileID: 95131908}
   - {fileID: 18269051}
   - {fileID: 1174790583}
   - {fileID: 36009024}
