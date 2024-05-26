@@ -1,31 +1,65 @@
 using UnityEngine;
-using ProcGenTiles;
-using System.Linq;
+
 using System.IO;
 using System.Collections.Generic;
-using UnityEngine.AI;
+
+
 
 public class GameManager: MonoBehaviour
 {
     [SerializeField] private LayerTerrain layerTerrain;
     [SerializeField] private Biomes biomes;
-    [SerializeField] private Terrain terrain;
+
+
+    public Terrain terrain;
 
     public Dictionary<string, int> texturesDict = new Dictionary<string, int>();
 
     public void Awake()
     {
-        if (terrain == null)
-            terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
-      
+        // if (terrain == null)
+        //     terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
+
+        Debug.Log("Running GameManager");
+        LoadTerrainPrefab();
+
         layerTerrain.layersDict.Add(LayersEnum.Elevation, layerTerrain.elevationLayers);
         layerTerrain.layersDict.Add(LayersEnum.Moisture, layerTerrain.moistureLayers);
         layerTerrain.GenerateTerrain();
+        
+    }
 
+  /*  public void OnDestroy()
+    {
+        string tl_dir = "Assets/Textures_and_Models/Resources/TerrainTextures/topo/layers/";
+        AssetDatabase.DeleteAsset(tl_dir + "/Topographic.terrainlayer");
+    }*/
+
+    public void LoadTerrainPrefab()
+    {
+        Debug.Log("Creating Initial Terrain Object...");
+        // Creates new terrain GameObject
+        // sets our Terrain for all of our scripts
+        // to an instance of this terrain
+
+        TerrainData terrainData = new TerrainData();
+        GameObject terrainGO = Terrain.CreateTerrainGameObject(terrainData);
+        GameObject terrainInstance = Instantiate(terrainGO);
+        layerTerrain.terrain = terrainInstance.GetComponent<Terrain>();
+
+        if (terrain == null)
+        {
+            Debug.Log("Unable to create Terrain object.");
+        }
+        else Debug.Log("Created Terrain Object:   " + terrain);
+        
+
+        
     }
 
     public void LoadTerrainTextures()
     {
+        Debug.Log("Loading Terrain Textures To Disk");
         DirectoryInfo dir;
         List<TerrainLayer> layers = new List<TerrainLayer>();
 

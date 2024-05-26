@@ -32,17 +32,17 @@ public class LayerTerrain : MonoBehaviour
     private float noiseScale; //For transforming the int coords into smaller float values to sample the noise better. Functions as zoom in effect
 
     //Assign layers from the inspector. In the future I either want ScriptableObjects that can be dragged in or JSON serialization so these don't get lost on a reset
-    [SerializeField]
-    public MapLayers elevationLayers;
-    [SerializeField]
-    public MapLayers moistureLayers;
+    [SerializeField] public MapLayers elevationLayers;
+    [SerializeField] public MapLayers moistureLayers;
 
-    [SerializeField]
-    private FastNoiseLite noise;
-    [SerializeField]
+    [SerializeField] private FastNoiseLite noise;
+
     public Terrain terrain; //This may become a custom mesh in the future, gotta dig up some code on it
+    public TerrainData terrainData;
 
     [SerializeField] public GameManager gameManager;
+
+    //public TerrainData terrainData;
 
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
     private Pathfinding pathfinding;
@@ -72,11 +72,11 @@ public class LayerTerrain : MonoBehaviour
 
 
 
-    public void Awake()
+    public void Start()
     {
-        if (terrain == null)
-            terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
-        waterheight_int = biomes.GetWaterLayer().value * depth;
+
+
+        if (terrain == null) Debug.Log("layerTerrain has no terrain obj");//Should already be assigned, but nab it otherwise
     }
 
     public void GenerateBiome() // MOVE
@@ -97,7 +97,7 @@ public class LayerTerrain : MonoBehaviour
 
     //stays
     public void GenerateTerrain()
-    {
+    {   
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
         pathfinding = new Pathfinding(finalMap); //Init the pathfinding for adjusting regions after they're created
         for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
@@ -117,7 +117,10 @@ public class LayerTerrain : MonoBehaviour
         GenerateBiome();
         //biomes.GenerateBiomes();
         CreateTerrainFromHeightmap();
-        pathfinding.LandWaterFloodfill(0, 0, biomes);
+        if (!makeTerrainTextureTopo)
+        {
+            pathfinding.LandWaterFloodfill(0, 0, biomes);
+        }
 
         //genTopo.createTopoTextures(0, 0, X, Y, false);
         // For now keep, but will be kicked off to topography script for coloring soon
@@ -138,24 +141,22 @@ public class LayerTerrain : MonoBehaviour
 
     public void CreateTerrainFromHeightmap()
     {
-        TerrainData terrainData = terrain.terrainData;
+        Debug.Log("Creating Terrain Surface From Heightmap");
+        terrainData = gameManager.terrain.terrainData;
         terrainData.size = new Vector3(X, depth, Y);
         terrainData.heightmapResolution = X + 1;
         terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
-
     }
 
     public void ApplyTextures(int start_x, int start_y, int end_x, int end_y, bool deform)
     {
+        Debug.Log("Applying Textures To Terrain");
         //load in textures
         gameManager.LoadTerrainTextures();
 
         TerrainData terrainData = terrain.terrainData;
         float[,,] splatmapData = new float[end_x - start_x, end_y - start_y, terrainData.alphamapLayers]; //Black magic fuckery, investigate more later
         
-
-        
-
         if (makeTerrainTextureTopo)
         {
             float[] splatWeights = new float[terrainData.alphamapLayers];
