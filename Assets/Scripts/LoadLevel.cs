@@ -11,6 +11,7 @@ public class LoadLevel : MonoBehaviour
     [SerializeField] LayerTerrain layerTerrain;
 
     [Header("Enemy Settings")]
+    [SerializeField] private LayerMask ground;
     [SerializeField] GameObject GreenEnemyPrefab;
     [SerializeField] GameObject RedEnemyPrefab;
     [SerializeField] GameObject PlayerPrefab;
@@ -27,7 +28,9 @@ public class LoadLevel : MonoBehaviour
         while (navmeshPoints.Count < numOfGreen + numOfRed)
         {
             NavMeshHit hit;
-            Vector3 randomPoint = new Vector3(Random.Range(0, layerTerrain.X - 1), 1.5f, Random.Range(0, layerTerrain.Y - 1));
+            Vector3 randomPoint = new Vector3(Random.Range(0, layerTerrain.X - 1), layerTerrain.depth + 5, Random.Range(0, layerTerrain.Y - 1));
+            //hit = Physics.Raycast(randomPoint, new Vector3(0,-1,0), layerTerrain.depth + 5);
+            
             if (NavMesh.SamplePosition(randomPoint, out hit, 25, 1))
             {
                 navmeshPoints.Add(hit.position);

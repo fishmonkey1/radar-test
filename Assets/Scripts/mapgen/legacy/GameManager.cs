@@ -3,6 +3,7 @@ using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine.AI;
+using UnityEditor;
 
 
 
@@ -23,13 +24,11 @@ public class GameManager: MonoBehaviour
 
     public void Awake()
     {
-        // if (terrain == null)
-        //     terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
-
         Debug.Log("Running GameManager");
-        LoadTerrainPrefab(); // create Terrain obj instance
+        AssetDatabase.DeleteAsset("Assets/Textures_and_Models/Resources/TerrainTextures/topo/layers/Topographic.terrainlayer");
+        AssetDatabase.Refresh();
+        CreateTerrainObject(); // create Terrain obj instance
 
-        
         layerTerrain.GenerateTerrain(); // runs all of layerTerrain's stuff
 
         LoadEnemies(); //spawnb in enemies once terrain is made
@@ -42,7 +41,7 @@ public class GameManager: MonoBehaviour
         AssetDatabase.DeleteAsset(tl_dir + "/Topographic.terrainlayer");
     }*/
 
-    public void LoadTerrainPrefab()
+    public void CreateTerrainObject()
     {
         Debug.Log("Creating Initial Terrain Object...");
         // Creates new terrain GameObject

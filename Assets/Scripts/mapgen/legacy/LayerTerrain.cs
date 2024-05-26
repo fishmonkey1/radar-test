@@ -152,6 +152,7 @@ public class LayerTerrain : MonoBehaviour
         terrainData.heightmapResolution = X + 1;
         terrainData.size = new Vector3(X, depth, Y);
         terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
+        
     }
 
     public void ApplyTextures(int start_x, int start_y, int end_x, int end_y, bool deform)
@@ -227,6 +228,7 @@ public class LayerTerrain : MonoBehaviour
             }
         }
         terrainData.SetAlphamaps(start_y, start_x, splatmapData); //I have a feeling that this is what is making this function so slow. Need to profile it
+        terrainData.RefreshPrototypes();
 
 
     }

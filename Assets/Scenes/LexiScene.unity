@@ -298,6 +298,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   layerTerrain: {fileID: 0}
+  ground:
+    serializedVersion: 2
+    m_Bits: 0
   GreenEnemyPrefab: {fileID: 4150585140477163999, guid: df339b76912b51140afb10d5a293bc64, type: 3}
   RedEnemyPrefab: {fileID: 128191738815701424, guid: 6f2aac000228dfc46818ea9d8e8af776, type: 3}
   PlayerPrefab: {fileID: 2205331970571292687, guid: 54d177f7af0576a4a9f86a51419671d8, type: 3}
