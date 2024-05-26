@@ -71,7 +71,11 @@ public class LayerTerrain : MonoBehaviour
 
 
 
-
+    public void Awake()
+    {
+        layersDict.Add(LayersEnum.Elevation, elevationLayers);
+        layersDict.Add(LayersEnum.Moisture, moistureLayers);
+    }
     public void Start()
     {
 
@@ -144,8 +148,9 @@ public class LayerTerrain : MonoBehaviour
     {
         Debug.Log("Creating Terrain Surface From Heightmap");
         terrainData = terrain.terrainData;
-        terrainData.size = new Vector3(X, depth, Y);
+        terrainData.alphamapResolution = X + 1;
         terrainData.heightmapResolution = X + 1;
+        terrainData.size = new Vector3(X, depth, Y);
         terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
     }
 

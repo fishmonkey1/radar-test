@@ -29,8 +29,7 @@ public class GameManager: MonoBehaviour
         Debug.Log("Running GameManager");
         LoadTerrainPrefab(); // create Terrain obj instance
 
-        layerTerrain.layersDict.Add(LayersEnum.Elevation, layerTerrain.elevationLayers);
-        layerTerrain.layersDict.Add(LayersEnum.Moisture, layerTerrain.moistureLayers);
+        
         layerTerrain.GenerateTerrain(); // runs all of layerTerrain's stuff
 
         LoadEnemies(); //spawnb in enemies once terrain is made
@@ -52,10 +51,11 @@ public class GameManager: MonoBehaviour
 
         TerrainData terrainData = new TerrainData();
         GameObject terrainGO = Terrain.CreateTerrainGameObject(terrainData);
-        GameObject terrainInstance = Instantiate(terrainGO);
+        //GameObject terrainInstance = Instantiate(terrainGO);
 
         
-        layerTerrain.terrain = terrainInstance.GetComponent<Terrain>();
+        layerTerrain.terrain = terrainGO.GetComponent<Terrain>();
+       
 
         if (layerTerrain.terrain == null)
         {
