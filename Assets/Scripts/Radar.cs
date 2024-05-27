@@ -69,7 +69,7 @@ public class Radar : MonoBehaviour
         hits = Physics.RaycastAll(radar.position, radar.TransformDirection(Vector3.forward), 100f, layerMask);
 
         // use for Debug
-        Debug.DrawRay(radar.position, radar.TransformDirection(Vector3.forward) * 100f, Color.black);
+        //Debug.DrawRay(radar.position, radar.TransformDirection(Vector3.forward) * 100f, Color.black);
         DrawSweepLine(); // draws line on radar screen
 
 

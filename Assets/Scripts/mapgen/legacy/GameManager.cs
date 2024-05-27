@@ -15,12 +15,14 @@ public class GameManager: MonoBehaviour
 
     public Dictionary<string, int> texturesDict = new Dictionary<string, int>();
     [Header("Enemy Settings")]
-    [SerializeField] GameObject GreenEnemyPrefab;
-    [SerializeField] GameObject RedEnemyPrefab;
+    [SerializeField] public GameObject GreenEnemyPrefab;
+    [SerializeField] public GameObject RedEnemyPrefab;
     [SerializeField] GameObject PlayerPrefab;
     [SerializeField] int numOfGreen = 10;
     [SerializeField] int numOfRed = 10;
     public static List<Vector3> enemyLoadPositions = new List<Vector3>();
+
+    
 
     public void Awake()
     {
@@ -35,11 +37,7 @@ public class GameManager: MonoBehaviour
         
     }
 
-  /*  public void OnDestroy()
-    {
-        string tl_dir = "Assets/Textures_and_Models/Resources/TerrainTextures/topo/layers/";
-        AssetDatabase.DeleteAsset(tl_dir + "/Topographic.terrainlayer");
-    }*/
+
 
     public void CreateTerrainObject()
     {
@@ -50,9 +48,10 @@ public class GameManager: MonoBehaviour
 
         TerrainData terrainData = new TerrainData();
         GameObject terrainGO = Terrain.CreateTerrainGameObject(terrainData);
+        terrainGO.layer = LayerMask.NameToLayer("Terrain");
         //GameObject terrainInstance = Instantiate(terrainGO);
 
-        
+
         layerTerrain.terrain = terrainGO.GetComponent<Terrain>();
        
 
