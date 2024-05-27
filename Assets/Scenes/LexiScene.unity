@@ -950,6 +950,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6254653454235699705, guid: 3b48ccf84b6a90b4eb9c8eec600abbb4, type: 3}
+      propertyPath: maxSpeed
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 6254653454235699705, guid: 3b48ccf84b6a90b4eb9c8eec600abbb4, type: 3}
+      propertyPath: turnAngleMin
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 6254653454235699705, guid: 3b48ccf84b6a90b4eb9c8eec600abbb4, type: 3}
+      propertyPath: decceleration
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8145815548147361805, guid: 3b48ccf84b6a90b4eb9c8eec600abbb4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 256
