@@ -19,15 +19,16 @@ public class Radar : MonoBehaviour
     [Header("Radar Settings")]
     [Range(1f, 45f)] [SerializeField] float rotationsPerMinute = 10.0f;
     [Range(.02f, 5f)] [SerializeField] public float disappearTimerMax = 3f;
-    [Range(.1f, 1f)] [SerializeField] public float sweepLineWidth = .5f;
+    [Range(-50, -1)] [SerializeField] private int sweepLineUnderCameraOffset = -5;
+    [Range(.01f, 1f)] [SerializeField] public float sweepLineWidth = .5f;
     [SerializeField] private Color sweepLineColor;
     [Range(.1f, 1f)] [SerializeField] private float sweepLineOpacity = 1f;
 
     [Header("radar camera Y value zoom settings")]
     [Header("(just for debug till we find good values)")]
-    [Tooltip("Default 40")] [SerializeField] public float zoom1_y = 40;
-    [Tooltip("Default 50")] [SerializeField] public float zoom2_y = 50;
-    [Tooltip("Default 60")] [SerializeField] public float zoom3_y = 60;
+    [Tooltip("Default 75")] [SerializeField] public float zoom1_y = 75;
+    [Tooltip("Default 125")] [SerializeField] public float zoom2_y = 125;
+    [Tooltip("Default 175")] [SerializeField] public float zoom3_y = 175;
 
     // List to track what the Raycast has collided with
     // so that we do not get multiple hits on the same object
@@ -56,6 +57,8 @@ public class Radar : MonoBehaviour
         zoom1_scale = blipScale;
         zoom2_scale = zoom1_scale + (zoom1_scale * (((zoom2_y - zoom1_y) / zoom1_y)));
         zoom3_scale = zoom1_scale + (zoom1_scale * (((zoom3_y - zoom1_y) / zoom1_y)));
+
+        radarCamera.transform.position = new Vector3(radarCamera.transform.position.x, zoom1_y, radarCamera.transform.position.z);
     }
 
     void FixedUpdate()
@@ -66,42 +69,45 @@ public class Radar : MonoBehaviour
         hits = Physics.RaycastAll(radar.position, radar.TransformDirection(Vector3.forward), 100f, layerMask);
 
         // use for Debug
-        Debug.DrawRay(radar.position, radar.TransformDirection(Vector3.forward) * 100f, Color.black);
+        //Debug.DrawRay(radar.position, radar.TransformDirection(Vector3.forward) * 100f, Color.black);
         DrawSweepLine(); // draws line on radar screen
 
-        // Raycasts, gets ship info, pings radar blip if applicable
-        for (int i = 0; i < hits.Length; i++)
-        {
-            RaycastHit hit = hits[i];
 
-            if (hit.collider != null)
-            {
-                // we're checking this so we don't
-                // get multiple hits per object as it passes
-                if (!collidedList.Contains(hit.collider))
+        /*        handled by OnTriggerEnter
+                // Raycasts, gets ship info, pings radar blip if applicable
+                for (int i = 0; i < hits.Length; i++)
                 {
-                    collidedList.Add(hit.collider);
-                    var ship = hit.collider.GetComponent<MoveRandom>(); //this will be Enemy not MoveRandom
-                    if (ship != null)
-                    {
-                        Dictionary<string, float> status = ship.statusDict;
+                    RaycastHit hit = hits[i];
 
-                        if (status["isVisible"] == 1f) // ship may be hidden from radar temporarily
+                    if (hit.collider != null)
+                    {
+                        // we're checking this so we don't
+                        // get multiple hits per object as it passes
+                        if (!collidedList.Contains(hit.collider))
                         {
-                            Vector3 location = hit.collider.transform.position;
-                            pingOnRadar(status, location);
+                            collidedList.Add(hit.collider);
+                            var ship = hit.collider.GetComponent<MoveRandom>(); //this will be Enemy not MoveRandom
+                            if (ship != null)
+                            {
+                                Dictionary<string, float> status = ship.statusDict;
+
+                                if (status["isVisible"] == 1f) // ship may be hidden from radar temporarily
+                                {
+                                    Vector3 location = hit.collider.transform.position;
+                                    pingOnRadar(status, location);
+                                }
+                            }
+
+                            StartCoroutine(collidedList_WaitThenRemove(hit.collider)); //I don't love this
                         }
                     }
-
-                    StartCoroutine(collidedList_WaitThenRemove(hit.collider)); //I don't love this
                 }
-            }
-        }
+        */
 
 
-        List<GameObject> toDeleteFromDict = new List<GameObject>();
 
         // This handles fading for each ping
+        List<GameObject> toDeleteFromDict = new List<GameObject>();
         foreach (KeyValuePair<GameObject, float> blip in currentBlipsDict)
         {
             GameObject blipObject = blip.Key;
@@ -132,6 +138,30 @@ public class Radar : MonoBehaviour
         // Rotate the Radar for next frame's raycast
         radar.Rotate(0, 6.0f * rotationsPerMinute * Time.deltaTime, 0);
     }
+
+    void OnTriggerEnter(Collider collider)
+    {
+        // we're checking this so we don't
+        // get multiple hits per object as it passes
+        if (!collidedList.Contains(collider))
+        {
+            collidedList.Add(collider);
+            var enemy = collider.GetComponent<MoveRandom>(); //this will be Enemy not MoveRandom
+            if (enemy != null)
+            {
+                Dictionary<string, float> status = enemy.statusDict;
+
+                if (status["isVisible"] == 1f) // ship may be hidden from radar temporarily
+                {
+                    Vector3 location = collider.transform.position;
+                    pingOnRadar(status, location);
+                }
+            }
+
+            StartCoroutine(collidedList_WaitThenRemove(collider)); //I don't love this
+        }
+    }
+
 
     private void pingOnRadar(Dictionary<string, float> status, Vector3 location)
     {
@@ -164,6 +194,9 @@ public class Radar : MonoBehaviour
            Then need to be scaled at 12.5 for Y50.
            Then need to be scaled at 15 for Y60. */
 
+        // scroll radar w/ mouse wheel
+        radarCamera.transform.position += new Vector3(0, Input.mouseScrollDelta.y *10, 0);
+ 
         if (Input.GetKey(KeyCode.Alpha1))
         {
             if (radarZoomLevel != 1)
@@ -227,8 +260,13 @@ public class Radar : MonoBehaviour
         radarSweepLine.endColor = sweepLineColor;
 
         // draw the damn thing
-        radarSweepLine.SetPosition(0, radar.position);
-        radarSweepLine.SetPosition(1, radar.position + radar.TransformDirection(Vector3.forward * 50));
+        /*  Gonna set it to under the camera instead of on the boat.
+         Vector3 linepos = radarCamera.transform.position + new Vector3(0, sweepLineUnderCameraOffset, 0); //offset to under the radar camera
+         radarSweepLine.SetPosition(0, linepos);
+         radarSweepLine.SetPosition(1, linepos + radar.TransformDirection(Vector3.forward * 50));
+         */
+        radarSweepLine.SetPosition(0, radar.transform.position);
+        radarSweepLine.SetPosition(1, radar.transform.position + radar.TransformDirection(Vector3.forward * 50));
     }
 
     private IEnumerator collidedList_WaitThenRemove(Collider collider)

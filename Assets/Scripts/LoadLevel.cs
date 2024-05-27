@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using ProcGenTiles;
+using UnityEngine.AI;
 
 public class LoadLevel : MonoBehaviour
 {   
@@ -10,6 +11,7 @@ public class LoadLevel : MonoBehaviour
     [SerializeField] LayerTerrain layerTerrain;
 
     [Header("Enemy Settings")]
+    [SerializeField] private LayerMask ground;
     [SerializeField] GameObject GreenEnemyPrefab;
     [SerializeField] GameObject RedEnemyPrefab;
     [SerializeField] GameObject PlayerPrefab;
@@ -19,23 +21,32 @@ public class LoadLevel : MonoBehaviour
 
     public static List<Vector3> enemyLoadPositions = new List<Vector3>();
 
-    void Start()
-    {
-        LoadEnemies();
-    }
-
-
     public void LoadEnemies()
     {
+        List<Vector3> navmeshPoints = new List<Vector3>();
+
+        while (navmeshPoints.Count < numOfGreen + numOfRed)
+        {
+            NavMeshHit hit;
+            Vector3 randomPoint = new Vector3(Random.Range(0, layerTerrain.X - 1), layerTerrain.depth + 5, Random.Range(0, layerTerrain.Y - 1));
+            //hit = Physics.Raycast(randomPoint, new Vector3(0,-1,0), layerTerrain.depth + 5);
+            
+            if (NavMesh.SamplePosition(randomPoint, out hit, 25, 1))
+            {
+                navmeshPoints.Add(hit.position);
+            }
+        }
+
+        int count = 0;
         for (int i = 0; i < numOfGreen; i++)
         {
-            Vector3 randomPoint = new Vector3(Random.Range(0, layerTerrain.X-1), 1, Random.Range(0, layerTerrain.Y-1));
-            Instantiate(GreenEnemyPrefab, randomPoint, new Quaternion(0, 0, 0, 0));
+            Instantiate(GreenEnemyPrefab, navmeshPoints[count], new Quaternion(0, 0, 0, 0));
+            count += 1;
         }
         for (int i = 0; i < numOfRed; i++)
         {
-            Vector3 randomPoint = new Vector3(Random.Range(0, layerTerrain.X), 1, Random.Range(0, layerTerrain.Y));
-            Instantiate(RedEnemyPrefab, randomPoint, new Quaternion(0, 0, 0, 0));
+            Instantiate(RedEnemyPrefab, navmeshPoints[count], new Quaternion(0, 0, 0, 0));
+            count += 1;
         }
     }
 }
