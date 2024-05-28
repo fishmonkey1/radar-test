@@ -66,56 +66,58 @@ public class GameManager: MonoBehaviour
     }
 
     public void LoadTerrainTextures()
-    {
-        Debug.Log("Loading Terrain Textures To Disk");
-        DirectoryInfo dir;
-        List<TerrainLayer> layers = new List<TerrainLayer>();
-
-        // need to make topo map first and create layer
-        layerTerrain.genTopo.createTopoTextures(0, 0, layerTerrain.X, layerTerrain.Y, false);
-
-        if (!layerTerrain.makeTerrainTextureTopo)
+    {   if (!layerTerrain.DrawInEditor)
         {
-            dir = new DirectoryInfo("Assets/Textures_and_Models/Resources/TerrainTextures/png");
+            Debug.Log("Loading Terrain Textures To Disk");
+            DirectoryInfo dir;
+            List<TerrainLayer> layers = new List<TerrainLayer>();
 
-            FileInfo[] info = dir.GetFiles("*.png"); //don't get the meta files
-            int index = 0;
-            
-            foreach (FileInfo file in info)
+            // need to make topo map first and create layer
+            layerTerrain.genTopo.createTopoTextures(0, 0, layerTerrain.X, layerTerrain.Y, false);
+
+            if (!layerTerrain.makeTerrainTextureTopo)
             {
-                string fileName = Path.GetFileNameWithoutExtension(file.FullName);
+                dir = new DirectoryInfo("Assets/Textures_and_Models/Resources/TerrainTextures/png");
 
-                // Resources.Load() needs a 'Resources' folder, that's where it starts the search.
-                string location_from_Resources_folder = "TerrainTextures/layers/";
-                TerrainLayer texture = Resources.Load<TerrainLayer>(location_from_Resources_folder + fileName);
-                layers.Add(texture);
-                texturesDict.Add(fileName, index);
-                index++;
+                FileInfo[] info = dir.GetFiles("*.png"); //don't get the meta files
+                int index = 0;
+
+                foreach (FileInfo file in info)
+                {
+                    string fileName = Path.GetFileNameWithoutExtension(file.FullName);
+
+                    // Resources.Load() needs a 'Resources' folder, that's where it starts the search.
+                    string location_from_Resources_folder = "TerrainTextures/layers/";
+                    TerrainLayer texture = Resources.Load<TerrainLayer>(location_from_Resources_folder + fileName);
+                    layers.Add(texture);
+                    texturesDict.Add(fileName, index);
+                    index++;
+                }
             }
-        }
-        else
-        {
-            //layerTerrain.genTopo.createTopoTextures(0, 0, layerTerrain.X, layerTerrain.Y, false);
-            dir = new DirectoryInfo("Assets/Textures_and_Models/Resources/TerrainTextures/topo/layers/");
-            FileInfo[] info = dir.GetFiles("*.terrainlayer"); //don't get the meta files
-            int index = 0;
-            foreach (FileInfo file in info)
-            {   
-                string fileName = Path.GetFileNameWithoutExtension(file.FullName);
-                Debug.Log("file name: "+fileName);
+            else
+            {
+                //layerTerrain.genTopo.createTopoTextures(0, 0, layerTerrain.X, layerTerrain.Y, false);
+                dir = new DirectoryInfo("Assets/Textures_and_Models/Resources/TerrainTextures/topo/layers/");
+                FileInfo[] info = dir.GetFiles("*.terrainlayer"); //don't get the meta files
+                int index = 0;
+                foreach (FileInfo file in info)
+                {
+                    string fileName = Path.GetFileNameWithoutExtension(file.FullName);
+                    Debug.Log("file name: " + fileName);
 
-                // Resources.Load() needs a 'Resources' folder, that's where it starts the search.
-                string location_from_Resources_folder = "TerrainTextures/topo/layers/";
-                TerrainLayer texture = Resources.Load<TerrainLayer>(location_from_Resources_folder + fileName);
-                layers.Add(texture);
+                    // Resources.Load() needs a 'Resources' folder, that's where it starts the search.
+                    string location_from_Resources_folder = "TerrainTextures/topo/layers/";
+                    TerrainLayer texture = Resources.Load<TerrainLayer>(location_from_Resources_folder + fileName);
+                    layers.Add(texture);
 
-                texturesDict.Add(fileName, index);
-                index++;
+                    texturesDict.Add(fileName, index);
+                    index++;
+                }
             }
-        }
 
-        layerTerrain.terrain.terrainData.terrainLayers = layers.ToArray(); //set new layers
-        layerTerrain.terrain.terrainData.RefreshPrototypes();
+            layerTerrain.terrain.terrainData.terrainLayers = layers.ToArray(); //set new layers
+            layerTerrain.terrain.terrainData.RefreshPrototypes();
+        }
     }
 
     public void LoadEnemies()

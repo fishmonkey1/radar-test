@@ -47,6 +47,16 @@ public class LayerTerrain : MonoBehaviour
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
     private Pathfinding pathfinding;
 
+    [Header("Editor research")]
+    [SerializeField] ResearchMapGenerator rmg;
+    public bool DrawInEditor;
+    public bool autoUpdate;
+
+    /*
+     run Generate
+     */
+
+
 
 
     public Dictionary<string, MapLayers> layersDict = new Dictionary<string, MapLayers>();
@@ -101,7 +111,7 @@ public class LayerTerrain : MonoBehaviour
     }
 
     //stays
-    public void GenerateTerrain()
+    public void GenerateTerrain() //main entry
     {   
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
         pathfinding = new Pathfinding(finalMap); //Init the pathfinding for adjusting regions after they're created
@@ -129,7 +139,11 @@ public class LayerTerrain : MonoBehaviour
 
         //genTopo.createTopoTextures(0, 0, X, Y, false);
         // For now keep, but will be kicked off to topography script for coloring soon
-        ApplyTextures(0, 0, X, Y, false);
+        if (!DrawInEditor)
+        {
+            ApplyTextures(0, 0, X, Y, false);
+        }
+        
 
         //pathfinding.MarkAllRegions(); // turned off until optimized
 
@@ -146,13 +160,14 @@ public class LayerTerrain : MonoBehaviour
 
     public void CreateTerrainFromHeightmap()
     {
-        Debug.Log("Creating Terrain Surface From Heightmap");
-        terrainData = terrain.terrainData;
-        terrainData.alphamapResolution = X + 1;
-        terrainData.heightmapResolution = X + 1;
-        terrainData.size = new Vector3(X, depth, Y);
-        terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
-        
+        if (!DrawInEditor) {
+            Debug.Log("Creating Terrain Surface From Heightmap");
+            terrainData = terrain.terrainData;
+            terrainData.alphamapResolution = X + 1;
+            terrainData.heightmapResolution = X + 1;
+            terrainData.size = new Vector3(X, depth, Y);
+            terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
+        }
     }
 
     public void ApplyTextures(int start_x, int start_y, int end_x, int end_y, bool deform)
@@ -381,6 +396,11 @@ public class LayerTerrain : MonoBehaviour
                 pair.NoiseParams = JsonUtility.FromJson<NoiseParams>(pair.JSON.text);
             }
         }
+    }
+
+    public void runResearchMapGen()
+    {
+        rmg.GenerateMap();
     }
 
 }

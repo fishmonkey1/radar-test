@@ -76,7 +76,8 @@ public class CreateTopoMap : MonoBehaviour
         Renderer rend = topoObject.GetComponent<Renderer>();
         texture.SetPixels(colorMap); //TODO: change to SetPixels32, it's faster. Especially if doing live reload
         texture.Apply();
-        rend.material.mainTexture = texture;
+        rend.sharedMaterial.mainTexture = texture; //cuz doing shit in editor too
+        //rend.material.mainTexture = texture;
         Debug.Log($"The created Texture2d texture is : {texture}");
 
 
