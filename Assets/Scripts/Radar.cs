@@ -73,68 +73,41 @@ public class Radar : MonoBehaviour
         DrawSweepLine(); // draws line on radar screen
 
 
-        /*        handled by OnTriggerEnter
-                // Raycasts, gets ship info, pings radar blip if applicable
-                for (int i = 0; i < hits.Length; i++)
-                {
-                    RaycastHit hit = hits[i];
-
-                    if (hit.collider != null)
-                    {
-                        // we're checking this so we don't
-                        // get multiple hits per object as it passes
-                        if (!collidedList.Contains(hit.collider))
-                        {
-                            collidedList.Add(hit.collider);
-                            var ship = hit.collider.GetComponent<MoveRandom>(); //this will be Enemy not MoveRandom
-                            if (ship != null)
-                            {
-                                Dictionary<string, float> status = ship.statusDict;
-
-                                if (status["isVisible"] == 1f) // ship may be hidden from radar temporarily
-                                {
-                                    Vector3 location = hit.collider.transform.position;
-                                    pingOnRadar(status, location);
-                                }
-                            }
-
-                            StartCoroutine(collidedList_WaitThenRemove(hit.collider)); //I don't love this
-                        }
-                    }
-                }
-        */
-
-
-
         // This handles fading for each ping
         List<GameObject> toDeleteFromDict = new List<GameObject>();
-        foreach (KeyValuePair<GameObject, float> blip in currentBlipsDict)
+        if (currentBlipsDict.Count > 0)
         {
-            GameObject blipObject = blip.Key;
-            float ageInSeconds = Time.fixedTime - blip.Value;
-
-            // Set new opacity based on age
-            Color color = blipObject.GetComponent<SpriteRenderer>().color;                        // get current color
-            float newAlpha = Mathf.Lerp(disappearTimerMax, 0f, ageInSeconds / disappearTimerMax); // calculate new Alpha value (opacity)
-            color.a = newAlpha;                                                                   // set new Alpha to color
-            blipObject.GetComponent<SpriteRenderer>().color = color;                              // set the blip's color to new color
-
-            // Destroy GameObject once it has disappeared, and remove from Dict
-            if (ageInSeconds > disappearTimerMax)
+            foreach (KeyValuePair<GameObject, float> blip in currentBlipsDict)
             {
-                Destroy(blipObject);
-                toDeleteFromDict.Add(blipObject);
+                GameObject blipObject = blip.Key;
+                float ageInSeconds = Time.fixedTime - blip.Value;
+
+                // Set new opacity based on age
+                Color color = blipObject.GetComponent<SpriteRenderer>().color;                        // get current color
+                float newAlpha = Mathf.Lerp(disappearTimerMax, 0f, ageInSeconds / disappearTimerMax); // calculate new Alpha value (opacity)
+                color.a = newAlpha;                                                                   // set new Alpha to color
+                blipObject.GetComponent<SpriteRenderer>().color = color;                              // set the blip's color to new color
+
+                // Destroy GameObject once it has disappeared, and remove from Dict
+                if (ageInSeconds > disappearTimerMax)
+                {
+                    Destroy(blipObject);
+                    toDeleteFromDict.Add(blipObject);
+                }
             }
         }
 
-        // Delete destroyed blip objects from Dictionary (can't remove while iterating Dict)
-        foreach (GameObject blipObject in toDeleteFromDict)
-        {
-            currentBlipsDict.Remove(blipObject);
-            //can also delete from collidedList here too but brain no worky rn
-            //collidedList.Remove(???);
-        }
 
+        // Delete destroyed blip objects from Dictionary (can't remove while iterating Dict)
+        if (toDeleteFromDict.Count > 0)
+        {
+            foreach (GameObject blipObject in toDeleteFromDict)
+            {
+                currentBlipsDict.Remove(blipObject);
+                //can also delete from collidedList here too but brain no worky rn
+                //collidedList.Remove(???);
+            }
+        }
         // Rotate the Radar for next frame's raycast
         radar.Rotate(0, 6.0f * rotationsPerMinute * Time.deltaTime, 0);
     }
