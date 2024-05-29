@@ -32,7 +32,8 @@ public class MapGenerator : MonoBehaviour
 		{
 			for (int x = 0; x < lt.X; x++)
 			{
-				float elevation = lt.finalMap.GetTile(x,y).ValuesHere[LayersEnum.Elevation];
+				//float elevation = lt.finalMap.GetTile(x,y).ValuesHere[LayersEnum.Elevation];
+				float elevation = noiseMap[x, y];
 				for (int j = 0; j < regions.Length; j++)
 				{
 					if (elevation <= regions[j].height)

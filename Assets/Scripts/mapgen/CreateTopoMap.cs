@@ -7,13 +7,13 @@ using System.Text;
 
 public class CreateTopoMap : MonoBehaviour
 {
-    [SerializeField] private bool print_debug = false;
+    [SerializeField] private bool print_debug = true;
     [SerializeField] private GameObject topoObject;
     [SerializeField] private LayerTerrain lt;
     private bool makeTerrainTopographic;
     Texture2D texture;
 
-    public void createTopoTextures(int start_x, int start_y, int end_x, int end_y, bool deform)
+    public void createTopoTextures(int start_x, int start_y, int end_x, int end_y, bool deform, float[,] noiseMap)
     {
         if (print_debug) Debug.Log("Running Topo Stuff");
 
@@ -48,7 +48,6 @@ public class CreateTopoMap : MonoBehaviour
 
         // Creating colormap
         Color[] colorMap = new Color[lt.X * lt.Y];
-        Texture2D[] texture2DMap = new Texture2D[lt.X * lt.Y];
 
         List<int> usedColors = new List<int>();
 
@@ -72,48 +71,14 @@ public class CreateTopoMap : MonoBehaviour
         }
         if (print_debug) Debug.Log($"Created colorMap with {usedColors.Count} colors");
 
-        // creating the Texture2D from the colormap
-        // applying it to the Topo plane
+
         Renderer rend = topoObject.GetComponent<Renderer>();
         texture.SetPixels(colorMap); //TODO: change to SetPixels32, it's faster. Especially if doing live reload
         texture.Apply();
         rend.sharedMaterial.mainTexture = texture; //cuz doing shit in editor too
-        //rend.material.mainTexture = texture;
+
         if (print_debug) Debug.Log($"The created Texture2d texture is : {texture}");
-
-
-        //--------------------------------------------------------------
-        // save .png of topo 
-        byte[] bytes = texture.EncodeToPNG();
-        //var dirPath = Application.dataPath + "/../SaveImages/";
-        string png_dir = "Assets/Textures_and_Models/Resources/TerrainTextures/topo/png";
-        if (!Directory.Exists(png_dir))
-        {
-            Directory.CreateDirectory(png_dir);
-        }
-        else
-        {
-            // delete folder and re-add to del already existing texture
-            Directory.Delete(png_dir, true);
-            Directory.CreateDirectory(png_dir);
-        }
-        // saves the png file
-        File.WriteAllBytes(png_dir + "Image" + ".png", bytes);
         
-        //-------------------------------------
-        // Create new TerrainLayer to override current TerrainLayers
-        if (makeTerrainTopographic)
-        {
-            string tl_dir = "Assets/Textures_and_Models/Resources/TerrainTextures/topo/layers/Topographic.terrainlayer";
-            
-            TerrainLayer new_tl = new TerrainLayer();
-            
-            
-            AssetDatabase.CreateAsset(new_tl, tl_dir);
-            AssetDatabase.Refresh();
-            if (print_debug) Debug.Log($"Created Topographic.terrainlayer file");
-
-        }
     }
 
     private void setSizeandLoc()

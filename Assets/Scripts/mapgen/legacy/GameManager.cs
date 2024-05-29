@@ -41,13 +41,15 @@ public class GameManager: MonoBehaviour
             CreateTerrainObject();
         }*/
         loadNewData();
-        //LoadEnemies(); //spawnb in enemies once terrain is made
+        LoadEnemies(); //spawnb in enemies once terrain is made
     }
 
     public void loadNewData()
     {
         layerTerrain.GenerateTerrain(); // runs all of layerTerrain's stuff, new noiseMap
         noiseMap = layerTerrain.finalMap.FetchFloatValues(LayersEnum.Elevation);
+
+        layerTerrain.genTopo.createTopoTextures(0, 0, layerTerrain.X, layerTerrain.Y, false, noiseMap);
 
         if (layerTerrain.drawMode == LayerTerrain.DrawMode.ColorMap)
         {   
@@ -66,9 +68,6 @@ public class GameManager: MonoBehaviour
 
             Texture2D texture = TextureGenerator.TextureFromColorMap(mapGenerator.GenerateColorMap(noiseMap), layerTerrain.X, layerTerrain.Y);
             SetTextureOnTerrain(texture);
-            //terrainTextureRender.sharedMaterial.mainTexture = texture;
-            //terrainTextureRender.transform.localScale = new Vector3(texture.width, 1, texture.height);
-
         }
     }
 
@@ -82,6 +81,7 @@ public class GameManager: MonoBehaviour
         newlayerlist[0] = newlayer;
         layerTerrain.terrain.terrainData.terrainLayers = newlayerlist;
     }
+
 
     public void CreateTerrainObject()
     {
@@ -122,7 +122,7 @@ public class GameManager: MonoBehaviour
             List<TerrainLayer> layers = new List<TerrainLayer>();
 
             // need to make topo map first and create layer
-            layerTerrain.genTopo.createTopoTextures(0, 0, layerTerrain.X, layerTerrain.Y, false);
+            layerTerrain.genTopo.createTopoTextures(0, 0, layerTerrain.X, layerTerrain.Y, false, noiseMap);
 
             if (!layerTerrain.makeTerrainTextureTopo)
             {
