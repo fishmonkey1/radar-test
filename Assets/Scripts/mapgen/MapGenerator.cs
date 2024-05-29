@@ -17,34 +17,35 @@ public class MapGenerator : MonoBehaviour
 
 	[SerializeField] private LayerTerrain lt;
 
+	public float meshHeightMultiplier;
+
 
 
 	public void GenerateMap()
-	{	
-		if (lt.DrawInEditor)
-        {
-			Debug.Log("got to MapGenerator.GenerateMap");
-			lt.GenerateTerrain();
-			float[,] noiseMap = lt.finalMap.FetchFloatValues(LayersEnum.Elevation);
+	{
+		lt.GenerateTerrain();
+		float[,] noiseMap = lt.finalMap.FetchFloatValues(LayersEnum.Elevation);
+		int h = noiseMap.GetLength(0) -1;
 
-			Color[] colorMap = new Color[lt.X * lt.Y];
-			for (int y = 0; y < lt.Y; y++)
+		Color[] colorMap = new Color[lt.X * lt.Y];
+		for (int y = 0; y < lt.Y; y++)
+		{
+			for (int x = 0; x < lt.X; x++)
 			{
-				for (int x = 0; x < lt.X; x++)
+				float elevation = lt.finalMap.GetTile(x,y).ValuesHere[LayersEnum.Elevation];
+				for (int j = 0; j < regions.Length; j++)
 				{
-					float elevation = lt.finalMap.GetTile(x, y).ValuesHere[LayersEnum.Elevation];
-					for (int j = 0; j < regions.Length; j++)
+					if (elevation <= regions[j].height)
 					{
-						if (elevation <= regions[j].height)
-						{
-							colorMap[x * lt.X + y] = regions[j].color;
-							break; //dont need to check rest of bands
-						}
+						colorMap[x * lt.X + y] = regions[j].color;
+						break; //dont need to check rest of bands
 					}
 				}
 			}
+		}
 
-
+		if (lt.DrawInEditor)
+        {
 			MapDisplay display = FindObjectOfType<MapDisplay>();
 			if (drawMode == DrawMode.NoiseMap)
             {
@@ -56,7 +57,7 @@ public class MapGenerator : MonoBehaviour
 			}
 			else if (drawMode == DrawMode.Mesh)
 			{
-				display.DrawMesh(MeshGenerator.GenerateTerrainMesh(noiseMap), TextureGenerator.TextureFromColorMap(colorMap, lt.X, lt.Y));
+				display.DrawMesh(MeshGenerator.GenerateTerrainMesh(noiseMap, meshHeightMultiplier), TextureGenerator.TextureFromColorMap(colorMap, lt.X, lt.Y));
 			}
 		}
 	}

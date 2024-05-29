@@ -3,11 +3,12 @@ using System.Collections;
 
 public static class MeshGenerator
 {
-
-	public static MeshData GenerateTerrainMesh(float[,] heightMap)
+	public static MeshData GenerateTerrainMesh(float[,] heightMap, float heightMultiplier)
 	{
 		int width = heightMap.GetLength(0);
 		int height = heightMap.GetLength(1);
+
+		Debug.Log($"GenerateTerrainMesh() width x height = {width}x{height}");
 
 		// why
 		float topLeftX = (width - 1) / -2f;
@@ -21,13 +22,17 @@ public static class MeshGenerator
 			for (int x = 0; x < width; x++)
 			{
 
-				meshData.vertices[vertexIndex] = new Vector3(topLeftX + x, heightMap[x, y], topLeftZ - y);
-				meshData.uvs[vertexIndex] = new Vector2(x / (float)width, y / (float)height);
+				meshData.vertices[vertexIndex] = new Vector3(topLeftX + x, heightMap[x, y] * heightMultiplier, topLeftZ - y);
+
+				//meshData.uvs[vertexIndex] = new Vector2( x / (float)width,y / (float)height); 
+				meshData.uvs[vertexIndex] = new Vector2( x / (float)width, 1f - y / (float)height); // this flips it
 
 				if (x < width - 1 && y < height - 1)
 				{
 					meshData.AddTriangle(vertexIndex, vertexIndex + width + 1, vertexIndex + width);
 					meshData.AddTriangle(vertexIndex + width + 1, vertexIndex, vertexIndex + 1);
+
+					
 				}
 
 				vertexIndex++;
