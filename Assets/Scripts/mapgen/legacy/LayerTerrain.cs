@@ -12,11 +12,16 @@ public class LayerTerrain : MonoBehaviour
     // Then I'll likely want to check my Pathfinding code and see if I can check for regions that arent reachable and start marking them.
     // It would be cool to add canals or valleys between the water regions so everything is accessable by boat. :3
     
-     generate terrain
-    create terrain from heightmap
-    readnoisparams
-    generate heightmap
+    // TO check
+    persistance (eo3)
+
      */
+
+    private float lastTimeInterval; //used for debug
+    private bool timeExecutionDebug = true;
+
+    public DrawMode drawMode; 
+    public DrawType drawType;
 
     [SerializeField]
     public Biomes biomes;
@@ -37,7 +42,7 @@ public class LayerTerrain : MonoBehaviour
 
     [SerializeField] private FastNoiseLite noise;
 
-    public Terrain terrain; //This may become a custom mesh in the future, gotta dig up some code on it
+    [SerializeField] public Terrain terrain; //This may become a custom mesh in the future, gotta dig up some code on it
     public TerrainData terrainData;
 
     [SerializeField] public GameManager gameManager;
@@ -47,27 +52,43 @@ public class LayerTerrain : MonoBehaviour
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
     private Pathfinding pathfinding;
 
-
+    
 
     public Dictionary<string, MapLayers> layersDict = new Dictionary<string, MapLayers>();
-
-    //public Renderer targetRenderer;
 
     public float highest_e = -100;
     private float lowest_e = 100;
 
     public float waterheight_int;
 
-    [SerializeField] public int numberOfTopoLevels;
+    [Header("Editor research")]
+    [SerializeField] MapGenerator rmg;
+    public bool DrawInEditor;
+    public bool autoUpdate;
 
     [Header("Topo Map Stuff")]
     [SerializeField] public CreateTopoMap genTopo;
     [SerializeField] public GameObject topoObject;
+    [SerializeField] public int numberOfTopoLevels;
     [SerializeField] public Color topoColor1;
     [SerializeField] public Color topoColor2;
     [SerializeField] public bool makeTerrainTextureTopo = true;
     // ----------------- DEBUG STUFF
     bool print_debug = false;
+
+    public enum DrawMode
+    {
+        NoiseMap,
+        ColorMap,
+        TopoMap,
+        Mesh
+    }
+    public enum DrawType
+    {
+        Terrain,
+        Plane,
+        Mesh
+    }
 
 
 
@@ -82,6 +103,8 @@ public class LayerTerrain : MonoBehaviour
 
         if (terrain == null) Debug.Log("layerTerrain has no terrain obj");//Should already be assigned, but nab it otherwise
         Debug.Log(terrain);
+
+        lastTimeInterval = Time.realtimeSinceStartup;
     }
 
     public void GenerateBiome() // MOVE
@@ -101,10 +124,13 @@ public class LayerTerrain : MonoBehaviour
     }
 
     //stays
-    public void GenerateTerrain()
+    public void GenerateTerrain() //main entry
     {   
+
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
         pathfinding = new Pathfinding(finalMap); //Init the pathfinding for adjusting regions after they're created
+        float tt = Time.realtimeSinceStartup; lastTimeInterval = tt; 
+
         for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
         {
             MapNoisePair pair = elevationLayers.NoisePairs[i];
@@ -117,19 +143,38 @@ public class LayerTerrain : MonoBehaviour
             //if (i == 0) { minValue = pair.NoiseParams.minValue; raisedPower = pair.NoiseParams.raisedPower; };
 
             GenerateHeightmap(pair, LayersEnum.Elevation); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable
-        }
+            if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - GenerateHeightmap(): {t - lastTimeInterval}"); lastTimeInterval = t; }
+        }   
+        if (timeExecutionDebug) { float t=Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - Generating All Heightmaps: {t-tt}"); lastTimeInterval=t;}
+        
         NormalizeFinalMap(LayersEnum.Elevation, elevationLayers.NoisePairs[0].NoiseParams.minValue, elevationLayers.NoisePairs[0].NoiseParams.raisedPower); //Make the final map only span from 0 to 1
-        GenerateBiome();
-        //biomes.GenerateBiomes();
+        if (timeExecutionDebug) { float t=Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - NormalizeFinalMap(): {t - lastTimeInterval}"); lastTimeInterval = t; }
+        
+        /*if (!DrawInEditor)
+        {   
+            GenerateBiome();
+            if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - GenerateBiome(): {t - lastTimeInterval}"); lastTimeInterval = t; }
+        }*/
+        
+
         CreateTerrainFromHeightmap();
-        if (!makeTerrainTextureTopo)
-        {
+        if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - CreateTerrainFromHeightmap(): {t - lastTimeInterval}"); lastTimeInterval = t; }
+
+        Debug.Log("NOT doing landwaterfloodfill() in GenerateTerrain()");
+        /*if (!makeTerrainTextureTopo)
+        {   
             pathfinding.LandWaterFloodfill(0, 0, biomes);
-        }
+            if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - LandWaterFloodfill(): {t - lastTimeInterval}"); lastTimeInterval = t; }
+        }*/
 
         //genTopo.createTopoTextures(0, 0, X, Y, false);
         // For now keep, but will be kicked off to topography script for coloring soon
-        ApplyTextures(0, 0, X, Y, false);
+        /*if (!DrawInEditor)
+        {
+            ApplyTextures(0, 0, X, Y, false);
+            if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - ApplyTextures(): {t - lastTimeInterval}"); lastTimeInterval = t; }
+        }*/
+        
 
         //pathfinding.MarkAllRegions(); // turned off until optimized
 
@@ -141,23 +186,24 @@ public class LayerTerrain : MonoBehaviour
                 Debug.Log($"Region {i} contains {pathfinding.regionSizes[i]} tiles");
             }
         }
-
+        if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - TOTAL TIME GenerateTerrain(): {t - tt}"); lastTimeInterval = t; }
     }
 
     public void CreateTerrainFromHeightmap()
     {
-        Debug.Log("Creating Terrain Surface From Heightmap");
-        terrainData = terrain.terrainData;
-        terrainData.alphamapResolution = X + 1;
-        terrainData.heightmapResolution = X + 1;
-        terrainData.size = new Vector3(X, depth, Y);
-        terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
-        
+        if (!DrawInEditor) {
+            //Debug.Log("Creating Terrain Surface From Heightmap");
+            terrainData = terrain.terrainData;
+            terrainData.alphamapResolution = X + 1;
+            terrainData.heightmapResolution = X + 1;
+            terrainData.size = new Vector3(X, depth, Y);
+            terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
+        }
     }
 
     public void ApplyTextures(int start_x, int start_y, int end_x, int end_y, bool deform)
     {
-        Debug.Log("Applying Textures To Terrain");
+        //Debug.Log("Applying Textures To Terrain");
         //load in textures
         gameManager.LoadTerrainTextures();
 
@@ -169,7 +215,7 @@ public class LayerTerrain : MonoBehaviour
             float[] splatWeights = new float[terrainData.alphamapLayers];
             string name = "";
             foreach (KeyValuePair<string, int> kvp in gameManager.texturesDict) name = kvp.Key;
-            Debug.Log("texturesDict key: "+name);
+            //Debug.Log("texturesDict key: "+name);
             splatWeights[gameManager.texturesDict[name]] = 1.0f;
 
             // Loop through each terrain texture
@@ -229,12 +275,7 @@ public class LayerTerrain : MonoBehaviour
         }
         terrainData.SetAlphamaps(start_y, start_x, splatmapData); //I have a feeling that this is what is making this function so slow. Need to profile it
         terrainData.RefreshPrototypes();
-
-
     }
-
-
-
 
 
     public void ReadNoiseParams(NoiseParams noiseParams) //STAYS
@@ -263,9 +304,12 @@ public class LayerTerrain : MonoBehaviour
             for (int y = 0; y < Y; y++)
             { //Inner for loop does most of the heavy lifting
                 Tile tile = noisePair.Map.Tiles[x, y]; //Get the tile at the location
+
+                //old
                 float noiseValue = noise.GetNoise(x * noiseScale, y * noiseScale); //Grab the value between -1 and 1
                 noiseValue = Mathf.InverseLerp(-1, 1, noiseValue); //set to 0  and 1 scale
-                //noiseValue = Mathf.Pow(noiseValue, noisePair.NoiseParams.raisedPower); // TODO: do this AFTER the normalization
+               
+                
 
 
                 //Set the elevation to the normalized value by checking if we've already set elevation data
@@ -381,6 +425,11 @@ public class LayerTerrain : MonoBehaviour
                 pair.NoiseParams = JsonUtility.FromJson<NoiseParams>(pair.JSON.text);
             }
         }
+    }
+
+    public void runResearchMapGen()
+    {
+        gameManager.loadNewData();
     }
 
 }

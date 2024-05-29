@@ -7,6 +7,7 @@ using System.Text;
 
 public class CreateTopoMap : MonoBehaviour
 {
+    [SerializeField] private bool print_debug = false;
     [SerializeField] private GameObject topoObject;
     [SerializeField] private LayerTerrain lt;
     private bool makeTerrainTopographic;
@@ -14,7 +15,7 @@ public class CreateTopoMap : MonoBehaviour
 
     public void createTopoTextures(int start_x, int start_y, int end_x, int end_y, bool deform)
     {
-        Debug.Log("Running Topo Stuff");
+        if (print_debug) Debug.Log("Running Topo Stuff");
 
         makeTerrainTopographic = lt.makeTerrainTextureTopo;
         texture = new Texture2D(lt.X, lt.Y);
@@ -31,7 +32,7 @@ public class CreateTopoMap : MonoBehaviour
             colors.Add(tileColor);
             currLerp += lerpStep;
         }
-        Debug.Log($"Created {colors.Count} colors");
+        if (print_debug) Debug.Log($"Created {colors.Count} colors");
 
         // make list of bands
         List<float> bands = new List<float>();
@@ -43,7 +44,7 @@ public class CreateTopoMap : MonoBehaviour
             float lerpedval = Mathf.InverseLerp(0f, (float)lt.depth, val);
             bands.Add(lerpedval);
         }
-        Debug.Log($"Created {bands.Count} bands");
+        if (print_debug) Debug.Log($"Created {bands.Count} bands");
 
         // Creating colormap
         Color[] colorMap = new Color[lt.X * lt.Y];
@@ -69,15 +70,16 @@ public class CreateTopoMap : MonoBehaviour
                 }
             }
         }
-        Debug.Log($"Created colorMap with {usedColors.Count} colors");
+        if (print_debug) Debug.Log($"Created colorMap with {usedColors.Count} colors");
 
         // creating the Texture2D from the colormap
         // applying it to the Topo plane
         Renderer rend = topoObject.GetComponent<Renderer>();
         texture.SetPixels(colorMap); //TODO: change to SetPixels32, it's faster. Especially if doing live reload
         texture.Apply();
-        rend.material.mainTexture = texture;
-        Debug.Log($"The created Texture2d texture is : {texture}");
+        rend.sharedMaterial.mainTexture = texture; //cuz doing shit in editor too
+        //rend.material.mainTexture = texture;
+        if (print_debug) Debug.Log($"The created Texture2d texture is : {texture}");
 
 
         //--------------------------------------------------------------
@@ -105,12 +107,11 @@ public class CreateTopoMap : MonoBehaviour
             string tl_dir = "Assets/Textures_and_Models/Resources/TerrainTextures/topo/layers/Topographic.terrainlayer";
             
             TerrainLayer new_tl = new TerrainLayer();
-            new_tl.diffuseTexture = texture;
-            new_tl.tileSize = new Vector2(lt.X, lt.Y); //set tile size so it doesn't tile
+            
             
             AssetDatabase.CreateAsset(new_tl, tl_dir);
             AssetDatabase.Refresh();
-            Debug.Log($"Created Topographic.terrainlayer file");
+            if (print_debug) Debug.Log($"Created Topographic.terrainlayer file");
 
         }
     }
