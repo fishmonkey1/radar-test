@@ -20,6 +20,9 @@ public class LayerTerrain : MonoBehaviour
     private float lastTimeInterval; //used for debug
     private bool timeExecutionDebug = true;
 
+    public DrawMode drawMode; 
+    public DrawType drawType;
+
     [SerializeField]
     public Biomes biomes;
 
@@ -39,7 +42,7 @@ public class LayerTerrain : MonoBehaviour
 
     [SerializeField] private FastNoiseLite noise;
 
-    public Terrain terrain; //This may become a custom mesh in the future, gotta dig up some code on it
+    [SerializeField] public Terrain terrain; //This may become a custom mesh in the future, gotta dig up some code on it
     public TerrainData terrainData;
 
     [SerializeField] public GameManager gameManager;
@@ -72,6 +75,20 @@ public class LayerTerrain : MonoBehaviour
     [SerializeField] public bool makeTerrainTextureTopo = true;
     // ----------------- DEBUG STUFF
     bool print_debug = false;
+
+    public enum DrawMode
+    {
+        NoiseMap,
+        ColorMap,
+        TopoMap,
+        Mesh
+    }
+    public enum DrawType
+    {
+        Terrain,
+        Plane,
+        Mesh
+    }
 
 
 
@@ -133,11 +150,11 @@ public class LayerTerrain : MonoBehaviour
         NormalizeFinalMap(LayersEnum.Elevation, elevationLayers.NoisePairs[0].NoiseParams.minValue, elevationLayers.NoisePairs[0].NoiseParams.raisedPower); //Make the final map only span from 0 to 1
         if (timeExecutionDebug) { float t=Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - NormalizeFinalMap(): {t - lastTimeInterval}"); lastTimeInterval = t; }
         
-        if (!DrawInEditor)
+        /*if (!DrawInEditor)
         {   
             GenerateBiome();
             if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - GenerateBiome(): {t - lastTimeInterval}"); lastTimeInterval = t; }
-        }
+        }*/
         
 
         CreateTerrainFromHeightmap();
@@ -152,11 +169,11 @@ public class LayerTerrain : MonoBehaviour
 
         //genTopo.createTopoTextures(0, 0, X, Y, false);
         // For now keep, but will be kicked off to topography script for coloring soon
-        if (!DrawInEditor)
+        /*if (!DrawInEditor)
         {
             ApplyTextures(0, 0, X, Y, false);
             if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - ApplyTextures(): {t - lastTimeInterval}"); lastTimeInterval = t; }
-        }
+        }*/
         
 
         //pathfinding.MarkAllRegions(); // turned off until optimized
@@ -412,7 +429,7 @@ public class LayerTerrain : MonoBehaviour
 
     public void runResearchMapGen()
     {
-        rmg.GenerateMap();
+        gameManager.loadNewData();
     }
 
 }

@@ -12,7 +12,8 @@ public class MapGenerator : MonoBehaviour
 		Mesh
     }
 
-	public DrawMode drawMode;
+	//public DrawMode drawMode;
+
 	public TerrainType[] regions;
 
 	[SerializeField] private LayerTerrain lt;
@@ -21,11 +22,10 @@ public class MapGenerator : MonoBehaviour
 
 
 
-	public void GenerateMap()
+	public Color[] GenerateColorMap(float[,] noiseMap)
 	{
-		lt.GenerateTerrain();
-		float[,] noiseMap = lt.finalMap.FetchFloatValues(LayersEnum.Elevation);
-		int h = noiseMap.GetLength(0) -1;
+		//lt.GenerateTerrain();
+		//noiseMap = lt.finalMap.FetchFloatValues(LayersEnum.Elevation);
 
 		Color[] colorMap = new Color[lt.X * lt.Y];
 		for (int y = 0; y < lt.Y; y++)
@@ -38,18 +38,18 @@ public class MapGenerator : MonoBehaviour
 					if (elevation <= regions[j].height)
 					{
 						colorMap[x * lt.X + y] = regions[j].color;
-						break; //dont need to check rest of bands
+						break; 
 					}
 				}
 			}
 		}
 
-		if (lt.DrawInEditor)
+		/*if (lt.DrawInEditor)
         {
 			MapDisplay display = FindObjectOfType<MapDisplay>();
 			if (drawMode == DrawMode.NoiseMap)
             {
-				display.DrawTexture(TextureGenerator.TextureFromHeightMap(noiseMap));
+				//display.DrawTexture(TextureGenerator.TextureFromHeightMap(noiseMap));
 			}
 			else if (drawMode == DrawMode.ColorMap)
             {	
@@ -59,7 +59,9 @@ public class MapGenerator : MonoBehaviour
 			{
 				display.DrawMesh(MeshGenerator.GenerateTerrainMesh(noiseMap, meshHeightMultiplier), TextureGenerator.TextureFromColorMap(colorMap, lt.X, lt.Y));
 			}
-		}
+		}*/
+
+		return colorMap;
 	}
 } 
 

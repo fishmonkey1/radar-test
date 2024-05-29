@@ -107,8 +107,7 @@ public class CreateTopoMap : MonoBehaviour
             string tl_dir = "Assets/Textures_and_Models/Resources/TerrainTextures/topo/layers/Topographic.terrainlayer";
             
             TerrainLayer new_tl = new TerrainLayer();
-            new_tl.diffuseTexture = texture;
-            new_tl.tileSize = new Vector2(lt.X, lt.Y); //set tile size so it doesn't tile
+            
             
             AssetDatabase.CreateAsset(new_tl, tl_dir);
             AssetDatabase.Refresh();
