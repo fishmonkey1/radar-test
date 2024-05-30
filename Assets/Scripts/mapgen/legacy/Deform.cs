@@ -18,8 +18,9 @@ public class Deform : MonoBehaviour
     //   and a way to mark the terrain as dirty in case we need to apply multiple deforms before updating the Terrain mesh
     */
 
-    [SerializeField]
-    LayerTerrain terrain; //Does not support using TerrainFromTilemap, so don't try it Lexi
+    [SerializeField] LayerTerrain terrain; //Does not support using TerrainFromTilemap, so don't try it Lexi
+
+    GameManager gameManager;
 
     Map map; //Fetched out of the terrain, but it would be wise to have a delegate this can listen for when the LayerTerrain has finished making the map (or move assignment to DeformTerrain)
 
@@ -95,7 +96,10 @@ public class Deform : MonoBehaviour
         //If there is a chance that multiple deforms can happen this needs to instead mark the LayerTerrain as dirty and wait until all operations are complete before updating the Terrain
         float[,] heights = map.FetchFloatValuesSlice(layer, 0, map.Width, 0, map.Height);
         terrain.UpdateTerrainHeightmap(0,0,heights);
-        terrain.ApplyTextures(sourceX-Radius,sourceY-Radius, sourceX+Radius, sourceY + Radius, true);
+        gameManager.loadNewData();
+
+
+
 
         // this is fucking terrible but works.... figure out why???
         // TODO: only run this if the deform causes new water layer.
@@ -106,4 +110,6 @@ public class Deform : MonoBehaviour
         //navmesh.UpdateNavMesh(false);
 
     }
+
+
 }

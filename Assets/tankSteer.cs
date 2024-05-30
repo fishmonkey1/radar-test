@@ -8,6 +8,8 @@ public class tankSteer : MonoBehaviour
     [SerializeField] private CharacterController controller;
     [SerializeField] private Camera overHeadCam;
     [SerializeField] private Camera firstPersonCam;
+    [SerializeField] private Canvas radarCanvas;
+
 
     [Header("Tank Settings")]
     [SerializeField] float maxSpeed = 50.0f;
@@ -106,6 +108,18 @@ public class tankSteer : MonoBehaviour
             {
                 firstPersonCam.enabled = true;
                 overHeadCam.enabled = false;
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            if (radarCanvas.enabled)
+            {
+                radarCanvas.enabled = false;
+            }
+            else
+            {
+                radarCanvas.enabled = true;
             }
         }
     }

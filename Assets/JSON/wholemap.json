@@ -1,0 +1,109 @@
+{
+    "drawMode": 1,
+    "drawType": 0,
+    "terrainSize": 0,
+    "X": 1024,
+    "Y": 1024,
+    "depth": 40,
+    "elevationLayers": {
+        "NoisePairs": [
+            {
+                "NoiseParams": {
+                    "noiseType": 3,
+                    "seed": 10,
+                    "noiseScale": 2.0,
+                    "frequency": 0.00139999995008111,
+                    "fractalType": 3,
+                    "fractalOctaves": 5,
+                    "fractalGain": 0.4320000112056732,
+                    "fractalLacunarity": 2.6500000953674318,
+                    "weightedStrength": 0.0,
+                    "raisedPower": 8.0,
+                    "minValue": 0.18000000715255738
+                },
+                "JSON": {
+                    "instanceID": 23680
+                },
+                "UseJsonFile": false
+            },
+            {
+                "NoiseParams": {
+                    "noiseType": 3,
+                    "seed": 10,
+                    "noiseScale": 2.0,
+                    "frequency": 0.00139999995008111,
+                    "fractalType": 3,
+                    "fractalOctaves": 5,
+                    "fractalGain": 0.4320000112056732,
+                    "fractalLacunarity": 2.6500000953674318,
+                    "weightedStrength": 0.0,
+                    "raisedPower": 8.0,
+                    "minValue": 0.18000000715255738
+                },
+                "JSON": {
+                    "instanceID": 23680
+                },
+                "UseJsonFile": false
+            }
+        ]
+    },
+    "moistureLayers": {
+        "NoisePairs": [
+            {
+                "NoiseParams": {
+                    "noiseType": 3,
+                    "seed": 10,
+                    "noiseScale": 0.0,
+                    "frequency": 0.019999999552965165,
+                    "fractalType": 3,
+                    "fractalOctaves": 4,
+                    "fractalGain": 0.5,
+                    "fractalLacunarity": 2.0,
+                    "weightedStrength": 1.0,
+                    "raisedPower": 15.0,
+                    "minValue": 0.0
+                },
+                "JSON": {
+                    "instanceID": 23346
+                },
+                "UseJsonFile": true
+            }
+        ]
+    },
+    "terrain": {
+        "instanceID": 23280
+    },
+    "terrainData": {
+        "instanceID": 23224
+    },
+    "gameManager": {
+        "instanceID": 23240
+    },
+    "highest_e": 1.9419066905975342,
+    "waterheight_int": 1.0,
+    "rmg": {
+        "instanceID": 0
+    },
+    "DrawInEditor": true,
+    "autoUpdate": false,
+    "genTopo": {
+        "instanceID": 23308
+    },
+    "topoObject": {
+        "instanceID": 23298
+    },
+    "numberOfTopoLevels": 5,
+    "topoColor1": {
+        "r": 0.8773584961891174,
+        "g": 0.8516751527786255,
+        "b": 0.5586952567100525,
+        "a": 1.0
+    },
+    "topoColor2": {
+        "r": 0.1921568661928177,
+        "g": 0.6392157077789307,
+        "b": 0.3294117748737335,
+        "a": 1.0
+    },
+    "makeTerrainTextureTopo": false
+}

@@ -18,7 +18,7 @@ public class MapGenerator : MonoBehaviour
 
 	[SerializeField] private LayerTerrain lt;
 
-	public float meshHeightMultiplier;
+	//public float meshHeightMultiplier;
 
 
 

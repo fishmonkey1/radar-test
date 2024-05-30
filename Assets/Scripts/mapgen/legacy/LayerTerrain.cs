@@ -20,21 +20,17 @@ public class LayerTerrain : MonoBehaviour
     private float lastTimeInterval; //used for debug
     private bool timeExecutionDebug = true;
 
-    public DrawMode drawMode; 
+    public DrawMode drawMode;
     public DrawType drawType;
 
-    [SerializeField]
-    public Biomes biomes;
+    //[SerializeField] public Biomes biomes;
 
-    //Future TODO: Standardize these naming conventions between the ProcGenTiles library and our codebase
-    [SerializeField]
-    public int X;
-    [SerializeField]
-    public int Y;
-    [SerializeField]
-    public int depth; //Maybe rename to height instead? depth is kinda lame
-    
-    
+    public TerrainSize terrainSize;
+    [SerializeField] public int X;
+    [SerializeField] public int Y;
+    [SerializeField] public int depth; //Maybe rename to height instead? depth is kinda lame
+
+
     private float noiseScale; //For transforming the int coords into smaller float values to sample the noise better. Functions as zoom in effect
 
     //Assign layers from the inspector. In the future I either want ScriptableObjects that can be dragged in or JSON serialization so these don't get lost on a reset
@@ -53,7 +49,7 @@ public class LayerTerrain : MonoBehaviour
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
     private Pathfinding pathfinding;
 
-    
+
 
     public Dictionary<string, MapLayers> layersDict = new Dictionary<string, MapLayers>();
 
@@ -82,13 +78,19 @@ public class LayerTerrain : MonoBehaviour
         NoiseMap,
         ColorMap,
         TopoMap,
-        Mesh
     }
     public enum DrawType
     {
         Terrain,
         Plane,
         Mesh
+    }
+
+    public enum TerrainSize
+    {
+        _1024,
+        _512,
+        _256,
     }
 
 
@@ -124,13 +126,21 @@ public class LayerTerrain : MonoBehaviour
         //CreateTerrainFromHeightmap();
     }
 
+    public void SetTerrainSize()
+    {
+        if (terrainSize == TerrainSize._1024) { X = 1024; Y = 1024; }
+        if (terrainSize == TerrainSize._512) { X = 512; Y = 512; }
+        if (terrainSize == TerrainSize._256) { X = 256; Y = 256; }
+    }
+
     //stays
     public void GenerateTerrain() //main entry
-    {   
+    {
+        if (drawType == DrawType.Terrain) SetTerrainSize();
 
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
         pathfinding = new Pathfinding(finalMap); //Init the pathfinding for adjusting regions after they're created
-        float tt = Time.realtimeSinceStartup; lastTimeInterval = tt; 
+        float tt = Time.realtimeSinceStartup; lastTimeInterval = tt;
 
         for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
         {
@@ -145,18 +155,18 @@ public class LayerTerrain : MonoBehaviour
 
             GenerateHeightmap(pair, LayersEnum.Elevation); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable
             if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - GenerateHeightmap(): {t - lastTimeInterval}"); lastTimeInterval = t; }
-        }   
-        if (timeExecutionDebug) { float t=Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - Generating All Heightmaps: {t-tt}"); lastTimeInterval=t;}
-        
+        }
+        if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - Generating All Heightmaps: {t - tt}"); lastTimeInterval = t; }
+
         NormalizeFinalMap(LayersEnum.Elevation, elevationLayers.NoisePairs[0].NoiseParams.minValue, elevationLayers.NoisePairs[0].NoiseParams.raisedPower); //Make the final map only span from 0 to 1
-        if (timeExecutionDebug) { float t=Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - NormalizeFinalMap(): {t - lastTimeInterval}"); lastTimeInterval = t; }
-        
+        if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - NormalizeFinalMap(): {t - lastTimeInterval}"); lastTimeInterval = t; }
+
         /*if (!DrawInEditor)
         {   
             GenerateBiome();
             if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - GenerateBiome(): {t - lastTimeInterval}"); lastTimeInterval = t; }
         }*/
-        
+
 
         CreateTerrainFromHeightmap();
         if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - CreateTerrainFromHeightmap(): {t - lastTimeInterval}"); lastTimeInterval = t; }
@@ -175,7 +185,7 @@ public class LayerTerrain : MonoBehaviour
             ApplyTextures(0, 0, X, Y, false);
             if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - ApplyTextures(): {t - lastTimeInterval}"); lastTimeInterval = t; }
         }*/
-        
+
 
         //pathfinding.MarkAllRegions(); // turned off until optimized
 
@@ -192,92 +202,15 @@ public class LayerTerrain : MonoBehaviour
 
     public void CreateTerrainFromHeightmap()
     {
-        if (!DrawInEditor) {
-            //Debug.Log("Creating Terrain Surface From Heightmap");
-            terrainData = terrain.terrainData;
-            terrainData.alphamapResolution = X + 1;
-            terrainData.heightmapResolution = X + 1;
-            terrainData.size = new Vector3(X, depth, Y);
-            terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
-        }
+
+        //Debug.Log("Creating Terrain Surface From Heightmap");
+        terrainData = terrain.terrainData;
+        terrainData.alphamapResolution = X + 1;
+        terrainData.heightmapResolution = X + 1;
+        terrainData.size = new Vector3(X, depth, Y);
+        terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
+
     }
-
-    public void ApplyTextures(int start_x, int start_y, int end_x, int end_y, bool deform)
-    {
-        //Debug.Log("Applying Textures To Terrain");
-        //load in textures
-        gameManager.LoadTerrainTextures();
-
-        TerrainData terrainData = terrain.terrainData;
-        float[,,] splatmapData = new float[end_x - start_x, end_y - start_y, terrainData.alphamapLayers]; //Black magic fuckery, investigate more later
-        
-        if (makeTerrainTextureTopo)
-        {
-            float[] splatWeights = new float[terrainData.alphamapLayers];
-            string name = "";
-            foreach (KeyValuePair<string, int> kvp in gameManager.texturesDict) name = kvp.Key;
-            //Debug.Log("texturesDict key: "+name);
-            splatWeights[gameManager.texturesDict[name]] = 1.0f;
-
-            // Loop through each terrain texture
-            for (int i = 0; i < terrainData.alphamapLayers; i++)
-            {
-                // Assign this point to the splatmap array
-                splatmapData[start_x, start_y, i] = splatWeights[i];
-            }
-        }
-        else
-        {
-            //old way - needs rewrite this is such a stuipid way to do this lmao
-            for (int y = start_y; y < end_y; y++)
-            {
-                for (int x = start_x; x < end_x; x++)
-                {
-                    float elevation = finalMap.GetTile(x, y).ValuesHere[LayersEnum.Elevation];
-                    float moisture = finalMap.GetTile(x, y).ValuesHere[LayersEnum.Moisture];
-
-                    // Setup an array to record the mix of texture weights at this point
-                    // TODO: see LoadTextures(), need to make TerrainLayer for each texture, so that it is added to the terrainData as a useable layer.
-                    float[] splatWeights = new float[terrainData.alphamapLayers];
-
-                    biome(); //sets the biome
-
-                    // Work in progress don't @ me
-                    void biome()
-                    {
-                        //if (elevation <= biomes.AllBiomes.values[0].value) { SetTexture("Water"); return; };
-                        if (elevation < biomes.AllBiomes.values[1].value) { SetTexture("Sand"); return; };
-
-                        if (elevation < biomes.AllBiomes.values[2].value) //if in grass band
-                        {
-                            if (moisture < .25f)
-                            {
-                                SetTexture("Dirt"); return;
-                            }
-                            SetTexture("Grass"); return; // else set to grass
-                        };
-
-                        if (elevation < biomes.AllBiomes.values[3].value) { SetTexture("Snow"); return; }; //snow
-
-                        void SetTexture(string name)
-                        {
-                            splatWeights[gameManager.texturesDict[name]] = 1.0f;
-                        }
-                    }
-
-                    // Loop through each terrain texture
-                    for (int i = 0; i < terrainData.alphamapLayers; i++)
-                    {
-                        // Assign this point to the splatmap array
-                        splatmapData[x - start_x, y - start_y, i] = splatWeights[i];
-                    }
-                }
-            }
-        }
-        terrainData.SetAlphamaps(start_y, start_x, splatmapData); //I have a feeling that this is what is making this function so slow. Need to profile it
-        terrainData.RefreshPrototypes();
-    }
-
 
     public void ReadNoiseParams(NoiseParams noiseParams) //STAYS
     {
@@ -311,8 +244,8 @@ public class LayerTerrain : MonoBehaviour
                 //old
                 float noiseValue = noise.GetNoise(x * noiseScale, y * noiseScale); //Grab the value between -1 and 1
                 noiseValue = Mathf.InverseLerp(-1, 1, noiseValue); //set to 0  and 1 scale
-               
-                
+
+
 
 
                 //Set the elevation to the normalized value by checking if we've already set elevation data
@@ -415,7 +348,31 @@ public class LayerTerrain : MonoBehaviour
             File.WriteAllText(filePath, json);
 
             Debug.Log($"JSON file saved to: {filePath}");
+            SerializeMapToJson();
         }
+    }
+
+    public void SerializeMapToJson()
+    {
+        //LayerTerrain lt = GetComponent<LayerTerrain>();
+        string json = JsonUtility.ToJson(this, true);
+        Debug.Log(json);
+
+        string folderPath = Path.Combine(Application.dataPath, "JSON");
+        string filePath = Path.Combine(folderPath, $"wholemap.json");
+
+        // Create the JSON folder if it doesn't exist
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+
+        // Write the JSON string to the file
+        File.WriteAllText(filePath, json);
+
+        Debug.Log($"wholemap JSON file saved to: {filePath}");
+
+
     }
 
     public void LoadNoiseParamsFromJson() //MOVE

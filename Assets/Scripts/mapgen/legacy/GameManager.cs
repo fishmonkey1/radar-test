@@ -57,7 +57,6 @@ public class GameManager: MonoBehaviour
         }
 
         RefreshObject();
-
     }
 
     public void RefreshObject()
