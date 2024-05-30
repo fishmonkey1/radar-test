@@ -1,19 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using ProcGenTiles;
+
 
 public class RoadGen : MonoBehaviour
 {
     [SerializeField] LayerTerrain lt;
     [SerializeField] Color roadColor;
+    public Pathfinding pathFinding;
 
 
     private float[,] noiseMap;
     private Color[] colorMap;
     private float[,] roadMapData;
     private List<(int, int)> entryPoints = new List<(int, int)>();
+    List<List<(int x, int xy)>> paths;
+
 
     public int entryGapMin = 6;
+    int width;
+    int height;
 
 
 
@@ -37,18 +44,24 @@ public class RoadGen : MonoBehaviour
     {
         noiseMap = noisyMcNoiseFace;
         colorMap = colorMcMapFace;
+        width = noiseMap.GetLength(0);
+        height = noiseMap.GetLength(1);
 
-        colorMap = GetMapEntries();
+        entryPoints = GetMapEntries();
+        paths = PathfindEachEntry(entryPoints);
+        pathFinding = new Pathfinding(lt.finalMap);
+        CreatePaths(paths);
+
+
 
         return colorMap;
     }
 
-    private Color[] GetMapEntries()
+    private List<(int, int)> GetMapEntries()
     {
-        int width = noiseMap.GetLength(0);
-        int height = noiseMap.GetLength(1);
 
         roadMapData = new float[width, height];
+        
 
 
 
@@ -82,7 +95,7 @@ public class RoadGen : MonoBehaviour
         }
 
         for (int row = 1; row < height; row++)
-        {   
+        {
             // bottom-right --> top right
             if (noiseMap[row, width - 1] <= 0.01f)
             {
@@ -130,7 +143,7 @@ public class RoadGen : MonoBehaviour
         }
 
 
-        for (int row = height-1; row <= 0; row--)
+        for (int row = height - 1; row <= 0; row--)
         {
             // top-left to bottom-right (start)
             if (noiseMap[row, 0] <= 0.01f)
@@ -153,20 +166,44 @@ public class RoadGen : MonoBehaviour
             }
         }
 
-        foreach ((int, int) coord in entryPoints)
-        {
-            //Debug.Log(coord);
-            (int colx, int rowy) = coord;
-
-            colorMap[colx * width + rowy] = Color.red;
-        }
-
-        return colorMap;
+        return entryPoints;
     }
 
-    public void ApplyTexture(float[,] noiseMap)
+    private List<List<(int x, int xy)>> PathfindEachEntry(List<(int x, int y)> entryPoints)
     {
+        paths = new List<List<(int x, int xy)>>();
 
+        for (int i = 0; i < entryPoints.Count; i++)
+        {
+            List<(int x, int y)> foundPath = new List<(int x, int y)>();
+
+            (int x, int y) xy_end;
+
+            xy_end = entryPoints[i + 1];
+            foundPath = pathFinding.AStar(entryPoints[i], xy_end);
+            
+
+            paths.Add(foundPath);
+        }
+        return paths;
+    }
+
+    private void CreatePaths(List<List<(int x, int xy)>> listOfPaths)
+    {
+        foreach (List<(int x, int xy)> path in listOfPaths)
+        {
+            foreach ((int x, int y) points in path)
+            {
+                ApplyRoadAtPoint(points.Item1, points.Item2);
+            }
+        }
+    }
+
+
+
+    public void ApplyRoadAtPoint(int x, int y)
+    {
+        colorMap[x * width + y] = Color.red;
     }
 
 
