@@ -18,9 +18,17 @@ public class RoadGen : MonoBehaviour
 
 
     /* 
-       1) Find map entries: loop around exterior of terrain.Find all of the low elevation levels.
-             The goal is to find the longest distance from these points, with the least amount of curve.
-       2) Pathfind between each point using only flat terrain. (for now)
+       1) Find map entries: loop around exterior of terrain. Find all of the low-elevation levels.
+               The goal is to find the longest distance from these points to another point, with the least amount of curve.
+               This is the arterial road(s). Think highways going through a city...
+        
+       2) Pathfind between each point using only flat terrain (for now) to keep things simple.
+               Need to pathfind start/end each found entry point.
+                    For each node along path, run a normal to the nearest opposite landmass (if something close within X meters).
+                    The pathfinding will follow the edge of a mountain, which is fine, but if it's going between two landmasses we want it centered between the two.
+               Find one or two roads that are the longest and most
+
+       
 
 
      */
