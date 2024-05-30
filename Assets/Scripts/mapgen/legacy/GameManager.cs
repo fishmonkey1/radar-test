@@ -10,6 +10,7 @@ using UnityEditor;
 public class GameManager: MonoBehaviour
 {
     [SerializeField] private MapGenerator mapGenerator;
+    [SerializeField] private RoadGen roadGen;
     private Renderer terrainTextureRender;
     private Renderer meshTextureRender;
     private Renderer planeTextureRender;
@@ -65,7 +66,11 @@ public class GameManager: MonoBehaviour
         {   
             layerTerrain.terrain.terrainData.SetHeights(0,0,noiseMap);
 
-            Texture2D texture = TextureGenerator.TextureFromColorMap(mapGenerator.GenerateColorMap(noiseMap), layerTerrain.X, layerTerrain.Y);
+            colorMap = mapGenerator.GenerateColorMap(noiseMap);
+
+            colorMap = roadGen.GetArterialPaths(noiseMap, colorMap);
+
+            Texture2D texture = TextureGenerator.TextureFromColorMap(colorMap, layerTerrain.X, layerTerrain.Y);
             SetTextureOnTerrain(texture);
         }
     }
