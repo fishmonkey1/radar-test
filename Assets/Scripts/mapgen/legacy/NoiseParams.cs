@@ -12,6 +12,9 @@ public class NoiseParams
     
     public int seed = 10;
 
+    [Tooltip("Scrolls the map in/out")]
+    public float noiseScale;
+
     [Tooltip("lower frequencies make wider hills \n" +
              "and higher frequencies make narrower hills.")]
     [Range(0.01f, .00000001f)]

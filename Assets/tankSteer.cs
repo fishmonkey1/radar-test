@@ -6,12 +6,17 @@ using UnityEngine.InputSystem;
 public class tankSteer : MonoBehaviour
 {
     [SerializeField] private CharacterController controller;
+    [SerializeField] private Camera overHeadCam;
+    [SerializeField] private Camera firstPersonCam;
+
+    [Header("Tank Settings")]
     [SerializeField] float maxSpeed = 50.0f;
     [SerializeField] float maxReverseSpeed = -2.0f;
     [SerializeField] float turnAngleMin = 20f;
     [SerializeField] float turnAngleMax = 50f;
     [SerializeField] float acceleration = 2.0f;
     [SerializeField] float decceleration = 5f;
+    [SerializeField] [Range(0.01f, 0.3f)] float quatLerp = .07f;
 
     [Header("Current Values")]
     [SerializeField] float currSpeed;
@@ -36,9 +41,11 @@ public class tankSteer : MonoBehaviour
     private void Start()
     {
         layerMask = LayerMask.GetMask("Terrain");
+        firstPersonCam.enabled = true;
+        overHeadCam.enabled = false;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         groundedPlayer = controller.isGrounded;
         // stop player when hit ground
@@ -62,7 +69,8 @@ public class tankSteer : MonoBehaviour
         {
             if (groundHit.normal != transform.up)
             {
-                transform.rotation = Quaternion.FromToRotation(transform.up, groundHit.normal) * transform.rotation;
+                Quaternion hitNormal = Quaternion.FromToRotation(transform.up, groundHit.normal) * transform.rotation;
+                transform.rotation = Quaternion.Lerp(transform.rotation, hitNormal, quatLerp);
             }
 
         }
@@ -84,6 +92,22 @@ public class tankSteer : MonoBehaviour
         turnAngle = Mathf.Clamp(turnAngleMaffs, turnAngleMin, turnAngleMax);
 
 
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            if (firstPersonCam.enabled)
+            {
+                firstPersonCam.enabled = false;
+                overHeadCam.enabled = true;
+            } else
+            {
+                firstPersonCam.enabled = true;
+                overHeadCam.enabled = false;
+            }
+        }
     }
 
     private void OnMove(InputValue value)

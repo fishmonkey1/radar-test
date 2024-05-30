@@ -33,7 +33,8 @@ public class LayerTerrain : MonoBehaviour
     public int Y;
     [SerializeField]
     public int depth; //Maybe rename to height instead? depth is kinda lame
-    [SerializeField]
+    
+    
     private float noiseScale; //For transforming the int coords into smaller float values to sample the noise better. Functions as zoom in effect
 
     //Assign layers from the inspector. In the future I either want ScriptableObjects that can be dragged in or JSON serialization so these don't get lost on a reset
@@ -283,6 +284,8 @@ public class LayerTerrain : MonoBehaviour
         //Read the noise info from the MapLayer and set all of the FastNoiseLite fields here
         if (noise == null)
             noise = new FastNoiseLite();
+
+        noiseScale = noiseParams.noiseScale;
 
         noise.SetSeed(noiseParams.seed);
         noise.SetNoiseType(noiseParams.noiseType);
