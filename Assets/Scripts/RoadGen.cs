@@ -42,29 +42,39 @@ public class RoadGen : MonoBehaviour
 
     public Color[] GetArterialPaths(float[,] noisyMcNoiseFace, Color[] colorMcMapFace)
     {
+        Debug.Log("=============== RoadGen =======================");
+        // Finding path from (0, 34) to (0, 95)
+
         noiseMap = noisyMcNoiseFace;
         colorMap = colorMcMapFace;
         width = noiseMap.GetLength(0);
         height = noiseMap.GetLength(1);
+        pathFinding = new Pathfinding(lt.finalMap); // this was being created after tryying to use it lol
 
         entryPoints = GetMapEntries();
+
+        /*entryPoints.Add((25,25));
+        entryPoints.Add((200, 200));*/
+
+        Debug.Log($"found {entryPoints.Count} entryPoints");
+        
         paths = PathfindEachEntry(entryPoints);
-        pathFinding = new Pathfinding(lt.finalMap);
-        CreatePaths(paths);
+        Debug.Log($"PathfindEachEntry() returned: {paths} , which contains {paths.Count} paths");
+        
+        DrawPathsOnColorMap(paths);
 
 
 
         return colorMap;
     }
 
+    /// <summary>
+    /// Returns a List<(int x, int y)> of entry points into the map.
+    /// </summary>
     private List<(int, int)> GetMapEntries()
     {
-
         roadMapData = new float[width, height];
         
-
-
-
         int lengthBottomSegment = 0;
         int lengthTopSegment = 0;
         int lengthLeftSegment = 0;
@@ -169,31 +179,38 @@ public class RoadGen : MonoBehaviour
         return entryPoints;
     }
 
+    /// <summary>
+    /// Returns List<List<(int x, int xy)>> of pathfinds into the map.
+    /// </summary>
     private List<List<(int x, int xy)>> PathfindEachEntry(List<(int x, int y)> entryPoints)
     {
         paths = new List<List<(int x, int xy)>>();
 
-        for (int i = 0; i < entryPoints.Count; i++)
+        for (int i = 0; i < entryPoints.Count-1; i++)
         {
             List<(int x, int y)> foundPath = new List<(int x, int y)>();
 
             (int x, int y) xy_end;
-
-            xy_end = entryPoints[i + 1];
-            foundPath = pathFinding.AStar(entryPoints[i], xy_end);
             
+            xy_end = entryPoints[i + 1];
+            Debug.Log($"Finding path from {entryPoints[i]} to {xy_end}");
+            foundPath = pathFinding.AStar(entryPoints[i], xy_end, noiseMap);
+            Debug.Log($"pathfinding found path with length: {foundPath.Count}");
 
             paths.Add(foundPath);
         }
         return paths;
     }
 
-    private void CreatePaths(List<List<(int x, int xy)>> listOfPaths)
+
+
+    private void DrawPathsOnColorMap(List<List<(int x, int xy)>> listOfPaths)
     {
         foreach (List<(int x, int xy)> path in listOfPaths)
         {
             foreach ((int x, int y) points in path)
             {
+                //Debug.Log($"applying path color at ({points.Item1},{points.Item2})");
                 ApplyRoadAtPoint(points.Item1, points.Item2);
             }
         }

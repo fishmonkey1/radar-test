@@ -12,6 +12,11 @@ namespace ProcGenTiles
         Map Map;
         public Dictionary<int, int> regionSizes = new Dictionary<int, int>(); //Holds the region index and the number of tiles marked with it, for size checking
 
+        List<(int x, int y)> path = new List<(int x, int y)>();
+        List<(int x, int y)> frontier = new List<(int x, int y)>();
+
+       
+
         public Pathfinding(Map map)
         {
             Map = map;
@@ -116,54 +121,50 @@ namespace ProcGenTiles
             }
         }
 
-        public List<(int x, int y)> AStar((int x, int y) start, (int x, int y) end)
+        public List<(int x, int y)> AStar((int x, int y) start, (int x, int y) end, float[,] noiseMap)
         {
-
-            List<(int x, int y)> path = new List<(int x, int y)>();
+            //Debug.Log("======== Astar =======");
+            //Debug.Log($"start is ({start.Item1},{start.Item2})");
             path.Add(start);
-            List<(int x, int y)> frontier = new List<(int x, int y)>();
-            //AddFourNeighbors(start, frontier); //Override AddFourNeighbors to accept a list object
+            AddFourNeighbors(start.Item1, start.Item2, null, frontier); //Override AddFourNeighbors to accept a list object
             int lowestCost = 9999999; //Set to something huge, this also might be a float, idk
             (int x, int y) lowestCandidate = (0,0);  //For storing the tuple that has lowestCost
 
-
+            //for (int x = 0; x < 50; x++)
             while (!path.Contains(end))
             {
                 for (int i = 0; i < frontier.Count; i++)
                 {
                     //Maybe remove any tiles that are already in the path here
                     var candidate = frontier[i];
-                    var manhattanCost = Helpers.ManhattanDistance(start.Item1, end.Item1, start.Item2, end.Item2);
+                    var manhattanCost = Helpers.ManhattanDistance(candidate.Item1, end.Item1, candidate.Item2, end.Item2);
                     if (manhattanCost < lowestCost)
                     {
                         lowestCost = manhattanCost;
                         lowestCandidate = candidate;
                     }
                 }
+                //Debug.Log($"Lowest Candidate is: {lowestCandidate}");
+                //Debug.Log($"========");
                 //Do this code after the for loop has run so we know it checked all the neighbors
                 lowestCost = 9999999; //Reset for next loop
                 path.Add(lowestCandidate);
-
-
-
-
                 frontier.Clear();
+                //Debug.Log($"frontier size is: {frontier.Count}");
                 AddFourNeighbors(lowestCandidate.Item1, lowestCandidate.Item2, null, frontier);
             }
 
             return path;
 
-
-
-
         }
 
-        private void AddFourNeighbors(int x, int y, Queue<(int x, int y)> q = null, List<(int x, int y)> l = null)
+        private void AddFourNeighbors(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> l = null)
         {
-            AddNeighborToQueue(x - 1, y, q);
-            AddNeighborToQueue(x + 1, y, q);
-            AddNeighborToQueue(x, y - 1, q);
-            AddNeighborToQueue(x, y + 1, q);
+            AddNeighborToQueue(x - 1, y, q, l);
+            AddNeighborToQueue(x + 1, y, q, l);
+            AddNeighborToQueue(x, y - 1, q, l);
+            AddNeighborToQueue(x, y + 1, q, l);
+            //Debug.Log($"frontier size is now: {l.Count}");
         }
 
         private void AddEightNeighbors(int x, int y, Queue<(int x, int y)> q)
@@ -175,12 +176,24 @@ namespace ProcGenTiles
             AddNeighborToQueue(x + 1, y + 1, q);
         }
 
-        private void AddNeighborToQueue(int x, int y, Queue<(int x, int y)> q)
+        private void AddNeighborToQueue(int x, int y, Queue<(int x, int y)> q = null, List<(int x, int y)> l = null)
         {
-            Debug.Log("Map is: " + Map);
-            if (Map.IsValidTilePosition(x, y) && !visited.Contains((x, y)))
-                q.Enqueue((x, y));
-            visited.Add((x, y));
+            /*if (Map.IsValidTilePosition(x, y) && !visited.Contains((x, y)))
+            {
+                if (q != null)
+                {
+                    q.Enqueue((x, y));
+                } 
+                l.Add((x, y));
+                Debug.Log($"added ({x},{y}) to frontier");
+            }  */
+            if (Map.IsValidTilePosition(x, y) && !path.Contains((x, y)))
+            {
+                
+                l.Add((x, y));
+                //Debug.Log($"added ({x},{y}) to frontier");
+            }
+             visited.Add((x, y));
         }
     }
 }

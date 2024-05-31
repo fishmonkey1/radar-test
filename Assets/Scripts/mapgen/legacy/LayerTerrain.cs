@@ -47,7 +47,7 @@ public class LayerTerrain : MonoBehaviour
     //public TerrainData terrainData;
 
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
-    private Pathfinding pathfinding;
+    public Pathfinding pathfinding;
 
 
 
