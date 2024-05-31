@@ -19,6 +19,8 @@ public class RoadGen : MonoBehaviour
     int width;
     int height;
 
+    [SerializeField] public int showOnlyPathAtIndex;
+
     public int entryGapMin = 6;
     public float elevationLimitForPathfind = 0.01f;
     
@@ -65,14 +67,20 @@ public class RoadGen : MonoBehaviour
             Debug.Log($"({points.Item1},{points.Item2})");
         }
 
+        // this is givint the full path travelled, need to remove from path as we move back
         paths = PathfindEachEntry(entryPoints);
-        Debug.Log($"PathfindEachEntry() returned: {paths} , which contains {paths.Count} paths");
-        
         DrawPathsOnColorMap(paths);
 
+        // just gonna add the Start points back cuz they got covered
+        foreach ((int x, int y) points in entryPoints)
+        {
+            ApplyRoadAtPoint(points.Item1, points.Item2, Color.cyan);
+        }
 
 
-        return colorMap;
+
+        return colorMap; //returns map to gamemanger to apply tex
+
     }
 
     /// <summary>
@@ -94,7 +102,7 @@ public class RoadGen : MonoBehaviour
             if (noiseMap[0, col] < 0.01f)
             {
                 roadMapData[0, col] = 1f;
-                colorMap[0 * width + col] = roadColor; //works
+                colorMap[0 * width + col] = Color.black; //works
                 lengthBottomSegment += 1;
             }
             else
@@ -117,7 +125,7 @@ public class RoadGen : MonoBehaviour
             if (noiseMap[row, width - 1] <= 0.01f)
             {
                 roadMapData[row, width - 1] = 1f;
-                colorMap[row * width - 1] = roadColor;
+                colorMap[row * width - 1] = Color.black;
                 lengthRightSegment += 1;
             }
             else
@@ -142,7 +150,7 @@ public class RoadGen : MonoBehaviour
             if (noiseMap[height - 1, col] <= 0.01f)
             {
                 roadMapData[height - 1, col] = 1f;
-                colorMap[(width - 1) * width + col] = roadColor; //works
+                colorMap[(width - 1) * width + col] = Color.black; //works
                 lengthTopSegment += 1;
             }
             else
@@ -166,7 +174,7 @@ public class RoadGen : MonoBehaviour
             if (noiseMap[row, 0] <= 0.01f)
             {
                 roadMapData[row, 0] = 1f;
-                colorMap[row * width] = roadColor;
+                colorMap[row * width] = Color.black;
                 lengthLeftSegment += 1;
             }
             else
@@ -183,11 +191,7 @@ public class RoadGen : MonoBehaviour
             }
         }
 
-        foreach ((int x, int y) points in entryPoints)
-        {
-            //Debug.Log($"applying path color at ({points.Item1},{points.Item2})");
-            ApplyRoadAtPoint(points.Item1, points.Item2);
-        }
+        
 
         return entryPoints;
     }
@@ -199,18 +203,25 @@ public class RoadGen : MonoBehaviour
     {
         paths = new List<List<(int x, int xy)>>();
 
-        for (int i = 0; i < entryPoints.Count-1; i++)
+        for (int i = 0; i < entryPoints.Count - 1; i++)
         {
-            List<(int x, int y)> foundPath = new List<(int x, int y)>();
+            for (int j = 1; j < (entryPoints.Count-1)-i; j++)
+            {
+                // if x or y is on the same border side, go to next
+                if (entryPoints[i].Item1 == entryPoints[i + j].Item1) continue;
+                if (entryPoints[i].Item2 == entryPoints[i + j].Item2) continue;
 
-            (int x, int y) xy_end;
-            
-            xy_end = entryPoints[i + 1];
-            Debug.Log($"Finding path from {entryPoints[i]} to {xy_end}");
-            foundPath = pathFinding.AStar(entryPoints[i], xy_end, noiseMap, elevationLimitForPathfind);
-            Debug.Log($"pathfinding found path with length: {foundPath.Count}");
+                (int x, int y) xy_end = entryPoints[i + j];
 
-            paths.Add(foundPath);
+                List<(int x, int xy)> foundPath = pathFinding.AStar(entryPoints[i], xy_end, noiseMap, elevationLimitForPathfind);
+                if (foundPath != null)
+                {
+                    Debug.Log($"Path from {entryPoints[i]} to {xy_end} has length of {foundPath.Count}");
+                    paths.Add(foundPath);
+                }
+                else Debug.Log($"No path for {entryPoints[i]} to {xy_end} !!!!!!");
+
+            }
         }
         return paths;
     }
@@ -224,16 +235,16 @@ public class RoadGen : MonoBehaviour
             foreach ((int x, int y) points in path)
             {
                 //Debug.Log($"applying path color at ({points.Item1},{points.Item2})");
-                ApplyRoadAtPoint(points.Item1, points.Item2);
+                ApplyRoadAtPoint(points.Item1, points.Item2, Color.red);
             }
         }
     }
 
 
 
-    public void ApplyRoadAtPoint(int x, int y)
+    public void ApplyRoadAtPoint(int x, int y, Color color)
     {
-        colorMap[x * width + y] = Color.red;
+        colorMap[x * width + y] = color;
     }
 
 

@@ -12,7 +12,7 @@ namespace ProcGenTiles
         Map Map;
         public Dictionary<int, int> regionSizes = new Dictionary<int, int>(); //Holds the region index and the number of tiles marked with it, for size checking
 
-        
+
 
         float[,] noiseMap;
         float elevationLimit;
@@ -131,36 +131,57 @@ namespace ProcGenTiles
 
 
             //Debug.Log("======== Astar =======");
-            Debug.Log($"Running AStar: ({start.Item1},{start.Item2}) ---> ({end.Item1},{end.Item2})");
+            //Debug.Log($"Running AStar: ({start.Item1},{start.Item2}) ---> ({end.Item1},{end.Item2})");
             path.Add(start);
-            AddEightNeighbors(start.Item1, start.Item2, null, frontier, path); //Override AddFourNeighbors to accept a list object
+            AddFourNeighbors(start.Item1, start.Item2, null, frontier, path); //Override AddFourNeighbors to accept a list object
             int lowestCost = 9999999; //Set to something huge, this also might be a float, idk
-            (int x, int y) lowestCandidate = (0,0);  //For storing the tuple that has lowestCost
+            (int x, int y) lowestCandidate = (0, 0);  //For storing the tuple that has lowestCost
 
-            for (int x = 0; x < 3000; x++) //this is for quick debug to keep me getting stuck in the while loop 
-           //while (!path.Contains(end))
-            {
+            for (int x = 0; x < 6000; x++) //this is for quick debug to keep me getting stuck in the while loop 
+                                           //while (!path.Contains(end))
+            { //doing the while loop breaks things :((((
                 for (int i = 0; i < frontier.Count; i++)
                 {
-                    //Maybe remove any tiles that are already in the path here
                     var candidate = frontier[i];
                     var manhattanCost = Helpers.ManhattanDistance(candidate.Item1, end.Item1, candidate.Item2, end.Item2);
-                    if (manhattanCost < lowestCost)
+                    if (manhattanCost < lowestCost && noiseMap[frontier[i].Item1, frontier[i].Item2] <= elevationLimit)
                     {
                         lowestCost = manhattanCost;
                         lowestCandidate = candidate;
                     }
                 }
 
-                //Do this code after the for loop has run so we know it checked all the neighbors
-                lowestCost = 9999999; //Reset for next loop
-                path.Add(lowestCandidate);
-                frontier.Clear();
-                AddEightNeighbors(lowestCandidate.Item1, lowestCandidate.Item2, null, frontier, path);
+                //if it found a good neighbor like State Farm
+                if (lowestCandidate != (0, 0)) //if it isn't the default whatever
+                {
+                    lowestCost = 9999999; //Reset for next loop
+                    path.Add(lowestCandidate);
+                    frontier.Clear();
+                    AddFourNeighbors(lowestCandidate.Item1, lowestCandidate.Item2, null, frontier, path);
+                    lowestCandidate = (0, 0); //reset lowest candidate
+                }
+                else
+                {   // if it didn't find a good neighbor
+                    // go back a square, try and get new neighbors.
+                    // Keep retracing steps until can find a path. (next iteration will go back again)
+                    // If get back to start, path returns null.
+
+                    // get neighbors of prev square in path
+                    int lastIndex = path.Count - 2;
+                    if (lastIndex >= 0)
+                    {
+                        if ((path[lastIndex].Item1, path[lastIndex].Item2) != start)
+                        {
+                            AddFourNeighbors(path[path.Count - 2].Item1, path[path.Count - 2].Item2, null, frontier, path);
+                            //path.RemoveAt(path.Count - 1); // remove last from path? this isn't working
+                            path.Remove(path[lastIndex+1]);
+                        }
+                    }
+                    else return null;
+                }
             }
 
             return path;
-
         }
 
         private void AddFourNeighbors(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> frontier, List<(int x, int y)> path)
@@ -172,7 +193,7 @@ namespace ProcGenTiles
         }
 
         private void AddEightNeighbors(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> frontier, List<(int x, int y)> path)
-        { 
+        {
             AddFourNeighbors(x, y, q, frontier, path);
             AddNeighborToQueue(x - 1, y - 1, q, frontier, path);
             AddNeighborToQueue(x + 1, y - 1, q, frontier, path);
@@ -180,28 +201,21 @@ namespace ProcGenTiles
             AddNeighborToQueue(x + 1, y + 1, q, frontier, path);
         }
 
-        private void AddNeighborToQueue(int x, int y, Queue<(int x, int y)>q , List<(int x, int y)> frontier, List<(int x, int y)> path)
+        private void AddNeighborToQueue(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> frontier, List<(int x, int y)> path)
         {
             if (Map.IsValidTilePosition(x, y) && !visited.Contains((x, y)))
             {
                 if (q != null)
                 {
                     q.Enqueue((x, y));
-                } 
-
+                }
             }
 
-            
-                if (Map.IsValidTilePosition(x, y) && !path.Contains((x, y)))
-                {
-                    if (noiseMap[x, y] <= elevationLimit)
-                    {
-                        frontier.Add((x, y));
-                    }
-                }
-            
-            
-             visited.Add((x, y));
+
+            if (Map.IsValidTilePosition(x, y) && !path.Contains((x, y)))
+            {
+                frontier.Add((x, y));
+            }
         }
     }
 }
