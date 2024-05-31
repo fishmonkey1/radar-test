@@ -96,37 +96,35 @@ public class tankSteer : MonoBehaviour
 
     }
 
-    private void Update()
+    public void OnMove(InputValue value)
     {
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            if (firstPersonCam.enabled)
-            {
-                firstPersonCam.enabled = false;
-                overHeadCam.enabled = true;
-            } else
-            {
-                firstPersonCam.enabled = true;
-                overHeadCam.enabled = false;
-            }
-        }
+        driverInput = value.Get<Vector2>();
+    }
 
-        if (Input.GetKeyDown(KeyCode.R))
+    public void OnCameraToggle()
+    {
+        if (firstPersonCam.enabled)
         {
-            if (radarCanvas.enabled)
-            {
-                radarCanvas.enabled = false;
-            }
-            else
-            {
-                radarCanvas.enabled = true;
-            }
+            firstPersonCam.enabled = false;
+            overHeadCam.enabled = true;
+        }
+        else
+        {
+            firstPersonCam.enabled = true;
+            overHeadCam.enabled = false;
         }
     }
 
-    private void OnMove(InputValue value)
+    public void OnToggleRadarMinimap()
     {
-        driverInput = value.Get<Vector2>();
+        if (radarCanvas.enabled)
+        {
+            radarCanvas.enabled = false;
+        }
+        else
+        {
+            radarCanvas.enabled = true;
+        }
     }
 
 }
