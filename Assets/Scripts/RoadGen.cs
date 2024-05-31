@@ -13,17 +13,18 @@ public class RoadGen : MonoBehaviour
 
     private float[,] noiseMap;
     private Color[] colorMap;
+    private Color[] colorMapWithEntries;
     private float[,] roadMapData;
     private List<(int, int)> entryPoints = new List<(int, int)>();
     List<List<(int x, int xy)>> paths;
     int width;
     int height;
 
-    [SerializeField] public int showOnlyPathAtIndex;
+    [SerializeField] public int pathListIndex = 0;
 
     public int entryGapMin = 6;
     public float elevationLimitForPathfind = 0.01f;
-    
+
 
 
 
@@ -45,6 +46,22 @@ public class RoadGen : MonoBehaviour
 
      */
 
+    public void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            if (pathListIndex > 0)
+            {
+                pathListIndex -= 1;
+            }
+            else
+            {
+                pathListIndex = paths.Count - 1;
+            }
+            DrawPathsOnColorMap(false);
+        }
+    }
+
     public Color[] GetArterialPaths(float[,] noisyMcNoiseFace, Color[] colorMcMapFace)
     {
         Debug.Log("=============== RoadGen =======================");
@@ -61,15 +78,13 @@ public class RoadGen : MonoBehaviour
         //entryPoints.Add((0,95));
         //entryPoints.Add((146, 255));
 
-        Debug.Log($"found {entryPoints.Count} entryPoints");
+        /*Debug.Log($"found {entryPoints.Count} entryPoints");
         foreach ((int x, int y) points in entryPoints)
         {
             Debug.Log($"({points.Item1},{points.Item2})");
-        }
+        }*/
 
-        // this is givint the full path travelled, need to remove from path as we move back
         paths = PathfindEachEntry(entryPoints);
-        DrawPathsOnColorMap(paths);
 
         // just gonna add the Start points back cuz they got covered
         foreach ((int x, int y) points in entryPoints)
@@ -77,7 +92,7 @@ public class RoadGen : MonoBehaviour
             ApplyRoadAtPoint(points.Item1, points.Item2, Color.cyan);
         }
 
-
+        DrawPathsOnColorMap(true);
 
         return colorMap; //returns map to gamemanger to apply tex
 
@@ -89,7 +104,7 @@ public class RoadGen : MonoBehaviour
     private List<(int, int)> GetMapEntries()
     {
         roadMapData = new float[width, height];
-        
+
         int lengthBottomSegment = 0;
         int lengthTopSegment = 0;
         int lengthLeftSegment = 0;
@@ -119,7 +134,7 @@ public class RoadGen : MonoBehaviour
             }
         }
 
-        for (int row = 1; row < height-1; row++)
+        for (int row = 1; row < height - 1; row++)
         {
             // bottom-right (0,length) --> top right (height, length)
             if (noiseMap[row, width - 1] <= 0.01f)
@@ -143,8 +158,8 @@ public class RoadGen : MonoBehaviour
 
         }
 
-        
-        for (int col = width-1; col > 0; col--)
+
+        for (int col = width - 1; col > 0; col--)
         {
             // top-right (height, length) --> top left (height,0)
             if (noiseMap[height - 1, col] <= 0.01f)
@@ -191,7 +206,7 @@ public class RoadGen : MonoBehaviour
             }
         }
 
-        
+
 
         return entryPoints;
     }
@@ -205,7 +220,7 @@ public class RoadGen : MonoBehaviour
 
         for (int i = 0; i < entryPoints.Count - 1; i++)
         {
-            for (int j = 1; j < (entryPoints.Count-1)-i; j++)
+            for (int j = 1; j < (entryPoints.Count - 1) - i; j++)
             {
                 // if x or y is on the same border side, go to next
                 if (entryPoints[i].Item1 == entryPoints[i + j].Item1) continue;
@@ -228,16 +243,27 @@ public class RoadGen : MonoBehaviour
 
 
 
-    private void DrawPathsOnColorMap(List<List<(int x, int xy)>> listOfPaths)
+    public void DrawPathsOnColorMap(bool ShowAll)
     {
-        foreach (List<(int x, int xy)> path in listOfPaths)
+        if (ShowAll)
         {
-            foreach ((int x, int y) points in path)
+            foreach (List<(int x, int xy)> path in paths)
             {
-                //Debug.Log($"applying path color at ({points.Item1},{points.Item2})");
+                foreach ((int x, int y) points in path)
+                {
+                    //Debug.Log($"applying path color at ({points.Item1},{points.Item2})");
+                    ApplyRoadAtPoint(points.Item1, points.Item2, Color.red);
+                }
+            }
+        } else
+        {
+            List<(int x, int xy)> activePath = paths[pathListIndex];
+            foreach ((int x, int y) points in activePath)
+            {
                 ApplyRoadAtPoint(points.Item1, points.Item2, Color.red);
             }
         }
+
     }
 
 

@@ -7,7 +7,7 @@ using System.Text;
 
 public class CreateTopoMap : MonoBehaviour
 {
-    [SerializeField] private bool print_debug = true;
+    [SerializeField] private bool print_debug = false;
     [SerializeField] private GameObject topoObject;
     [SerializeField] private LayerTerrain lt;
     private bool makeTerrainTopographic;

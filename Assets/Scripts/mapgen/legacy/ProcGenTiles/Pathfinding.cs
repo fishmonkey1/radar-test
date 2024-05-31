@@ -52,7 +52,7 @@ namespace ProcGenTiles
                 else
                     tile.ValuesHere.Add("Land", 0);
 
-                AddFourNeighbors(coords.x, coords.y, queue, null, null);
+                AddFourNeighbors(coords.x, coords.y, queue, null, null, null);
             }
         }
 
@@ -92,7 +92,7 @@ namespace ProcGenTiles
                         found.ValuesHere.TryAdd("Region", region);
                         regionSizes[region]++; //Increment the number of tiles in the region
                         values.Remove(coords); //Delete from values if region is marked
-                        AddFourNeighbors(coords.x, coords.y, queue, null, null);
+                        AddFourNeighbors(coords.x, coords.y, queue, null, null, null);
                     }
                 }
                 region++; //On to the next one if the frontier ran out
@@ -113,7 +113,7 @@ namespace ProcGenTiles
                 var current = queue.Dequeue();
 
                 // Add neighboring tiles to the queue if not visited for 4 dir pathfinding: diamonds
-                AddFourNeighbors(current.x, current.y, queue, null, null);
+                AddFourNeighbors(current.x, current.y, queue, null, null, null);
 
                 //Thinking about running a Func<> through the params to determine what to do with the found tiles
 
@@ -128,12 +128,13 @@ namespace ProcGenTiles
 
             List<(int x, int y)> path = new List<(int x, int y)>();
             List<(int x, int y)> frontier = new List<(int x, int y)>();
+            List<(int x, int y)> badPaths = new List<(int x, int y)>();
 
 
             //Debug.Log("======== Astar =======");
             //Debug.Log($"Running AStar: ({start.Item1},{start.Item2}) ---> ({end.Item1},{end.Item2})");
             path.Add(start);
-            AddFourNeighbors(start.Item1, start.Item2, null, frontier, path); //Override AddFourNeighbors to accept a list object
+            AddFourNeighbors(start.Item1, start.Item2, null, frontier, path, badPaths); //Override AddFourNeighbors to accept a list object
             int lowestCost = 9999999; //Set to something huge, this also might be a float, idk
             (int x, int y) lowestCandidate = (0, 0);  //For storing the tuple that has lowestCost
 
@@ -157,22 +158,23 @@ namespace ProcGenTiles
                     lowestCost = 9999999; //Reset for next loop
                     path.Add(lowestCandidate);
                     frontier.Clear();
-                    AddFourNeighbors(lowestCandidate.Item1, lowestCandidate.Item2, null, frontier, path);
+                    AddFourNeighbors(lowestCandidate.Item1, lowestCandidate.Item2, null, frontier, path, badPaths);
                     lowestCandidate = (0, 0); //reset lowest candidate
                 }
                 else
                 {   // if it didn't find a good neighbor
                     // go back a square, try and get new neighbors.
-                    // Keep retracing steps until can find a path. (next iteration will go back again)
+                    // Keep retracing steps until can find neighbors. (next iteration will go back again)
                     // If get back to start, path returns null.
 
                     // get neighbors of prev square in path
+                    badPaths.Add(path[path.Count - 1]);
                     int lastIndex = path.Count - 2;
                     if (lastIndex >= 0)
                     {
                         if ((path[lastIndex].Item1, path[lastIndex].Item2) != start)
                         {
-                            AddFourNeighbors(path[path.Count - 2].Item1, path[path.Count - 2].Item2, null, frontier, path);
+                            AddFourNeighbors(path[path.Count - 2].Item1, path[path.Count - 2].Item2, null, frontier, path, badPaths);
                             //path.RemoveAt(path.Count - 1); // remove last from path? this isn't working
                             path.Remove(path[lastIndex+1]);
                         }
@@ -184,24 +186,24 @@ namespace ProcGenTiles
             return path;
         }
 
-        private void AddFourNeighbors(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> frontier, List<(int x, int y)> path)
+        private void AddFourNeighbors(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> frontier, List<(int x, int y)> path, List<(int x, int y)> badPaths)
         {
-            AddNeighborToQueue(x - 1, y, q, frontier, path);
-            AddNeighborToQueue(x + 1, y, q, frontier, path);
-            AddNeighborToQueue(x, y - 1, q, frontier, path);
-            AddNeighborToQueue(x, y + 1, q, frontier, path);
+            AddNeighborToQueue(x - 1, y, q, frontier, path, badPaths);
+            AddNeighborToQueue(x + 1, y, q, frontier, path, badPaths);
+            AddNeighborToQueue(x, y - 1, q, frontier, path, badPaths);
+            AddNeighborToQueue(x, y + 1, q, frontier, path, badPaths);
         }
 
-        private void AddEightNeighbors(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> frontier, List<(int x, int y)> path)
+        private void AddEightNeighbors(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> frontier, List<(int x, int y)> path, List<(int x, int y)> badPaths)
         {
-            AddFourNeighbors(x, y, q, frontier, path);
-            AddNeighborToQueue(x - 1, y - 1, q, frontier, path);
-            AddNeighborToQueue(x + 1, y - 1, q, frontier, path);
-            AddNeighborToQueue(x - 1, y + 1, q, frontier, path);
-            AddNeighborToQueue(x + 1, y + 1, q, frontier, path);
+            AddFourNeighbors(x, y, q, frontier, path, badPaths);
+            AddNeighborToQueue(x - 1, y - 1, q, frontier, path, badPaths);
+            AddNeighborToQueue(x + 1, y - 1, q, frontier, path, badPaths);
+            AddNeighborToQueue(x - 1, y + 1, q, frontier, path, badPaths);
+            AddNeighborToQueue(x + 1, y + 1, q, frontier, path, badPaths);
         }
 
-        private void AddNeighborToQueue(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> frontier, List<(int x, int y)> path)
+        private void AddNeighborToQueue(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> frontier, List<(int x, int y)> path, List<(int x, int y)> badPaths)
         {
             if (Map.IsValidTilePosition(x, y) && !visited.Contains((x, y)))
             {
@@ -212,7 +214,7 @@ namespace ProcGenTiles
             }
 
 
-            if (Map.IsValidTilePosition(x, y) && !path.Contains((x, y)))
+            if (Map.IsValidTilePosition(x, y) && !path.Contains((x, y)) && !badPaths.Contains((x, y))) // ---->  if (Map.IsValidTilePosition(x, y) && !path.Contains((x, y)) && !badPaths.Contains((x,y)))
             {
                 frontier.Add((x, y));
             }
