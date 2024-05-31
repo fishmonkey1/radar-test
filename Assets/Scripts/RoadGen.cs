@@ -16,11 +16,14 @@ public class RoadGen : MonoBehaviour
     private float[,] roadMapData;
     private List<(int, int)> entryPoints = new List<(int, int)>();
     List<List<(int x, int xy)>> paths;
-
-
-    public int entryGapMin = 6;
     int width;
     int height;
+
+    public int entryGapMin = 6;
+    public float elevationLimitForPathfind = 0.01f;
+    
+
+
 
 
 
@@ -53,15 +56,15 @@ public class RoadGen : MonoBehaviour
 
         entryPoints = GetMapEntries();
 
-        /*entryPoints.Add((25,25));
-        entryPoints.Add((200, 200));*/
+        //entryPoints.Add((0,95));
+        //entryPoints.Add((146, 255));
 
         Debug.Log($"found {entryPoints.Count} entryPoints");
-        /*foreach ((int x, int y) points in entryPoints)
+        foreach ((int x, int y) points in entryPoints)
         {
             Debug.Log($"({points.Item1},{points.Item2})");
-        }*/
-        
+        }
+
         paths = PathfindEachEntry(entryPoints);
         Debug.Log($"PathfindEachEntry() returned: {paths} , which contains {paths.Count} paths");
         
@@ -141,7 +144,6 @@ public class RoadGen : MonoBehaviour
                 roadMapData[height - 1, col] = 1f;
                 colorMap[(width - 1) * width + col] = roadColor; //works
                 lengthTopSegment += 1;
-                Debug.Log(lengthTopSegment);
             }
             else
             {
@@ -205,7 +207,7 @@ public class RoadGen : MonoBehaviour
             
             xy_end = entryPoints[i + 1];
             Debug.Log($"Finding path from {entryPoints[i]} to {xy_end}");
-            foundPath = pathFinding.AStar(entryPoints[i], xy_end, noiseMap);
+            foundPath = pathFinding.AStar(entryPoints[i], xy_end, noiseMap, elevationLimitForPathfind);
             Debug.Log($"pathfinding found path with length: {foundPath.Count}");
 
             paths.Add(foundPath);
