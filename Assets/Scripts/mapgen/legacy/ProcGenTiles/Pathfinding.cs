@@ -142,12 +142,18 @@ namespace ProcGenTiles
                                            //while (!path.Contains(end))
             { //doing the while loop breaks things :((((
                 for (int i = 0; i < frontier.Count; i++)
-                {
+                {   
                     var candidate = frontier[i];
-                    var manhattanCost = Helpers.ManhattanDistance(candidate.Item1, end.Item1, candidate.Item2, end.Item2);
-                    if (manhattanCost < lowestCost && noiseMap[frontier[i].Item1, frontier[i].Item2] <= elevationLimit)
+
+                    // if not traversible skip this node
+                    if (noiseMap[candidate.Item1, candidate.Item2] > elevationLimit) continue; 
+
+                    var gCost = Helpers.ManhattanDistance(candidate.Item1, start.Item1, candidate.Item2, start.Item2); //dist to start
+                    var hCost = Helpers.ManhattanDistance(candidate.Item1, end.Item1, candidate.Item2, end.Item2); //dist to end
+                    var fCost = gCost + hCost; // start dist + end dist
+                    if (fCost < lowestCost)
                     {
-                        lowestCost = manhattanCost;
+                        lowestCost = fCost;
                         lowestCandidate = candidate;
                     }
                 }
@@ -175,8 +181,7 @@ namespace ProcGenTiles
                         if ((path[lastIndex].Item1, path[lastIndex].Item2) != start)
                         {
                             AddFourNeighbors(path[path.Count - 2].Item1, path[path.Count - 2].Item2, null, frontier, path, badPaths);
-                            //path.RemoveAt(path.Count - 1); // remove last from path? this isn't working
-                            path.Remove(path[lastIndex+1]);
+                            path.Remove(path[path.Count - 1]);
                         }
                     }
                     else return null;
@@ -214,7 +219,7 @@ namespace ProcGenTiles
             }
 
 
-            if (Map.IsValidTilePosition(x, y) && !path.Contains((x, y)) && !badPaths.Contains((x, y))) // ---->  if (Map.IsValidTilePosition(x, y) && !path.Contains((x, y)) && !badPaths.Contains((x,y)))
+            if (Map.IsValidTilePosition(x, y) && !badPaths.Contains((x, y))) // ---->  if (Map.IsValidTilePosition(x, y) && !path.Contains((x, y)) && !badPaths.Contains((x,y)))
             {
                 frontier.Add((x, y));
             }
