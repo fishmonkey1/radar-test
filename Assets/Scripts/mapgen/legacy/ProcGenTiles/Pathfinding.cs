@@ -121,13 +121,60 @@ namespace ProcGenTiles
             }
         }
 
+
+        public List<(int x, int y)> FindLandmassFloodFill((int x, int y) start, float[,] noiseMap, float[,] roadMapData, float elevationLimit)
+        {
+            List<(int x, int y)> floodpoints = new List<(int x, int y)>();
+
+            queue.Clear();
+            queue.Enqueue(start);
+            visited.Clear();
+            visited.Add(start);
+
+            int count = 0;
+
+            for (int x = 0; x < 100; x++) //this is for quick debug to keep me getting stuck in the while loop 
+            //while (queue.Count > 0)
+            {
+                (int x, int y) coords = queue.Dequeue();
+
+                if (isWall(coords)) {
+                    addData(coords, 1);
+                } else {
+                    addData(coords, 0);
+                    floodpoints.Add(coords);
+
+                        }
+                int qcount = queue.Count;
+                AddFourNeighbors(coords.x, coords.y, queue, null, null, null);
+                int added = qcount - queue.Count;
+                count += added;
+            }
+
+            Debug.Log("floodfill got: "+count);
+
+            void addData((int x, int y) coords, int val)
+            {
+                Debug.Log(coords);
+                Debug.Log(val);
+                Debug.Log(roadMapData);
+                roadMapData[coords.Item1, coords.Item2] = val;
+            }
+
+            bool isWall((int x, int y) coords)
+            {
+                return noiseMap[coords.Item1, coords.Item2] > elevationLimit;
+            }
+            return floodpoints;
+        }
+
         public Dictionary<string, List<(int x, int y)>> AStar((int x, int y) start, (int x, int y) end, float[,] nm, float el)
         {
             var pathData = new Dictionary<string, List<(int x, int y)>>();
 
             // (List<(int x, int y)> ,List<(int x, int y)>)
-            noiseMap = nm;
-            elevationLimit = el;
+            float[,] noiseMap = nm;
+            float elevationLimit = el;
 
             List<(int x, int y)> path = new List<(int x, int y)>();
             List<(int x, int y)> frontier = new List<(int x, int y)>();
@@ -145,9 +192,9 @@ namespace ProcGenTiles
 
             //for (int x = 0; x < 10000; x++) //this is for quick debug to keep me getting stuck in the while loop 
             while (!path.Contains(end))
-            { 
+            {
                 for (int i = 0; i < frontier.Count; i++)
-                {   
+                {
                     var candidate = frontier[i];
                     var candidate_x = candidate.Item1;
                     var candidate_y = candidate.Item2;
@@ -167,7 +214,7 @@ namespace ProcGenTiles
                         return pathData;
                     }
 
-                    if (frontier.Count==1 && candidate==start) // idk if this works... should try to retrace its steps back to the start if there's no path?
+                    if (frontier.Count == 1 && candidate == start) // idk if this works... should try to retrace its steps back to the start if there's no path?
                     {
                         path = null;
                         pathData.Add("path", path);
@@ -180,8 +227,8 @@ namespace ProcGenTiles
                     var fCost = gCost + hCost; // start dist + end dist
 
                     //Debug.Log(candidate+$"  gCost {gCost},  hCost {hCost},  fCost {fCost},");
-                    
-                    if (hCost < lowestCost) 
+
+                    if (hCost < lowestCost)
                     {
                         lowestCost = hCost;
                         lowestCandidate = candidate;
@@ -202,7 +249,7 @@ namespace ProcGenTiles
                 {
                     //Debug.Log($"No good node at {path[path.Count-1]}, added to badPaths");                    
                     retracing = true;
-                    badPaths.Add((path[path.Count-1]));
+                    badPaths.Add((path[path.Count - 1]));
                     AddEightNeighbors(lowestCandidate.Item1, lowestCandidate.Item2, null, frontier, path, badPaths);
                 }
                 else
@@ -218,12 +265,16 @@ namespace ProcGenTiles
 
             }
 
-            Debug.Log("if you're seeing this, there was a fucky wucky with Pathfinding.Astar() ... Broke out of loop without finding path OR returning null...");
+            Debug.Log("if you're seeing this, there was a fucky wucky with Pathfinding.Astar() ... Broke out of while loop without finding path OR returning null...");
             return pathData; // this will never be called...hopefully
         }
 
+
+        // TODO: Have these return the neighbors instead of setting them directly.
         private void AddFourNeighbors(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> frontier, List<(int x, int y)> path, List<(int x, int y)> badPaths)
         {
+            List<(int x, int y)> neighbors = new List<(int x, int y)>();
+
             AddNeighborToQueue(x - 1, y, q, frontier, path, badPaths);
             AddNeighborToQueue(x + 1, y, q, frontier, path, badPaths);
             AddNeighborToQueue(x, y - 1, q, frontier, path, badPaths);
@@ -232,6 +283,8 @@ namespace ProcGenTiles
 
         private void AddEightNeighbors(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> frontier, List<(int x, int y)> path, List<(int x, int y)> badPaths)
         {
+            List<(int x, int y)> neighbors = new List<(int x, int y)>();
+
             AddFourNeighbors(x, y, q, frontier, path, badPaths);
             AddNeighborToQueue(x - 1, y - 1, q, frontier, path, badPaths);
             AddNeighborToQueue(x + 1, y - 1, q, frontier, path, badPaths);
@@ -244,15 +297,16 @@ namespace ProcGenTiles
             if (Map.IsValidTilePosition(x, y) && !visited.Contains((x, y)))
             {
                 if (q != null)
-                {
+                {   
+                    
                     q.Enqueue((x, y));
                 }
             }
 
-
-            if (Map.IsValidTilePosition(x, y)) 
+            
+            if (Map.IsValidTilePosition(x, y))
             {
-                frontier.Add((x, y));
+                //frontier.Add((x, y));
             }
         }
     }

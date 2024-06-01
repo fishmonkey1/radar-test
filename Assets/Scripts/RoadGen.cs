@@ -84,13 +84,14 @@ public class RoadGen : MonoBehaviour
         colorMap = colorMcMapFace;
         width = noiseMap.GetLength(0);
         height = noiseMap.GetLength(1);
-        pathFinding = new Pathfinding(lt.finalMap); 
+        pathFinding = new Pathfinding(lt.finalMap);
+        roadMapData = new float[width, height];
 
 
         //entryPoints = GetMapEntries(); // this will populate entry-points automatically
-                                         // need to fix no-path before this will work
-                                         // (makes while loop run forever)
-                                         
+        // need to fix no-path before this will work
+        // (makes while loop run forever)
+
         // this is just for debug
         entryPoints.Add((0, 10));
         entryPoints.Add((132, 0));
@@ -105,17 +106,17 @@ public class RoadGen : MonoBehaviour
 
         paths = PathfindEachEntry(entryPoints);
 
-        // draw paths
+       /* // draw paths
         foreach (List<(int x, int y)> path in paths) //draw paths
         {
             DrawPathsOnColorMap(path, Color.green, true);
-        }
+        }*/
 
         // draw bad paths (if applicable)
-        foreach (List<(int x, int y)> path in badPaths) 
+        /*foreach (List<(int x, int y)> path in badPaths) 
         {
             DrawPathsOnColorMap(path, Color.red, true);
-        }
+        }*/
 
         // draw start points
         foreach ((int x, int y) points in entryPoints) 
@@ -123,6 +124,13 @@ public class RoadGen : MonoBehaviour
             DrawColorAtPoint(points.Item1, points.Item2, Color.cyan);
         }
 
+        // FLOPODFILL STUFF
+
+        List<(int x,int y)> floodpoints= pathFinding.FindLandmassFloodFill((0, 10), noiseMap, roadMapData, elevationLimitForPathfind);
+        foreach ((int x, int y) points in floodpoints)
+        {
+            DrawColorAtPoint(points.Item1, points.Item2, Color.cyan);
+        }
 
         return colorMap; //returns map to gamemanger, which applies texture
 
@@ -139,7 +147,7 @@ public class RoadGen : MonoBehaviour
         // TODO: Implement where when it gets to the corner,
         //       if it's currently in a gap, continue the gap size.    <--- implemented but not tested
 
-        roadMapData = new float[width, height];
+        
 
         int lengthBottomSegmentGap = 0;
         int lengthTopSegmentGap = 0;
@@ -151,7 +159,7 @@ public class RoadGen : MonoBehaviour
         {
             if (noiseMap[0, col] <= elevationLimitForPathfind)
             {
-                roadMapData[0, col] = 1f;
+                roadMapData[0, col] = 0f;
                 colorMap[0 * width + col] = Color.black; //works
                 lengthBottomSegmentGap += 1;
             }
@@ -176,7 +184,7 @@ public class RoadGen : MonoBehaviour
    
             if (noiseMap[row, width - 1] <= elevationLimitForPathfind)
             {
-                roadMapData[row, width - 1] = 1f;
+                roadMapData[row, width - 1] = 0f;
                 colorMap[row * width - 1] = Color.black;
                 lengthRightSegmentGap += 1;
             }
@@ -202,7 +210,7 @@ public class RoadGen : MonoBehaviour
 
             if (noiseMap[height - 1, col] <= elevationLimitForPathfind)
             {
-                roadMapData[height - 1, col] = 1f;
+                roadMapData[height - 1, col] = 0f;
                 colorMap[(width - 1) * width + col] = Color.black; //works
                 lengthTopSegmentGap += 1;
             }
@@ -228,7 +236,7 @@ public class RoadGen : MonoBehaviour
             
             if (noiseMap[row, 0] <= elevationLimitForPathfind)
             {
-                roadMapData[row, 0] = 1f;
+                roadMapData[row, 0] = 0f;
                 colorMap[row * width] = Color.black;
                 lengthLeftSegmentGap += 1;
             }
@@ -276,7 +284,7 @@ public class RoadGen : MonoBehaviour
 
                 if (foundPath != null)
                 {
-                    Debug.Log($"Path from {entryPoints[i]} to {xy_end} has length of {foundPath.Count}");
+                    //Debug.Log($"Path from {entryPoints[i]} to {xy_end} has length of {foundPath.Count}");
                     paths.Add(foundPath);
 
                     if (pathData.ContainsKey("badPaths")) 
