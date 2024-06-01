@@ -122,42 +122,38 @@ namespace ProcGenTiles
         }
 
 
-        public List<(int x, int y)> FindLandmassFloodFill((int x, int y) start, float[,] noiseMap, float[,] roadMapData, float elevationLimit)
+        public List<List<(int x, int y)>> FindLandmassFloodFill((int x, int y) start, float[,] noiseMap, float[,] roadMapData, float elevationLimit)
         {
-            List<(int x, int y)> floodpoints = new List<(int x, int y)>();
+            List<List<(int x, int y)>> landmasses = new List<List<(int x, int y)>>();
 
-            queue.Clear();
-            queue.Enqueue(start);
-            visited.Clear();
-            visited.Add(start);
 
-            int count = 0;
-
-            for (int x = 0; x < 100; x++) //this is for quick debug to keep me getting stuck in the while loop 
+            for (int x = 0; x < 38000; x++) //this is for quick debug to keep me getting stuck in the while loop 
             //while (queue.Count > 0)
             {
                 (int x, int y) coords = queue.Dequeue();
+                visited.Add(coords);
 
                 if (isWall(coords)) {
                     addData(coords, 1);
                 } else {
                     addData(coords, 0);
-                    floodpoints.Add(coords);
+
+                    //Debug.Log(coords);
 
                         }
                 int qcount = queue.Count;
                 AddFourNeighbors(coords.x, coords.y, queue, null, null, null);
-                int added = qcount - queue.Count;
-                count += added;
+                int added = queue.Count - qcount;
+
             }
 
-            Debug.Log("floodfill got: "+count);
+
 
             void addData((int x, int y) coords, int val)
             {
-                Debug.Log(coords);
-                Debug.Log(val);
-                Debug.Log(roadMapData);
+               // Debug.Log(coords);
+               // Debug.Log(val);
+               // Debug.Log(roadMapData);
                 roadMapData[coords.Item1, coords.Item2] = val;
             }
 
@@ -165,7 +161,8 @@ namespace ProcGenTiles
             {
                 return noiseMap[coords.Item1, coords.Item2] > elevationLimit;
             }
-            return floodpoints;
+
+            return landmasses;
         }
 
         public Dictionary<string, List<(int x, int y)>> AStar((int x, int y) start, (int x, int y) end, float[,] nm, float el)
@@ -294,13 +291,11 @@ namespace ProcGenTiles
 
         private void AddNeighborToQueue(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> frontier, List<(int x, int y)> path, List<(int x, int y)> badPaths)
         {
-            if (Map.IsValidTilePosition(x, y) && !visited.Contains((x, y)))
+            if (Map.IsValidTilePosition(x, y) && !visited.Contains((x, y))) //
             {
-                if (q != null)
-                {   
-                    
+            
                     q.Enqueue((x, y));
-                }
+                
             }
 
             

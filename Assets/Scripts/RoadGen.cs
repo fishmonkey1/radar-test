@@ -104,7 +104,7 @@ public class RoadGen : MonoBehaviour
 
         //Debug.Log($"found {entryPoints.Count} entryPoints");
 
-        paths = PathfindEachEntry(entryPoints);
+        //paths = PathfindEachEntry(entryPoints);
 
        /* // draw paths
         foreach (List<(int x, int y)> path in paths) //draw paths
@@ -126,11 +126,13 @@ public class RoadGen : MonoBehaviour
 
         // FLOPODFILL STUFF
 
-        List<(int x,int y)> floodpoints= pathFinding.FindLandmassFloodFill((0, 10), noiseMap, roadMapData, elevationLimitForPathfind);
-        foreach ((int x, int y) points in floodpoints)
+       // List<List<(int x,int y)>> floodpoints = pathFinding.FindLandmassFloodFill((0, 10), noiseMap, roadMapData, elevationLimitForPathfind);
+        //Debug.Log($"got back {floodpoints.Count}");
+
+       /* foreach ((int x, int y) points in floodpoints)
         {
             DrawColorAtPoint(points.Item1, points.Item2, Color.cyan);
-        }
+        }*/
 
         return colorMap; //returns map to gamemanger, which applies texture
 
@@ -256,7 +258,9 @@ public class RoadGen : MonoBehaviour
 
         return entryPoints;
     }
-
+    /// <summary>
+    /// 
+    /// </summary>
 
     //-----------------------------------------------------------------------------------------
     /// <summary>
@@ -280,8 +284,6 @@ public class RoadGen : MonoBehaviour
                 Dictionary<string, List<(int x, int y)>> pathData = pathFinding.AStar(entryPoints[i], xy_end, noiseMap, elevationLimitForPathfind);
                 List<(int x, int xy)> foundPath = pathData["path"];
                
-               
-
                 if (foundPath != null)
                 {
                     //Debug.Log($"Path from {entryPoints[i]} to {xy_end} has length of {foundPath.Count}");

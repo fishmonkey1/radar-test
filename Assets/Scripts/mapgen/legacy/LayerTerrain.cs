@@ -321,7 +321,7 @@ public class LayerTerrain : MonoBehaviour
     }
 
     public void UpdateTerrainHeightmap(int xBase, int yBase, float[,] heightmap) //MOVE?
-    { //This might need work to instead mark the terrain as dirty until all deform operations are done, and THEN we set the heights
+    { // TODO: This might need work to instead mark the terrain as dirty until all deform operations are done, and THEN we set the heights
         terrain.terrainData.SetHeights(xBase, yBase, heightmap); //Fuck you SetHeights, why do you pretend like I can update regions with the xBase and yBase when you actually suck?
 
         //Because fuck you, that's why! >:)
