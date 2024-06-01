@@ -121,8 +121,11 @@ namespace ProcGenTiles
             }
         }
 
-        public List<(int x, int y)> AStar((int x, int y) start, (int x, int y) end, float[,] nm, float el)
+        public Dictionary<string, List<(int x, int y)>> AStar((int x, int y) start, (int x, int y) end, float[,] nm, float el)
         {
+            var pathData = new Dictionary<string, List<(int x, int y)>>();
+
+            // (List<(int x, int y)> ,List<(int x, int y)>)
             noiseMap = nm;
             elevationLimit = el;
 
@@ -133,62 +136,90 @@ namespace ProcGenTiles
 
             //Debug.Log("======== Astar =======");
             //Debug.Log($"Running AStar: ({start.Item1},{start.Item2}) ---> ({end.Item1},{end.Item2})");
-            path.Add(start);
-            AddFourNeighbors(start.Item1, start.Item2, null, frontier, path, badPaths); //Override AddFourNeighbors to accept a list object
-            int lowestCost = 9999999; //Set to something huge, this also might be a float, idk
-            (int x, int y) lowestCandidate = (0, 0);  //For storing the tuple that has lowestCost
 
-            for (int x = 0; x < 6000; x++) //this is for quick debug to keep me getting stuck in the while loop 
-                                           //while (!path.Contains(end))
-            { //doing the while loop breaks things :((((
+            path.Add(start);
+            AddEightNeighbors(start.Item1, start.Item2, null, frontier, path, badPaths); //Override AddFourNeighbors to accept a list object
+            int lowestCost = int.MaxValue; //Set to something huge, this also might be a float, idk
+            var lowestCandidate = (int.MaxValue, int.MaxValue);  //For storing the tuple that has lowestCost
+            bool retracing = false;
+
+            //for (int x = 0; x < 10000; x++) //this is for quick debug to keep me getting stuck in the while loop 
+            while (!path.Contains(end))
+            { 
                 for (int i = 0; i < frontier.Count; i++)
                 {   
                     var candidate = frontier[i];
+                    var candidate_x = candidate.Item1;
+                    var candidate_y = candidate.Item2;
 
                     // if not traversible skip this node
-                    if (noiseMap[candidate.Item1, candidate.Item2] > elevationLimit) continue; 
+                    if (noiseMap[candidate_x, candidate_y] > elevationLimit) continue;
+                    // if in badPath also skip node
+                    if (badPaths.Contains((candidate_x, candidate_y))) continue;
+                    // ignore path unless retracing steps...idk about this one lol
+                    if (!retracing && path.Contains(candidate)) continue;
 
-                    var gCost = Helpers.ManhattanDistance(candidate.Item1, start.Item1, candidate.Item2, start.Item2); //dist to start
-                    var hCost = Helpers.ManhattanDistance(candidate.Item1, end.Item1, candidate.Item2, end.Item2); //dist to end
+                    if (candidate == end)
+                    {
+                        path.Add(candidate);
+                        pathData.Add("path", path);
+                        pathData.Add("badPaths", badPaths);
+                        return pathData;
+                    }
+
+                    if (frontier.Count==1 && candidate==start) // idk if this works... should try to retrace its steps back to the start if there's no path?
+                    {
+                        path = null;
+                        pathData.Add("path", path);
+                        pathData.Add("badPaths", badPaths);
+                        return pathData;
+                    }
+
+                    var gCost = Helpers.ManhattanDistance(candidate_x, start.Item1, candidate_y, start.Item2); //dist to start
+                    var hCost = Helpers.ManhattanDistance(candidate_x, end.Item1, candidate_y, end.Item2); //dist to end
                     var fCost = gCost + hCost; // start dist + end dist
-                    if (fCost < lowestCost)
+
+                    //Debug.Log(candidate+$"  gCost {gCost},  hCost {hCost},  fCost {fCost},");
+                    
+                    if (hCost < lowestCost) 
+                    {
+                        lowestCost = hCost;
+                        lowestCandidate = candidate;
+                    }
+
+                    // Why does fCost not work? I thought that was how you were supposed to do this?
+                    /*
+                    if (fCost < lowestCost) 
                     {
                         lowestCost = fCost;
                         lowestCandidate = candidate;
                     }
+                    */
                 }
 
-                //if it found a good neighbor like State Farm
-                if (lowestCandidate != (0, 0)) //if it isn't the default whatever
+                // if no good nodes found
+                if (lowestCandidate == (int.MaxValue, int.MaxValue))
                 {
-                    lowestCost = 9999999; //Reset for next loop
-                    path.Add(lowestCandidate);
-                    frontier.Clear();
-                    AddFourNeighbors(lowestCandidate.Item1, lowestCandidate.Item2, null, frontier, path, badPaths);
-                    lowestCandidate = (0, 0); //reset lowest candidate
+                    //Debug.Log($"No good node at {path[path.Count-1]}, added to badPaths");                    
+                    retracing = true;
+                    badPaths.Add((path[path.Count-1]));
+                    AddEightNeighbors(lowestCandidate.Item1, lowestCandidate.Item2, null, frontier, path, badPaths);
                 }
                 else
-                {   // if it didn't find a good neighbor
-                    // go back a square, try and get new neighbors.
-                    // Keep retracing steps until can find neighbors. (next iteration will go back again)
-                    // If get back to start, path returns null.
-
-                    // get neighbors of prev square in path
-                    badPaths.Add(path[path.Count - 1]);
-                    int lastIndex = path.Count - 2;
-                    if (lastIndex >= 0)
-                    {
-                        if ((path[lastIndex].Item1, path[lastIndex].Item2) != start)
-                        {
-                            AddFourNeighbors(path[path.Count - 2].Item1, path[path.Count - 2].Item2, null, frontier, path, badPaths);
-                            path.Remove(path[path.Count - 1]);
-                        }
-                    }
-                    else return null;
+                {   //Debug.Log($"lowestCandidate is {lowestCandidate}, finding new neighbors...");
+                    retracing = false;
+                    lowestCost = int.MaxValue; //Reset for next loop
+                    path.Add(lowestCandidate);
+                    frontier.Clear();
+                    AddEightNeighbors(lowestCandidate.Item1, lowestCandidate.Item2, null, frontier, path, badPaths);
+                    lowestCandidate = (int.MaxValue, int.MaxValue); //reset lowest candidate
                 }
+                //Debug.Log($"======================================================================");
+
             }
 
-            return path;
+            Debug.Log("if you're seeing this, there was a fucky wucky with Pathfinding.Astar() ... Broke out of loop without finding path OR returning null...");
+            return pathData; // this will never be called...hopefully
         }
 
         private void AddFourNeighbors(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> frontier, List<(int x, int y)> path, List<(int x, int y)> badPaths)
@@ -219,7 +250,7 @@ namespace ProcGenTiles
             }
 
 
-            if (Map.IsValidTilePosition(x, y) && !badPaths.Contains((x, y))) // ---->  if (Map.IsValidTilePosition(x, y) && !path.Contains((x, y)) && !badPaths.Contains((x,y)))
+            if (Map.IsValidTilePosition(x, y)) 
             {
                 frontier.Add((x, y));
             }
