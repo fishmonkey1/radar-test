@@ -73,10 +73,19 @@ public class RoadGen : MonoBehaviour
         height = noiseMap.GetLength(1);
         pathFinding = new Pathfinding(lt.finalMap); // this was being created after tryying to use it lol
 
-        entryPoints = GetMapEntries();
+        //entryPoints = GetMapEntries();
 
-        //entryPoints.Add((0,95));
-        //entryPoints.Add((146, 255));
+        //entryPoints.Add((0, 10));
+        //entryPoints.Add((142, 255));
+       // entryPoints.Add((255, 117));
+        
+        //entryPoints.Add((132, 0));
+        entryPoints.Add((0, 88));
+        entryPoints.Add((192, 0));
+        entryPoints.Add((192, 0));
+        //entryPoints.Add((0, 177));
+        // entryPoints.Add((142, 255));
+
 
         /*Debug.Log($"found {entryPoints.Count} entryPoints");
         foreach ((int x, int y) points in entryPoints)
