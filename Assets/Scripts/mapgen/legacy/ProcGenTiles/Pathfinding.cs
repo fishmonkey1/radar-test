@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -119,6 +121,89 @@ namespace ProcGenTiles
 
 
             }
+        }
+
+        public List<List<Tile>> MarkLandmassRegions(float[,] noiseMap, float elevationLimit)
+        {
+            List<List<Tile>> allRegions = new List<List<Tile>>();
+            int regionLabel = 1;
+            for (int width = 0; width < Map.Width; width++)
+            {
+                for (int height = 0; height < Map.Height; height++)
+                { //Loop through all tiles on the map
+                  //Check if the tile has a land code and assign it based on the elevationLimit
+                  //If the tile is over the elevationLimit, do a DFS or BFS on all neighbors above the limit and label
+                    Tile t = Map.GetTile(width, height);
+                    if (!t.ValuesHere.ContainsKey("Elevation"))
+                    { //Raise an error ifg you run the landmass marking without elevation data set
+                        throw new System.Exception("Cannot floodfill landmasses without elevation data!");
+                    }
+                    else
+                    { //There's elevation data here, so we check if it's under the elevation limit
+                        if (t.ValuesHere["Elevation"] < elevationLimit && !t.ValuesHere.ContainsKey("Region"))
+                        { //This is not a raised landmass and just needs to have its Land value added as zero
+                            t.ValuesHere.Add("Land", 0); //This takes a float, but we'll use 0 and 1 anyways :P
+                            t.ValuesHere.Add("Region", 0); //All flat ground will be region zero, regardless of connection
+                        }
+                        else
+                        { //The tile is above the elevation limit and needs to be checked
+                            if (!t.ValuesHere.ContainsKey("Region"))
+                            {//If this hasn't had a region assigned then we need to floodfill this area
+                                t.ValuesHere.Add("Land", 1); //We'll still mark the land here anyways, cause fuggit
+                                //Do something with the returned region later, i guess?
+                                List<Tile> region = FloodfillRegion(regionLabel, width, height, elevationLimit);
+                                allRegions.Add(region); //Just stuff it in here for now :c
+                                regionLabel++;
+                            }
+                        }
+                    }
+                }
+            }
+            return allRegions;
+        }
+
+        private List<Tile> FloodfillRegion(int regionNumber, int x, int y, float elevationLimit)
+        { //Provide an override if you want to pass just the ints
+            return FloodfillRegion(regionNumber, (x, y), elevationLimit);
+        }
+
+        private List<Tile> FloodfillRegion(int regionNumber, (int x, int y) coords, float elevationLimit)
+        {
+            Tile startTile = Map.GetTile(coords);
+            startTile.ValuesHere.Add("Region", regionNumber); //Mark the first tile with the region number
+            List<Tile> regionTiles = new List<Tile>(); //For holding all the tiles that are found
+            regionTiles.Add(startTile);
+            Queue<Tile> frontier = new Queue<Tile>(); //All eligible neighbors we've found
+            frontier.Enqueue(startTile);
+
+            while (frontier.Count != 0)
+            { //time to start finding neighbors
+                Tile t = frontier.Dequeue();
+                List<Tile> neighbors = GetFourNeighborsList(t.x, t.y, TileOverElevation, checkFloat: elevationLimit);
+                if (neighbors.Count == 0)
+                    continue; //Keep going, we found nothing
+                
+                foreach (Tile neighbor in neighbors)
+                { //Time to check if the neighbor has been checked already
+                    if (!regionTiles.Contains(neighbor))
+                    { //This is land that hasn't been assigned a region code, so lets fix that
+                        if (neighbor.ValuesHere.ContainsKey("Region"))
+                            continue; //Don't try to mark regions that have already been marked
+                        neighbor.ValuesHere.Add("Region", regionNumber);
+                        regionTiles.Add(neighbor);
+                        List<Tile> neighborNeighbors = GetFourNeighborsList(neighbor.x, neighbor.y, TileOverElevation, checkFloat: elevationLimit);
+                        foreach (Tile tile in neighborNeighbors)
+                        {
+                            if (!regionTiles.Contains(tile))
+                            { //Make sure we aren't adding tiles we've already marked
+                                frontier.Enqueue(tile);
+                            }
+                        }
+                    }
+                }
+            }
+            Debug.Log("Created region with tile size of: " + regionTiles.Count);
+            return regionTiles;
         }
 
 
@@ -268,6 +353,74 @@ namespace ProcGenTiles
 
 
         // TODO: Have these return the neighbors instead of setting them directly.
+
+        /// <summary>
+        /// Returns a list of four neighboring tiles using the checkFunction passed
+        /// </summary>
+        /// <param name="coords"></param>
+        /// <param name="checkFunction"></param>
+        /// <param name="optionalAddList"></param>
+        /// <returns>List<(int x, int y)></returns>
+        private List<Tile> GetFourNeighborsList((int x, int y) coords, Func<Tile, float, bool> checkFunction, List<Tile> optionalAddList = null, float checkFloat = 0)
+        { 
+            List<Tile> foundNeighbors = null;
+            if (optionalAddList == null)
+                foundNeighbors = new List<Tile>();
+            else
+                foundNeighbors = optionalAddList;
+            Tile start = Map.GetTile(coords);
+
+            Tile east = Map.GetTile(coords.x - 1, coords.y);
+            Tile west = Map.GetTile(coords.x + 1, coords.y);
+            Tile north = Map.GetTile(coords.x, coords.y + 1);
+            Tile south = Map.GetTile(coords.x, coords.y - 1);
+
+            //Run the found tile through the function that checks if we should add it
+
+            if (east != null)
+            {
+                if (checkFunction(east, checkFloat))
+                    foundNeighbors.Add(east);
+            }
+            if (west != null)
+            {
+                if (checkFunction(west, checkFloat))
+                    foundNeighbors.Add(west);
+            }
+            if (north != null)
+            {
+                if (checkFunction(north, checkFloat))
+                    foundNeighbors.Add(north);
+            }
+            if (south != null)
+            {
+                if (checkFunction(south, checkFloat))
+                    foundNeighbors.Add(south);
+            }
+
+            return foundNeighbors;
+        }
+
+        /// <summary>
+        /// Optional override in case you don't want to pack your own tuple :3
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="checkFunction"></param>
+        /// <param name="optionalAddList"></param>
+        /// <returns></returns>
+        private List<Tile> GetFourNeighborsList(int x, int y, Func<Tile, float, bool> checkFunction, List<Tile> optionalAddList = null, float checkFloat = 0)
+        {
+            return GetFourNeighborsList((x, y), checkFunction, optionalAddList);
+        }
+
+        private bool TileOverElevation(Tile t, float elevationLimit)
+        {
+            if (t.ValuesHere["Elevation"] > elevationLimit)
+                return true;
+            return false;
+        }
+
         private void AddFourNeighbors(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> frontier, List<(int x, int y)> path, List<(int x, int y)> badPaths)
         {
             List<(int x, int y)> neighbors = new List<(int x, int y)>();

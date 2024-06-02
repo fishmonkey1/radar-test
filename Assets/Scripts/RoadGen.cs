@@ -123,17 +123,24 @@ public class RoadGen : MonoBehaviour
         {
             DrawColorAtPoint(points.Item1, points.Item2, Color.cyan);
         }
-
-        // FLOPODFILL STUFF
-
-       // List<List<(int x,int y)>> floodpoints = pathFinding.FindLandmassFloodFill((0, 10), noiseMap, roadMapData, elevationLimitForPathfind);
-        //Debug.Log($"got back {floodpoints.Count}");
-
-       /* foreach ((int x, int y) points in floodpoints)
-        {
-            DrawColorAtPoint(points.Item1, points.Item2, Color.cyan);
-        }*/
-
+        List<List<Tile>> allRegions = pathFinding.MarkLandmassRegions(noiseMap, elevationLimitForPathfind);
+        Color[] someColors = { Color.blue, Color.grey, Color.green, Color.red, Color.magenta,
+            Color.yellow, Color.cyan, Color.black, Color.white };
+        int colorIndex = 0;
+        foreach (List<Tile> region in allRegions)
+        { //Color each region with a unique color
+            Color drawColor = someColors[colorIndex];
+            foreach (Tile t in region)
+            {
+                DrawColorAtPoint(t.x, t.y, drawColor);
+            }
+            colorIndex++;
+            if (colorIndex >= someColors.Length -1)
+            {
+                colorIndex = 0;
+            }
+        }
+        Debug.Log("Length of all regions is: " + allRegions.Count);
         return colorMap; //returns map to gamemanger, which applies texture
 
     }
@@ -302,7 +309,7 @@ public class RoadGen : MonoBehaviour
     }
 
 
-    public void DrawPathsOnColorMap(List<(int x, int xy)> toDraw, Color color, bool ShowAll = true)
+    public void DrawPathsOnColorMap(List<(int x, int y)> toDraw, Color color, bool ShowAll = true)
     {
         if (ShowAll)
         {
