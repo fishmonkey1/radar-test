@@ -208,7 +208,7 @@ namespace ProcGenTiles
                     }
                 }
             }
-            if (regionTiles.Count > 1) Debug.Log("Created region with tile size of: " + regionTiles.Count);
+            //if (regionTiles.Count > 1) Debug.Log("Created region with tile size of: " + regionTiles.Count);
 
             return regionTiles;
         }

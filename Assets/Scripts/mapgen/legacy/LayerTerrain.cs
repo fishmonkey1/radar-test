@@ -159,12 +159,12 @@ public class LayerTerrain : MonoBehaviour
             //if (i == 0) { minValue = pair.NoiseParams.minValue; raisedPower = pair.NoiseParams.raisedPower; };
 
             GenerateHeightmap(pair, LayersEnum.Elevation); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable
-            if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - GenerateHeightmap(): {t - lastTimeInterval}"); lastTimeInterval = t; }
+            //if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - GenerateHeightmap(): {t - lastTimeInterval}"); lastTimeInterval = t; }
         }
-        if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - Generating All Heightmaps: {t - tt}"); lastTimeInterval = t; }
+        //if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - Generating All Heightmaps: {t - tt}"); lastTimeInterval = t; }
 
         NormalizeFinalMap(LayersEnum.Elevation, elevationLayers.NoisePairs[0].NoiseParams.minValue, elevationLayers.NoisePairs[0].NoiseParams.raisedPower); //Make the final map only span from 0 to 1
-        if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - NormalizeFinalMap(): {t - lastTimeInterval}"); lastTimeInterval = t; }
+        //if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - NormalizeFinalMap(): {t - lastTimeInterval}"); lastTimeInterval = t; }
 
         /*if (!DrawInEditor)
         {   
@@ -174,7 +174,7 @@ public class LayerTerrain : MonoBehaviour
 
 
         CreateTerrainFromHeightmap();
-        if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - CreateTerrainFromHeightmap(): {t - lastTimeInterval}"); lastTimeInterval = t; }
+        //if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - CreateTerrainFromHeightmap(): {t - lastTimeInterval}"); lastTimeInterval = t; }
 
         Debug.Log("NOT doing landwaterfloodfill() in GenerateTerrain()");
         /*if (!makeTerrainTextureTopo)
@@ -202,7 +202,7 @@ public class LayerTerrain : MonoBehaviour
                 Debug.Log($"Region {i} contains {pathfinding.regionSizes[i]} tiles");
             }
         }
-        if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - TOTAL TIME GenerateTerrain(): {t - tt}"); lastTimeInterval = t; }
+        //if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - TOTAL TIME GenerateTerrain(): {t - tt}"); lastTimeInterval = t; }
     }
 
     public void CreateTerrainFromHeightmap()

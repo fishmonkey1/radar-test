@@ -9,6 +9,7 @@ public class RoadGen : MonoBehaviour
     [SerializeField] LayerTerrain lt;
     [SerializeField] Color roadColor;
     public Pathfinding pathFinding;
+    //public ConvexHull convexHull;
 
     private float[,] noiseMap;
     private Color[] colorMap;
@@ -21,12 +22,14 @@ public class RoadGen : MonoBehaviour
     int height;
 
     public bool showPaths = false;
-    public bool showFloodfill = false;
     public bool showEntryPoints = false;
+    public bool showFloodfill = false;
+    public int FloodfillSizeColorLimit = 0;
+
+    Dictionary<Vector3[], Color> gizmoPointsDict;
 
     public int entryGapMin = 15;
     [SerializeField] public float elevationLimitForPathfind;
-
 
     /* 
        1) Find map entries: loop around exterior of terrain. Find all of the low-elevation levels.
@@ -141,28 +144,53 @@ public class RoadGen : MonoBehaviour
             Color[] someColors = { Color.blue, Color.grey, Color.green, Color.red, Color.magenta,
             Color.yellow, Color.cyan, Color.black, Color.white };
             int colorIndex = 0;
+            gizmoPointsDict = new Dictionary<Vector3[], Color>();
+
             foreach (List<Tile> region in allRegions)
-            { //Color each region with a unique color
-                Color drawColor = someColors[colorIndex];
-                foreach (Tile t in region)
+            { 
+                if (region.Count >= FloodfillSizeColorLimit)
                 {
-                    DrawColorAtPoint(t.x, t.y, drawColor);
+                    //Color each region with a unique color
+                    Color drawColor = someColors[colorIndex];
+                    foreach (Tile t in region)
+                    {
+                        DrawColorAtPoint(t.x, t.y, drawColor);
+                    }
+
+                    drawHullGizmos(drawColor); //passing in the color so that we can color them the same
+
+                    colorIndex++;
+                    if (colorIndex >= someColors.Length - 1)
+                    {
+                        colorIndex = 0;
+                    }
+
+                    void drawHullGizmos(Color drawColor)
+                    {   
+                        // TODO: this is fucking DISGUSTING dont @ me lmao
+                        List<(int x, int y)> tilesasTuple = new List<(int x, int y)>();
+                        foreach (Tile t in region) tilesasTuple.Add((t.x, t.y));
+                        List<(int x, int y)> hullPoints = ConvexHull.GetConvexHull(tilesasTuple);
+
+                        Vector3[] gizmoPoints = new Vector3[hullPoints.Count];
+
+                        for (int i = 0; i < hullPoints.Count; i++)
+                        {
+                            //gizmoPoints[i] = new Vector3((float)hullPoints[i].x, 1.0f, (float)hullPoints[i].y); //my fucked axis has finally fucked me back -_-
+                            gizmoPoints[i] = new Vector3((float)hullPoints[i].y, 1.0f, (float)hullPoints[i].x);
+                        }
+                        gizmoPointsDict.Add(gizmoPoints, drawColor);
+                    }
+
                 }
-                colorIndex++;
-                if (colorIndex >= someColors.Length - 1)
-                {
-                    colorIndex = 0;
-                }
+                
             }
-            Debug.Log("Length of all regions is: " + allRegions.Count);
         }
-
-        
-
 
         return colorMap; //returns map to gamemanger, which applies texture
 
     }
+
 
     /// <summary>
     /// Loops around edges of noiseMap, finds entry points based on elevation.
@@ -175,7 +203,6 @@ public class RoadGen : MonoBehaviour
         // TODO: Implement where when it gets to the corner,
         //       if it's currently in a gap, continue the gap size.    <--- implemented but not tested
 
-        
 
         int lengthBottomSegmentGap = 0;
         int lengthTopSegmentGap = 0;
@@ -261,7 +288,6 @@ public class RoadGen : MonoBehaviour
         {
             if (lengthTopSegmentGap > 0) lengthLeftSegmentGap = lengthTopSegmentGap;
 
-            
             if (noiseMap[row, 0] <= elevationLimitForPathfind)
             {
                 roadMapData[row, 0] = 0f;
@@ -284,9 +310,6 @@ public class RoadGen : MonoBehaviour
 
         return entryPoints;
     }
-    /// <summary>
-    /// 
-    /// </summary>
 
     //-----------------------------------------------------------------------------------------
     /// <summary>
@@ -349,5 +372,15 @@ public class RoadGen : MonoBehaviour
         colorMap[x * width + y] = color;
     }
 
-
+    void OnDrawGizmosSelected()
+    {
+        if (gizmoPointsDict != null)
+        {
+            foreach (KeyValuePair<Vector3[], Color> gizmoPoints in gizmoPointsDict)
+            {
+                Gizmos.color = gizmoPoints.Value;
+                Gizmos.DrawLineStrip(gizmoPoints.Key, true);
+            }
+        }
+    }
 }
