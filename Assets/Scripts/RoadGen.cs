@@ -22,6 +22,8 @@ public class RoadGen : MonoBehaviour
 
     public bool showPaths = false;
     public bool showFloodfill = false;
+    public bool showEntryPoints = false;
+
     public int entryGapMin = 15;
     public float elevationLimitForPathfind = 0.01f;
 
@@ -94,16 +96,27 @@ public class RoadGen : MonoBehaviour
         // (makes while loop run forever)
 
         // this is just for debug, only works for 256x256 map
-        /*entryPoints.Add((0, 10));
-        entryPoints.Add((132, 0));
-        entryPoints.Add((0, 177));
-        entryPoints.Add((142, 255));
-        entryPoints.Add((0, 88));
-        entryPoints.Add((192, 0));*/
-        //entryPoints.Add((142, 255)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
-        //entryPoints.Add((255, 117)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
+        if (showEntryPoints)
+        {
+            entryPoints.Add((0, 10));
+            /*
+            entryPoints.Add((132, 0));
+            entryPoints.Add((0, 177));
+            entryPoints.Add((142, 255));
+            entryPoints.Add((0, 88));
+            entryPoints.Add((192, 0));*/
+            //entryPoints.Add((142, 255)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
+            //entryPoints.Add((255, 117)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
 
-        //Debug.Log($"found {entryPoints.Count} entryPoints");
+            //Debug.Log($"found {entryPoints.Count} entryPoints");
+
+            // color map entry points
+            foreach ((int x, int y) points in entryPoints)
+            {
+                DrawColorAtPoint(points.Item1, points.Item2, Color.cyan);
+            }
+        }
+
         if (showPaths)
         {
             paths = PathfindEachEntry(entryPoints);
@@ -144,11 +157,7 @@ public class RoadGen : MonoBehaviour
             Debug.Log("Length of all regions is: " + allRegions.Count);
         }
 
-        // color map entry points
-        foreach ((int x, int y) points in entryPoints)
-        {
-            DrawColorAtPoint(points.Item1, points.Item2, Color.cyan);
-        }
+        
 
 
         return colorMap; //returns map to gamemanger, which applies texture

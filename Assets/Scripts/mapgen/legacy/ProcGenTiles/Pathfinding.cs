@@ -140,10 +140,14 @@ namespace ProcGenTiles
                     }
                     else
                     { //There's elevation data here, so we check if it's under the elevation limit
-                        if (t.ValuesHere["Elevation"] < elevationLimit && !t.ValuesHere.ContainsKey("Region"))
+                        if (t.ValuesHere["Elevation"] < elevationLimit )
                         { //This is not a raised landmass and just needs to have its Land value added as zero
-                            t.ValuesHere.Add("Land", 0); //This takes a float, but we'll use 0 and 1 anyways :P
-                            t.ValuesHere.Add("Region", 0); //All flat ground will be region zero, regardless of connection
+                            if (!t.ValuesHere.ContainsKey("Region"))
+                            {
+                                t.ValuesHere.Add("Land", 0); //This takes a float, but we'll use 0 and 1 anyways :P
+                                t.ValuesHere.Add("Region", 0); //All flat ground will be region zero, regardless of connection
+                            }
+                            
                         }
                         else
                         { //The tile is above the elevation limit and needs to be checked
@@ -152,6 +156,7 @@ namespace ProcGenTiles
                                 t.ValuesHere.Add("Land", 1); //We'll still mark the land here anyways, cause fuggit
                                 //Do something with the returned region later, i guess?
                                 List<Tile> region = FloodfillRegion(regionLabel, width, height, elevationLimit);
+   
                                 allRegions.Add(region); //Just stuff it in here for now :c
                                 regionLabel++;
                             }
@@ -370,32 +375,54 @@ namespace ProcGenTiles
                 foundNeighbors = optionalAddList;
             Tile start = Map.GetTile(coords);
 
-            Tile east = Map.GetTile(coords.x - 1, coords.y);
-            Tile west = Map.GetTile(coords.x + 1, coords.y);
+            Tile west = Map.GetTile(coords.x - 1, coords.y);
+            Tile east = Map.GetTile(coords.x + 1, coords.y);
             Tile north = Map.GetTile(coords.x, coords.y + 1);
             Tile south = Map.GetTile(coords.x, coords.y - 1);
 
             //Run the found tile through the function that checks if we should add it
 
+            bool firstDot = false;
+            if (coords == (12, 0)) firstDot = true;
+
             if (east != null)
             {
                 if (checkFunction(east, checkFloat))
+                {
                     foundNeighbors.Add(east);
+                    if (firstDot) Debug.Log("east is added at firstDot");
+                }
+
             }
             if (west != null)
             {
                 if (checkFunction(west, checkFloat))
+                {
                     foundNeighbors.Add(west);
+                    if (firstDot) Debug.Log("west is added at firstDot");
+                }
+
             }
+
             if (north != null)
             {
                 if (checkFunction(north, checkFloat))
+                {
                     foundNeighbors.Add(north);
+                    if (firstDot) Debug.Log("north is added at firstDot");
+                }
             }
+
             if (south != null)
             {
                 if (checkFunction(south, checkFloat))
+                {
                     foundNeighbors.Add(south);
+                    if (firstDot) Debug.Log("south is added at firstDot");
+                }
+            } else
+            {
+                if (firstDot) Debug.Log("south is null at firstDot");
             }
 
             return foundNeighbors;
