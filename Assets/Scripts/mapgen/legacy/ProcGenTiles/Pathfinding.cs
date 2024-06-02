@@ -265,49 +265,50 @@ namespace ProcGenTiles
             float[,] noiseMap = nm;
             float elevationLimit = el;
 
-            List<(int x, int y)> path = new List<(int x, int y)>();
-            List<(int x, int y)> frontier = new List<(int x, int y)>();
-            List<(int x, int y)> badPaths = new List<(int x, int y)>();
+            List<(int x, int y)> _path = new List<(int x, int y)>();
+            List<(int x, int y)> _frontier = new List<(int x, int y)>();
+            List<(int x, int y)> _badPaths = new List<(int x, int y)>();
 
 
             //Debug.Log("======== Astar =======");
-            //Debug.Log($"Running AStar: ({start.Item1},{start.Item2}) ---> ({end.Item1},{end.Item2})");
+            Debug.Log($"Running AStar: ({start.x},{start.y}) ---> ({end.x},{end.y})");
 
-            path.Add(start);
-            AddEightNeighbors(start.Item1, start.Item2, null, frontier, path, badPaths); //Override AddFourNeighbors to accept a list object
+            _path.Add(start);
+            AddEightNeighbors(start.Item1, start.Item2, null, _frontier, _path, _badPaths); //Override AddFourNeighbors to accept a list object
             int lowestCost = int.MaxValue; //Set to something huge, this also might be a float, idk
             var lowestCandidate = (int.MaxValue, int.MaxValue);  //For storing the tuple that has lowestCost
             bool retracing = false;
 
             //for (int x = 0; x < 10000; x++) //this is for quick debug to keep me getting stuck in the while loop 
-            while (!path.Contains(end))
+            while (!_path.Contains(end))
             {
-                for (int i = 0; i < frontier.Count; i++)
+                for (int i = 0; i < _frontier.Count; i++)
                 {
-                    var candidate = frontier[i];
+                    var candidate = _frontier[i];
                     var candidate_x = candidate.Item1;
                     var candidate_y = candidate.Item2;
 
                     // if not traversible skip this node
                     if (noiseMap[candidate_x, candidate_y] > elevationLimit) continue;
                     // if in badPath also skip node
-                    if (badPaths.Contains((candidate_x, candidate_y))) continue;
+                    if (_badPaths.Contains((candidate_x, candidate_y))) continue;
                     // ignore path unless retracing steps...idk about this one lol
-                    if (!retracing && path.Contains(candidate)) continue;
+                    if (!retracing && _path.Contains(candidate)) continue;
 
                     if (candidate == end)
                     {
-                        path.Add(candidate);
-                        pathData.Add("path", path);
-                        pathData.Add("badPaths", badPaths);
+                        Debug.Log("FoundEnd");
+                        _path.Add(candidate);
+                        pathData.Add("path", _path);
+                        pathData.Add("badPaths", _badPaths);
                         return pathData;
                     }
 
-                    if (frontier.Count == 1 && candidate == start) // idk if this works... should try to retrace its steps back to the start if there's no path?
+                    if (_frontier.Count == 1 && candidate == start) // idk if this works... should try to retrace its steps back to the start if there's no path?
                     {
-                        path = null;
-                        pathData.Add("path", path);
-                        pathData.Add("badPaths", badPaths);
+                        _path = null;
+                        pathData.Add("path", _path);
+                        pathData.Add("badPaths", _badPaths);
                         return pathData;
                     }
 
@@ -338,16 +339,16 @@ namespace ProcGenTiles
                 {
                     //Debug.Log($"No good node at {path[path.Count-1]}, added to badPaths");                    
                     retracing = true;
-                    badPaths.Add((path[path.Count - 1]));
-                    AddEightNeighbors(lowestCandidate.Item1, lowestCandidate.Item2, null, frontier, path, badPaths);
+                    _badPaths.Add((_path[_path.Count - 1]));
+                    AddEightNeighbors(lowestCandidate.Item1, lowestCandidate.Item2, null, _frontier, _path, _badPaths);
                 }
                 else
                 {   //Debug.Log($"lowestCandidate is {lowestCandidate}, finding new neighbors...");
                     retracing = false;
                     lowestCost = int.MaxValue; //Reset for next loop
-                    path.Add(lowestCandidate);
-                    frontier.Clear();
-                    AddEightNeighbors(lowestCandidate.Item1, lowestCandidate.Item2, null, frontier, path, badPaths);
+                    _path.Add(lowestCandidate);
+                    _frontier.Clear();
+                    AddEightNeighbors(lowestCandidate.Item1, lowestCandidate.Item2, null, _frontier, _path, _badPaths);
                     lowestCandidate = (int.MaxValue, int.MaxValue); //reset lowest candidate
                 }
                 //Debug.Log($"======================================================================");
@@ -355,6 +356,8 @@ namespace ProcGenTiles
             }
 
             Debug.Log("if you're seeing this, there was a fucky wucky with Pathfinding.Astar() ... Broke out of while loop without finding path OR returning null...");
+            pathData.Add("path", _path);
+            pathData.Add("badPaths", _badPaths);
             return pathData; // this will never be called...hopefully
         }
 
@@ -468,17 +471,17 @@ namespace ProcGenTiles
 
         private void AddNeighborToQueue(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> frontier, List<(int x, int y)> path, List<(int x, int y)> badPaths)
         {
-            if (Map.IsValidTilePosition(x, y) && !visited.Contains((x, y))) //
+/*            if (Map.IsValidTilePosition(x, y) && !visited.Contains((x, y))) //
             {
             
                     q.Enqueue((x, y));
                 
-            }
+            }*/ //won't be using this much longer
 
             
             if (Map.IsValidTilePosition(x, y))
             {
-                //frontier.Add((x, y));
+                frontier.Add((x, y));
             }
         }
     }

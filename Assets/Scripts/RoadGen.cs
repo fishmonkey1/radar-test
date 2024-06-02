@@ -17,9 +17,9 @@ public class RoadGen : MonoBehaviour
     private Color[] colorMap;
 
     private float[,] roadMapData;
-    private List<(int, int)> entryPoints = new List<(int, int)>();
-    List<List<(int x, int xy)>> paths;
-    List<List<(int x, int xy)>> badPaths;
+    //private List<(int, int)> entryPoints;
+    //List<List<(int x, int xy)>> paths;
+    //List<List<(int x, int xy)>> badPaths;
     int width;
     int height;
 
@@ -97,55 +97,11 @@ public class RoadGen : MonoBehaviour
         roadMapData = new float[width, height];
         gizmoPointsDict = new Dictionary<Vector3[], Color>();
 
+        // these get reset every subsequent run
+        List<List<(int x, int xy)>> paths = new List<List<(int x, int xy)>>();
+        List<List<(int x, int xy)>> badPaths = new List<List<(int x, int xy)>>();
+        List<(int x, int xy)> entryPoints = new List<(int, int)>();
 
-        //entryPoints = GetMapEntries(); // this will populate entry-points automatically
-        // need to fix no-path before this will work
-        // (makes while loop run forever)
-
-        // this is just for debug, only works for 256x256 map
-        
-            
-        /*
-        entryPoints.Add((132, 0));
-        entryPoints.Add((0, 177));
-        entryPoints.Add((142, 255));
-        entryPoints.Add((0, 88));
-        entryPoints.Add((192, 0));*/
-        //entryPoints.Add((142, 255)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
-        //entryPoints.Add((255, 117)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
-
-        //Debug.Log($"found {entryPoints.Count} entryPoints");
-        if (showEntryPoints)
-        {
-            entryPoints.Add((0, 10));
-            // color map entry points
-            foreach ((int x, int y) points in entryPoints)
-            {
-                DrawColorAtPoint(points.Item1, points.Item2, Color.cyan);
-            }
-        }
-
-        if (showPaths)
-        {   if (entryPoints == null)
-            {
-                entryPoints.Add((0, 10));
-                entryPoints.Add((142,255));
-                entryPoints.Add((142, 255)); //idk why but there's a bug where it won't do it if there isn't 3
-            }
-            paths = PathfindEachEntry(entryPoints);
-
-            // draw paths
-            foreach (List<(int x, int y)> path in paths) //draw paths
-            {
-                DrawPathsOnColorMap(path, Color.green, true);
-            }
-
-            // draw bad paths (if applicable)
-            foreach (List<(int x, int y)> path in badPaths)
-            {
-                DrawPathsOnColorMap(path, Color.red, true);
-            }
-        }
 
         if (showFloodfill || showConvexHull) //if doing either we need the regions
         {
@@ -186,20 +142,69 @@ public class RoadGen : MonoBehaviour
                     void drawHullGizmos(Color drawColor)
                     {
                         List<(int x, int y)> hullPoints = ConvexHull.GetConvexHull(region); //TODO: Can you have this return a List<Tile> instead?
-
-                        Vector3[] gizmoPoints = new Vector3[hullPoints.Count]; //idk why but need to do it like this for the Gizmo stuff?
-
-                        for (int i = 0; i < hullPoints.Count; i++)
+                        if (hullPoints != null)
                         {
-                            gizmoPoints[i] = new Vector3((float)hullPoints[i].y, 1.0f, (float)hullPoints[i].x);
-                        }
+                            Vector3[] gizmoPoints = new Vector3[hullPoints.Count]; //idk why but need to do it like this for the Gizmo stuff?
 
-                        gizmoPointsDict.Add(gizmoPoints, drawColor);
+                            for (int i = 0; i < hullPoints.Count; i++)
+                            {
+                                gizmoPoints[i] = new Vector3((float)hullPoints[i].y, 1.0f, (float)hullPoints[i].x);
+                            }
+
+                            gizmoPointsDict.Add(gizmoPoints, drawColor);
+                        }
+                        
                     }
 
                 }
 
 
+            }
+        }
+
+
+        if (showPaths)
+        {
+
+            //entryPoints = GetMapEntries(); // this will populate entry-points automatically
+            // need to fix no-path before this will work
+            // (makes while loop run forever)
+            // this is just for debug, only works for 256x256 map
+
+            // TODO: If less than 3 Entry points, will not do path. Fix the for loops in PathfindEachEntry()
+
+            entryPoints.Add((0, 10));
+            entryPoints.Add((142, 255));
+            entryPoints.Add((132, 0));
+            /* entryPoints.Add((0, 177));
+             entryPoints.Add((142, 255));
+             entryPoints.Add((0, 88));
+             entryPoints.Add((192, 0));*/
+            //entryPoints.Add((142, 255)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
+            //entryPoints.Add((255, 117)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
+
+            PathfindEachEntry(entryPoints, paths, badPaths);
+
+            // draw paths
+            foreach (List<(int x, int y)> path in paths) //draw paths
+            {
+                DrawPathsOnColorMap(path, Color.green, true);
+            }
+
+            // draw bad paths (if applicable)
+            foreach (List<(int x, int y)> path in badPaths)
+            {
+                DrawPathsOnColorMap(path, Color.red, true);
+            }
+        }
+
+        if (showEntryPoints)
+        {
+            //entryPoints.Add((0, 10));
+            // color map entry points
+            foreach ((int x, int y) points in entryPoints)
+            {
+                DrawColorAtPoint(points.Item1, points.Item2, Color.cyan);
             }
         }
 
@@ -212,7 +217,7 @@ public class RoadGen : MonoBehaviour
     /// Loops around edges of noiseMap, finds entry points based on elevation.
     /// Returns a List<(int x, int y)> of entry points into the map, using 'entryGapMin' value.
     /// </summary>
-    private List<(int, int)> GetMapEntries()
+    private void GetMapEntries(List<(int, int)> entryPoints)
     {
         // TODO: Make this not stupid
         // TODO: Fix bug where it doesn't get the right size of gap sometimes?
@@ -323,48 +328,44 @@ public class RoadGen : MonoBehaviour
                 }
             }
         }
-
-        return entryPoints;
     }
 
     //-----------------------------------------------------------------------------------------
     /// <summary>
     /// Returns List<List<(int x, int xy)>> of pathfinds into the map.
     /// </summary>
-    private List<List<(int x, int xy)>> PathfindEachEntry(List<(int x, int y)> entryPoints)
+    /*private List<List<(int x, int xy)>> PathfindEachEntry(List<(int x, int y)> entryPoints)
+    {*/
+    private void PathfindEachEntry(List<(int x, int y)> entryPoints, List<List<(int x, int xy)>> paths, List<List<(int x, int xy)>> badPaths)
     {
-        paths = new List<List<(int x, int xy)>>();
-        badPaths = new List<List<(int x, int xy)>>();
-
+        Debug.Log(entryPoints.Count);
         for (int i = 0; i < entryPoints.Count - 1; i++)
         {
-            for (int j = 1; j < (entryPoints.Count - 1) - i; j++)
+            for (int j = i+1; j < (entryPoints.Count - 1); j++)
             {
                 // if x or y is on the same border side, go to next
-                if (entryPoints[i].Item1 == entryPoints[i + j].Item1) continue;
-                if (entryPoints[i].Item2 == entryPoints[i + j].Item2) continue;
+                (int x, int y) end = entryPoints[j];
+                if (entryPoints[i].x == end.x) continue;
+                if (entryPoints[i].y == end.y) continue;
+                              
 
-                (int x, int y) xy_end = entryPoints[i + j];
-
-                Dictionary<string, List<(int x, int y)>> pathData = pathFinding.AStar(entryPoints[i], xy_end, noiseMap, elevationLimitForPathfind);
+                Dictionary<string, List<(int x, int y)>> pathData = pathFinding.AStar(entryPoints[i], end, noiseMap, elevationLimitForPathfind);
                 List<(int x, int xy)> foundPath = pathData["path"];
-
+                Debug.Log("Astar is returning: "+pathData);
                 if (foundPath != null)
                 {
-                    //Debug.Log($"Path from {entryPoints[i]} to {xy_end} has length of {foundPath.Count}");
+                    Debug.Log($"Path from {entryPoints[i]} to {end} has length of {foundPath.Count}");
                     paths.Add(foundPath);
 
                     if (pathData.ContainsKey("badPaths"))
                     {
-                        List<(int x, int xy)> bad = pathData["badPaths"];
-                        badPaths.Add(bad);
+                        badPaths.Add(pathData["badPaths"]);
                     }
                 }
-                else Debug.Log($"No path for {entryPoints[i]} to {xy_end} !!!!!!");
+                else Debug.Log($"No path for {entryPoints[i]} to {end} !!!!!!");
             }
         }
 
-        return paths;
     }
 
 
