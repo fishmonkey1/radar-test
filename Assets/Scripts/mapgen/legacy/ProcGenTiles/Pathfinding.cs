@@ -174,6 +174,7 @@ namespace ProcGenTiles
 
         private List<Tile> FloodfillRegion(int regionNumber, (int x, int y) coords, float elevationLimit)
         {
+            
             Tile startTile = Map.GetTile(coords);
             startTile.ValuesHere.Add("Region", regionNumber); //Mark the first tile with the region number
             List<Tile> regionTiles = new List<Tile>(); //For holding all the tiles that are found
@@ -207,7 +208,8 @@ namespace ProcGenTiles
                     }
                 }
             }
-            Debug.Log("Created region with tile size of: " + regionTiles.Count);
+            if (regionTiles.Count > 1) Debug.Log("Created region with tile size of: " + regionTiles.Count);
+
             return regionTiles;
         }
 
@@ -390,7 +392,12 @@ namespace ProcGenTiles
                 if (checkFunction(east, checkFloat))
                 {
                     foundNeighbors.Add(east);
-                    if (firstDot) Debug.Log("east is added at firstDot");
+                    if (firstDot)
+                    {
+                        Debug.Log($"east ({east.x},{east.y}) is added at firstDot");
+                        Debug.Log($"elevation at east is {east.ValuesHere["Elevation"]}, checkFunc is getting float val of: {checkFloat}");
+
+                    }
                 }
 
             }
@@ -399,7 +406,7 @@ namespace ProcGenTiles
                 if (checkFunction(west, checkFloat))
                 {
                     foundNeighbors.Add(west);
-                    if (firstDot) Debug.Log("west is added at firstDot");
+                    if (firstDot) Debug.Log($"west ({west.x},{west.y}) is added at firstDot");
                 }
 
             }
@@ -409,7 +416,7 @@ namespace ProcGenTiles
                 if (checkFunction(north, checkFloat))
                 {
                     foundNeighbors.Add(north);
-                    if (firstDot) Debug.Log("north is added at firstDot");
+                    if (firstDot) Debug.Log($"north ({north.x},{north.y}) is added at firstDot");
                 }
             }
 
@@ -418,11 +425,11 @@ namespace ProcGenTiles
                 if (checkFunction(south, checkFloat))
                 {
                     foundNeighbors.Add(south);
-                    if (firstDot) Debug.Log("south is added at firstDot");
+                    if (firstDot) Debug.Log($"south ({south.x},{south.y}) is added at firstDot");
                 }
             } else
             {
-                if (firstDot) Debug.Log("south is null at firstDot");
+                if (firstDot) Debug.Log($"south is null at firstDot");
             }
 
             return foundNeighbors;
@@ -437,15 +444,22 @@ namespace ProcGenTiles
         /// <param name="optionalAddList"></param>
         /// <returns></returns>
         private List<Tile> GetFourNeighborsList(int x, int y, Func<Tile, float, bool> checkFunction, List<Tile> optionalAddList = null, float checkFloat = 0)
-        {
-            return GetFourNeighborsList((x, y), checkFunction, optionalAddList);
+        {   
+
+            return GetFourNeighborsList((x, y), checkFunction, optionalAddList, checkFloat);
         }
 
         private bool TileOverElevation(Tile t, float elevationLimit)
         {
             if (t.ValuesHere["Elevation"] > elevationLimit)
+            {
                 return true;
-            return false;
+            } else
+            {
+                return false;
+            }
+                
+            
         }
 
         private void AddFourNeighbors(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> frontier, List<(int x, int y)> path, List<(int x, int y)> badPaths)

@@ -25,7 +25,7 @@ public class RoadGen : MonoBehaviour
     public bool showEntryPoints = false;
 
     public int entryGapMin = 15;
-    public float elevationLimitForPathfind = 0.01f;
+    [SerializeField] public float elevationLimitForPathfind;
 
 
     /* 
