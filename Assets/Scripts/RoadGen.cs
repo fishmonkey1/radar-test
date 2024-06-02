@@ -132,7 +132,7 @@ public class RoadGen : MonoBehaviour
                     {
                         drawHullGizmos(drawColor); //passing in the color so that we can color them the same if we show them
                     }
-                   
+
 
                     colorIndex++;
                     if (colorIndex >= someColors.Length - 1)
@@ -154,7 +154,7 @@ public class RoadGen : MonoBehaviour
 
                             gizmoPointsDict.Add(gizmoPoints, drawColor);
                         }
-                        
+
                     }
 
                 }
@@ -174,20 +174,30 @@ public class RoadGen : MonoBehaviour
 
             // TODO: If less than 3 Entry points, will not do path. Fix the for loops in PathfindEachEntry()
 
-            entryPoints.Add((0, 10));
-            entryPoints.Add((142, 255));
-            entryPoints.Add((132, 0));
-            /* entryPoints.Add((0, 177));
-             entryPoints.Add((142, 255));
-             entryPoints.Add((0, 88));
-             entryPoints.Add((192, 0));*/
-            //entryPoints.Add((142, 255)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
+
+            // entryPoints.Add((142, 255));  // gets stuck
+            //entryPoints.Add((132, 0));
+
+            entryPoints.Add((142, 255)); //gets stuck
+            entryPoints.Add((192, 0));
+
+            //entryPoints.Add((142, 255)); // works
+            //entryPoints.Add((255, 175));
+
+
+            /* entryPoints.Add((0, 30));
+
+              entryPoints.Add((0, 177));
+              entryPoints.Add((142, 255));
+              entryPoints.Add((0, 88));
+              entryPoints.Add((192, 0));*/
+
             //entryPoints.Add((255, 117)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
 
             PathfindEachEntry(entryPoints, paths, badPaths);
 
             // draw paths
-            foreach (List<(int x, int y)> path in paths) //draw paths
+            foreach (List<(int x, int y)> path in paths) 
             {
                 DrawPathsOnColorMap(path, Color.green, true);
             }
@@ -197,20 +207,36 @@ public class RoadGen : MonoBehaviour
             {
                 DrawPathsOnColorMap(path, Color.red, true);
             }
-        }
 
-        if (showEntryPoints)
-        {
-            //entryPoints.Add((0, 10));
-            // color map entry points
-            foreach ((int x, int y) points in entryPoints)
+            if (showEntryPoints)
             {
-                DrawColorAtPoint(points.Item1, points.Item2, Color.cyan);
+                if (!showPaths)
+                {
+                    //entryPoints.Add((0, 30));
+                    entryPoints.Add((142, 255));
+                    entryPoints.Add((132, 0));
+                }
+
+                // color map entry points
+                foreach ((int x, int y) points in entryPoints)
+                {
+                    DrawColorAtPoint(points.Item1, points.Item2, Color.cyan);
+                }
+
+                foreach (List<(int x, int y)> path in paths) //draw end node
+                {
+                    if (showEntryPoints)
+                    {
+                        (int x, int y) last = path[path.Count - 1];
+                        DrawColorAtPoint(last.x, last.y, Color.cyan);
+                    }
+                }
             }
         }
-
+     
         return colorMap; //returns map to gamemanger, which applies texture
 
+        
     }
 
 
@@ -340,9 +366,9 @@ public class RoadGen : MonoBehaviour
     private void PathfindEachEntry(List<(int x, int y)> entryPoints, List<List<(int x, int xy)>> paths, List<List<(int x, int xy)>> badPaths)
     {
         Debug.Log(entryPoints.Count);
-        for (int i = 0; i < entryPoints.Count - 1; i++)
+        for (int i = 0; i < entryPoints.Count-1; i++) //stop at second-to-last
         {
-            for (int j = i+1; j < (entryPoints.Count - 1); j++)
+            for (int j = i+1; j < (entryPoints.Count); j++)
             {
                 // if x or y is on the same border side, go to next
                 (int x, int y) end = entryPoints[j];

@@ -214,49 +214,6 @@ namespace ProcGenTiles
         }
 
 
-        public List<List<(int x, int y)>> FindLandmassFloodFill((int x, int y) start, float[,] noiseMap, float[,] roadMapData, float elevationLimit)
-        {
-            List<List<(int x, int y)>> landmasses = new List<List<(int x, int y)>>();
-
-
-            for (int x = 0; x < 38000; x++) //this is for quick debug to keep me getting stuck in the while loop 
-            //while (queue.Count > 0)
-            {
-                (int x, int y) coords = queue.Dequeue();
-                visited.Add(coords);
-
-                if (isWall(coords)) {
-                    addData(coords, 1);
-                } else {
-                    addData(coords, 0);
-
-
-
-                        }
-                int qcount = queue.Count;
-                AddFourNeighbors(coords.x, coords.y, queue, null, null, null);
-                int added = queue.Count - qcount;
-
-            }
-
-
-
-            void addData((int x, int y) coords, int val)
-            {
-               // Debug.Log(coords);
-               // Debug.Log(val);
-               // Debug.Log(roadMapData);
-                roadMapData[coords.Item1, coords.Item2] = val;
-            }
-
-            bool isWall((int x, int y) coords)
-            {
-                return noiseMap[coords.Item1, coords.Item2] > elevationLimit;
-            }
-
-            return landmasses;
-        }
-
         public Dictionary<string, List<(int x, int y)>> AStar((int x, int y) start, (int x, int y) end, float[,] nm, float el)
         {
             var pathData = new Dictionary<string, List<(int x, int y)>>();
@@ -279,8 +236,8 @@ namespace ProcGenTiles
             var lowestCandidate = (int.MaxValue, int.MaxValue);  //For storing the tuple that has lowestCost
             bool retracing = false;
 
-            //for (int x = 0; x < 10000; x++) //this is for quick debug to keep me getting stuck in the while loop 
-            while (!_path.Contains(end))
+            for (int x = 0; x < 20000; x++) //this is for quick debug to keep me getting stuck in the while loop 
+            //while (!_path.Contains(end))
             {
                 for (int i = 0; i < _frontier.Count; i++)
                 {
@@ -288,16 +245,21 @@ namespace ProcGenTiles
                     var candidate_x = candidate.Item1;
                     var candidate_y = candidate.Item2;
 
-                    // if not traversible skip this node
-                    if (noiseMap[candidate_x, candidate_y] > elevationLimit) continue;
-                    // if in badPath also skip node
+                    // if in badPath skip node
                     if (_badPaths.Contains((candidate_x, candidate_y))) continue;
+
+                    // if not traversible skip this node
+                    if (noiseMap[candidate_x, candidate_y] > elevationLimit) 
+                    {
+                        continue; 
+                    }
+                   
                     // ignore path unless retracing steps...idk about this one lol
                     if (!retracing && _path.Contains(candidate)) continue;
 
                     if (candidate == end)
                     {
-                        Debug.Log("FoundEnd");
+                        Debug.Log("FoundEnd at cycle: "+x);
                         _path.Add(candidate);
                         pathData.Add("path", _path);
                         pathData.Add("badPaths", _badPaths);
@@ -339,7 +301,13 @@ namespace ProcGenTiles
                 {
                     //Debug.Log($"No good node at {path[path.Count-1]}, added to badPaths");                    
                     retracing = true;
+                    Tile t = Map.GetTile(_path[_path.Count - 1]);
+
+                    // need to only add neighbor to _badPaths if it's over elevation
+                    // we;re adding to badpaths EVERy time we go backwards.
+                    // THIS IS WHERE THE BUG IS
                     _badPaths.Add((_path[_path.Count - 1]));
+
                     AddEightNeighbors(lowestCandidate.Item1, lowestCandidate.Item2, null, _frontier, _path, _badPaths);
                 }
                 else
@@ -355,7 +323,9 @@ namespace ProcGenTiles
 
             }
 
-            Debug.Log("if you're seeing this, there was a fucky wucky with Pathfinding.Astar() ... Broke out of while loop without finding path OR returning null...");
+            Debug.Log("  This path ^^^ did not reach the end of it's path. This Start --> End combination will cause a crash in Astar's while loop.");
+            Debug.Log("===============================================================================================================================");
+
             pathData.Add("path", _path);
             pathData.Add("badPaths", _badPaths);
             return pathData; // this will never be called...hopefully
