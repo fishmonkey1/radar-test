@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -187,7 +188,10 @@ namespace ProcGenTiles
                 Tile t = frontier.Dequeue();
                 List<Tile> neighbors = GetFourNeighborsList(t.x, t.y, TileOverElevation, checkFloat: elevationLimit);
                 if (neighbors.Count == 0)
+                {
+                    Debug.Log($"No valid neighbors found during the floodfill at {t.x},{t.y}");
                     continue; //Keep going, we found nothing
+                }
                 
                 foreach (Tile neighbor in neighbors)
                 { //Time to check if the neighbor has been checked already
@@ -372,7 +376,8 @@ namespace ProcGenTiles
         /// <param name="optionalAddList"></param>
         /// <returns>List<(int x, int y)></returns>
         private List<Tile> GetFourNeighborsList((int x, int y) coords, Func<Tile, float, bool> checkFunction, List<Tile> optionalAddList = null, float checkFloat = 0)
-        { 
+        {
+            bool debug = false;
             List<Tile> foundNeighbors = null;
             if (optionalAddList == null)
                 foundNeighbors = new List<Tile>();
@@ -392,6 +397,8 @@ namespace ProcGenTiles
                 {
                     foundNeighbors.Add(east);
                 }
+                else
+                    debug = true;
 
             }
             if (west != null)
@@ -400,6 +407,8 @@ namespace ProcGenTiles
                 {
                     foundNeighbors.Add(west);
                 }
+                else
+                    debug = true;
             }
 
             if (north != null)
@@ -408,6 +417,8 @@ namespace ProcGenTiles
                 {
                     foundNeighbors.Add(north);
                 }
+                else
+                    debug = true;
             }
 
             if (south != null)
@@ -416,8 +427,17 @@ namespace ProcGenTiles
                 {
                     foundNeighbors.Add(south);
                 }
+                else
+                    debug = true;
             } 
             
+            if (debug)
+            {
+                Debug.Log($"Neighbors check. Start is {start.x},{start.y} with elevation {start.ValuesHere["Elevation"]}");
+                foreach (var neighbor in foundNeighbors)
+                    Debug.Log($"Found neighbor at {neighbor.x},{neighbor.y} with elevation {neighbor.ValuesHere["Elevation"]}");
+            }
+
             return foundNeighbors;
         }
 
@@ -430,8 +450,7 @@ namespace ProcGenTiles
         /// <param name="optionalAddList"></param>
         /// <returns></returns>
         private List<Tile> GetFourNeighborsList(int x, int y, Func<Tile, float, bool> checkFunction, List<Tile> optionalAddList = null, float checkFloat = 0)
-        {   
-
+        {
             return GetFourNeighborsList((x, y), checkFunction, optionalAddList, checkFloat);
         }
 
