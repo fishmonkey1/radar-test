@@ -27,7 +27,8 @@ public class RoadGen : MonoBehaviour
     public bool showEntryPoints = false;
     public bool showFloodfill = false;
     public bool showConvexHull = false;
-    public int FloodfillSizeColorLimit = 0;
+    [Tooltip("Limits the region drawing to regions larger than the minimum")]
+    public int floodfillRegionMinimum = 0;
 
     Dictionary<Vector3[], Color> gizmoPointsDict;
 
@@ -158,7 +159,7 @@ public class RoadGen : MonoBehaviour
 
             foreach (List<Tile> region in allRegions)
             {
-                if (region.Count >= FloodfillSizeColorLimit)
+                if (region.Count >= floodfillRegionMinimum)
                 {
                     //Color each region with a unique color
                     Color drawColor = someColors[colorIndex];
