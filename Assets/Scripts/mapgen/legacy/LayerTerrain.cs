@@ -87,10 +87,13 @@ public class LayerTerrain : MonoBehaviour
     }
 
     public enum TerrainSize
-    {
+    {   // if you add more, remember to add in SetTerrainSize() too :3
         _1024,
         _512,
         _256,
+        _128,
+        _64,
+
     }
 
 
@@ -131,6 +134,8 @@ public class LayerTerrain : MonoBehaviour
         if (terrainSize == TerrainSize._1024) { X = 1024; Y = 1024; }
         if (terrainSize == TerrainSize._512) { X = 512; Y = 512; }
         if (terrainSize == TerrainSize._256) { X = 256; Y = 256; }
+        if (terrainSize == TerrainSize._128) { X = 128; Y = 128; }
+        if (terrainSize == TerrainSize._64) { X = 64; Y = 64; }
     }
 
     //stays
@@ -206,7 +211,7 @@ public class LayerTerrain : MonoBehaviour
         //Debug.Log("Creating Terrain Surface From Heightmap");
         terrainData = terrain.terrainData;
         terrainData.alphamapResolution = X + 1;
-        terrainData.heightmapResolution = X + 1;
+        terrainData.heightmapResolution = X -1;
         terrainData.size = new Vector3(X, depth, Y);
         terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
 

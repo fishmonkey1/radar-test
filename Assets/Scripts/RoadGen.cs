@@ -20,7 +20,8 @@ public class RoadGen : MonoBehaviour
     int width;
     int height;
 
-
+    public bool showPaths = false;
+    public bool showFloodfill = false;
     public int entryGapMin = 15;
     public float elevationLimitForPathfind = 0.01f;
 
@@ -92,55 +93,64 @@ public class RoadGen : MonoBehaviour
         // need to fix no-path before this will work
         // (makes while loop run forever)
 
-        // this is just for debug
-        entryPoints.Add((0, 10));
+        // this is just for debug, only works for 256x256 map
+        /*entryPoints.Add((0, 10));
         entryPoints.Add((132, 0));
         entryPoints.Add((0, 177));
         entryPoints.Add((142, 255));
         entryPoints.Add((0, 88));
-        entryPoints.Add((192, 0));
+        entryPoints.Add((192, 0));*/
         //entryPoints.Add((142, 255)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
         //entryPoints.Add((255, 117)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
 
         //Debug.Log($"found {entryPoints.Count} entryPoints");
-
-        //paths = PathfindEachEntry(entryPoints);
-
-       /* // draw paths
-        foreach (List<(int x, int y)> path in paths) //draw paths
+        if (showPaths)
         {
-            DrawPathsOnColorMap(path, Color.green, true);
-        }*/
+            paths = PathfindEachEntry(entryPoints);
 
-        // draw bad paths (if applicable)
-        /*foreach (List<(int x, int y)> path in badPaths) 
+            // draw paths
+            foreach (List<(int x, int y)> path in paths) //draw paths
+            {
+                DrawPathsOnColorMap(path, Color.green, true);
+            }
+
+            // draw bad paths (if applicable)
+            foreach (List<(int x, int y)> path in badPaths)
+            {
+                DrawPathsOnColorMap(path, Color.red, true);
+            }
+        }
+       
+
+        if (showFloodfill)
         {
-            DrawPathsOnColorMap(path, Color.red, true);
-        }*/
+            List<List<Tile>> allRegions = pathFinding.MarkLandmassRegions(noiseMap, elevationLimitForPathfind);
+            Color[] someColors = { Color.blue, Color.grey, Color.green, Color.red, Color.magenta,
+            Color.yellow, Color.cyan, Color.black, Color.white };
+            int colorIndex = 0;
+            foreach (List<Tile> region in allRegions)
+            { //Color each region with a unique color
+                Color drawColor = someColors[colorIndex];
+                foreach (Tile t in region)
+                {
+                    DrawColorAtPoint(t.x, t.y, drawColor);
+                }
+                colorIndex++;
+                if (colorIndex >= someColors.Length - 1)
+                {
+                    colorIndex = 0;
+                }
+            }
+            Debug.Log("Length of all regions is: " + allRegions.Count);
+        }
 
-        // draw start points
-        foreach ((int x, int y) points in entryPoints) 
+        // color map entry points
+        foreach ((int x, int y) points in entryPoints)
         {
             DrawColorAtPoint(points.Item1, points.Item2, Color.cyan);
         }
-        List<List<Tile>> allRegions = pathFinding.MarkLandmassRegions(noiseMap, elevationLimitForPathfind);
-        Color[] someColors = { Color.blue, Color.grey, Color.green, Color.red, Color.magenta,
-            Color.yellow, Color.cyan, Color.black, Color.white };
-        int colorIndex = 0;
-        foreach (List<Tile> region in allRegions)
-        { //Color each region with a unique color
-            Color drawColor = someColors[colorIndex];
-            foreach (Tile t in region)
-            {
-                DrawColorAtPoint(t.x, t.y, drawColor);
-            }
-            colorIndex++;
-            if (colorIndex >= someColors.Length -1)
-            {
-                colorIndex = 0;
-            }
-        }
-        Debug.Log("Length of all regions is: " + allRegions.Count);
+
+
         return colorMap; //returns map to gamemanger, which applies texture
 
     }

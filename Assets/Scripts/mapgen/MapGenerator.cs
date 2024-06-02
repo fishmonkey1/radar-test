@@ -4,21 +4,11 @@ using UnityEngine;
 
 public class MapGenerator : MonoBehaviour
 {
-	public enum DrawMode
-    {
-		NoiseMap,
-		ColorMap,
-		TopoMap,
-		Mesh
-    }
-
-	//public DrawMode drawMode;
 
 	public TerrainType[] regions;
 
 	[SerializeField] private LayerTerrain lt;
 
-	//public float meshHeightMultiplier;
 
 
 
