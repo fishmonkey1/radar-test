@@ -11,6 +11,8 @@ public class RoadGen : MonoBehaviour
     public Pathfinding pathFinding;
     //public ConvexHull convexHull;
 
+    public bool autoUpdate = true;
+
     private float[,] noiseMap;
     private Color[] colorMap;
 
@@ -24,6 +26,7 @@ public class RoadGen : MonoBehaviour
     public bool showPaths = false;
     public bool showEntryPoints = false;
     public bool showFloodfill = false;
+    public bool showConvexHull = false;
     public int FloodfillSizeColorLimit = 0;
 
     Dictionary<Vector3[], Color> gizmoPointsDict;
@@ -92,6 +95,7 @@ public class RoadGen : MonoBehaviour
         height = noiseMap.GetLength(1);
         pathFinding = new Pathfinding(lt.finalMap);
         roadMapData = new float[width, height];
+        gizmoPointsDict = new Dictionary<Vector3[], Color>();
 
 
         //entryPoints = GetMapEntries(); // this will populate entry-points automatically
@@ -99,20 +103,21 @@ public class RoadGen : MonoBehaviour
         // (makes while loop run forever)
 
         // this is just for debug, only works for 256x256 map
+        
+            
+        /*
+        entryPoints.Add((132, 0));
+        entryPoints.Add((0, 177));
+        entryPoints.Add((142, 255));
+        entryPoints.Add((0, 88));
+        entryPoints.Add((192, 0));*/
+        //entryPoints.Add((142, 255)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
+        //entryPoints.Add((255, 117)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
+
+        //Debug.Log($"found {entryPoints.Count} entryPoints");
         if (showEntryPoints)
         {
             entryPoints.Add((0, 10));
-            /*
-            entryPoints.Add((132, 0));
-            entryPoints.Add((0, 177));
-            entryPoints.Add((142, 255));
-            entryPoints.Add((0, 88));
-            entryPoints.Add((192, 0));*/
-            //entryPoints.Add((142, 255)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
-            //entryPoints.Add((255, 117)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
-
-            //Debug.Log($"found {entryPoints.Count} entryPoints");
-
             // color map entry points
             foreach ((int x, int y) points in entryPoints)
             {
@@ -121,7 +126,12 @@ public class RoadGen : MonoBehaviour
         }
 
         if (showPaths)
-        {
+        {   if (entryPoints == null)
+            {
+                entryPoints.Add((0, 10));
+                entryPoints.Add((142,255));
+                entryPoints.Add((142, 255)); //idk why but there's a bug where it won't do it if there isn't 3
+            }
             paths = PathfindEachEntry(entryPoints);
 
             // draw paths
@@ -136,28 +146,36 @@ public class RoadGen : MonoBehaviour
                 DrawPathsOnColorMap(path, Color.red, true);
             }
         }
-       
 
-        if (showFloodfill)
+        if (showFloodfill || showConvexHull) //if doing either we need the regions
         {
             List<List<Tile>> allRegions = pathFinding.MarkLandmassRegions(noiseMap, elevationLimitForPathfind);
+
             Color[] someColors = { Color.blue, Color.grey, Color.green, Color.red, Color.magenta,
             Color.yellow, Color.cyan, Color.black, Color.white };
             int colorIndex = 0;
             gizmoPointsDict = new Dictionary<Vector3[], Color>();
 
             foreach (List<Tile> region in allRegions)
-            { 
+            {
                 if (region.Count >= FloodfillSizeColorLimit)
                 {
                     //Color each region with a unique color
                     Color drawColor = someColors[colorIndex];
-                    foreach (Tile t in region)
+
+                    if (showFloodfill)
                     {
-                        DrawColorAtPoint(t.x, t.y, drawColor);
+                        foreach (Tile t in region)
+                        {
+                            DrawColorAtPoint(t.x, t.y, drawColor);
+                        }
                     }
 
-                    drawHullGizmos(drawColor); //passing in the color so that we can color them the same
+                    if (showConvexHull)
+                    {
+                        drawHullGizmos(drawColor); //passing in the color so that we can color them the same if we show them
+                    }
+                   
 
                     colorIndex++;
                     if (colorIndex >= someColors.Length - 1)
@@ -166,24 +184,22 @@ public class RoadGen : MonoBehaviour
                     }
 
                     void drawHullGizmos(Color drawColor)
-                    {   
-                        // TODO: this is fucking DISGUSTING dont @ me lmao
-                        List<(int x, int y)> tilesasTuple = new List<(int x, int y)>();
-                        foreach (Tile t in region) tilesasTuple.Add((t.x, t.y));
-                        List<(int x, int y)> hullPoints = ConvexHull.GetConvexHull(tilesasTuple);
+                    {
+                        List<(int x, int y)> hullPoints = ConvexHull.GetConvexHull(region); //TODO: Can you have this return a List<Tile> instead?
 
-                        Vector3[] gizmoPoints = new Vector3[hullPoints.Count];
+                        Vector3[] gizmoPoints = new Vector3[hullPoints.Count]; //idk why but need to do it like this for the Gizmo stuff?
 
                         for (int i = 0; i < hullPoints.Count; i++)
                         {
-                            //gizmoPoints[i] = new Vector3((float)hullPoints[i].x, 1.0f, (float)hullPoints[i].y); //my fucked axis has finally fucked me back -_-
                             gizmoPoints[i] = new Vector3((float)hullPoints[i].y, 1.0f, (float)hullPoints[i].x);
                         }
+
                         gizmoPointsDict.Add(gizmoPoints, drawColor);
                     }
 
                 }
-                
+
+
             }
         }
 
@@ -236,7 +252,7 @@ public class RoadGen : MonoBehaviour
         for (int row = 1; row < height - 1; row++)
         {
             if (lengthBottomSegmentGap > 0) lengthRightSegmentGap = lengthBottomSegmentGap;
-   
+
             if (noiseMap[row, width - 1] <= elevationLimitForPathfind)
             {
                 roadMapData[row, width - 1] = 0f;
@@ -332,18 +348,19 @@ public class RoadGen : MonoBehaviour
 
                 Dictionary<string, List<(int x, int y)>> pathData = pathFinding.AStar(entryPoints[i], xy_end, noiseMap, elevationLimitForPathfind);
                 List<(int x, int xy)> foundPath = pathData["path"];
-               
+
                 if (foundPath != null)
                 {
                     //Debug.Log($"Path from {entryPoints[i]} to {xy_end} has length of {foundPath.Count}");
                     paths.Add(foundPath);
 
-                    if (pathData.ContainsKey("badPaths")) 
-                    { 
-                        List<(int x, int xy)> bad = pathData["badPaths"]; 
-                        badPaths.Add(bad); 
+                    if (pathData.ContainsKey("badPaths"))
+                    {
+                        List<(int x, int xy)> bad = pathData["badPaths"];
+                        badPaths.Add(bad);
                     }
-                } else Debug.Log($"No path for {entryPoints[i]} to {xy_end} !!!!!!");
+                }
+                else Debug.Log($"No path for {entryPoints[i]} to {xy_end} !!!!!!");
             }
         }
 
@@ -359,8 +376,9 @@ public class RoadGen : MonoBehaviour
             {
                 DrawColorAtPoint(points.Item1, points.Item2, color);
             }
-        } else
-        {   
+        }
+        else
+        {
             // I was cooking but i forgor why    
         }
 
@@ -373,14 +391,24 @@ public class RoadGen : MonoBehaviour
     }
 
     void OnDrawGizmosSelected()
-    {
-        if (gizmoPointsDict != null)
+    {   
+        if (showConvexHull)
         {
-            foreach (KeyValuePair<Vector3[], Color> gizmoPoints in gizmoPointsDict)
+            if (gizmoPointsDict != null)
             {
-                Gizmos.color = gizmoPoints.Value;
-                Gizmos.DrawLineStrip(gizmoPoints.Key, true);
+                foreach (KeyValuePair<Vector3[], Color> gizmoPoints in gizmoPointsDict)
+                {
+                    Gizmos.color = gizmoPoints.Value;
+                    Gizmos.DrawLineStrip(gizmoPoints.Key, true);
+                }
             }
         }
+        
     }
+
+    public void runMapGen() //this is so the Editor script can auto update on changes
+    {
+        lt.gameManager.loadNewData();
+    }
+
 }

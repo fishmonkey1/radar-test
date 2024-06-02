@@ -349,10 +349,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lt: {fileID: 18269053}
   roadColor: {r: 0, g: 0, b: 0, a: 0}
+  autoUpdate: 1
   showPaths: 0
   showEntryPoints: 0
   showFloodfill: 1
-  FloodfillSizeColorLimit: 400
+  showConvexHull: 1
+  FloodfillSizeColorLimit: 500
   entryGapMin: 21
   elevationLimitForPathfind: 0.02
 --- !u!1 &36009021
@@ -467,7 +469,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2121944553}
+        m_Texture: {fileID: 1741029480}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -1419,12 +1421,7 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!20 &1972317800 stripped
-Camera:
-  m_CorrespondingSourceObject: {fileID: 328608520402597086, guid: 3b48ccf84b6a90b4eb9c8eec600abbb4, type: 3}
-  m_PrefabInstance: {fileID: 2558351157055049953}
-  m_PrefabAsset: {fileID: 0}
---- !u!28 &2121944553
+--- !u!28 &1741029480
 Texture2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1472,6 +1469,11 @@ Texture2D:
     offset: 0
     size: 0
     path: 
+--- !u!20 &1972317800 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 328608520402597086, guid: 3b48ccf84b6a90b4eb9c8eec600abbb4, type: 3}
+  m_PrefabInstance: {fileID: 2558351157055049953}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2558351157055049953
 PrefabInstance:
   m_ObjectHideFlags: 0
