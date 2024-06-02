@@ -18,7 +18,7 @@ public class LayerTerrain : MonoBehaviour
      */
 
     private float lastTimeInterval; //used for debug
-    private bool timeExecutionDebug = true;
+    private bool timeExecutionDebug = false;
 
     public DrawMode drawMode;
     public DrawType drawType;

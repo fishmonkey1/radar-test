@@ -230,7 +230,7 @@ namespace ProcGenTiles
                 } else {
                     addData(coords, 0);
 
-                    //Debug.Log(coords);
+
 
                         }
                 int qcount = queue.Count;
@@ -383,21 +383,11 @@ namespace ProcGenTiles
             Tile south = Map.GetTile(coords.x, coords.y - 1);
 
             //Run the found tile through the function that checks if we should add it
-
-            bool firstDot = false;
-            if (coords == (12, 0)) firstDot = true;
-
             if (east != null)
             {
                 if (checkFunction(east, checkFloat))
                 {
                     foundNeighbors.Add(east);
-                    if (firstDot)
-                    {
-                        Debug.Log($"east ({east.x},{east.y}) is added at firstDot");
-                        Debug.Log($"elevation at east is {east.ValuesHere["Elevation"]}, checkFunc is getting float val of: {checkFloat}");
-
-                    }
                 }
 
             }
@@ -406,9 +396,7 @@ namespace ProcGenTiles
                 if (checkFunction(west, checkFloat))
                 {
                     foundNeighbors.Add(west);
-                    if (firstDot) Debug.Log($"west ({west.x},{west.y}) is added at firstDot");
                 }
-
             }
 
             if (north != null)
@@ -416,7 +404,6 @@ namespace ProcGenTiles
                 if (checkFunction(north, checkFloat))
                 {
                     foundNeighbors.Add(north);
-                    if (firstDot) Debug.Log($"north ({north.x},{north.y}) is added at firstDot");
                 }
             }
 
@@ -425,13 +412,9 @@ namespace ProcGenTiles
                 if (checkFunction(south, checkFloat))
                 {
                     foundNeighbors.Add(south);
-                    if (firstDot) Debug.Log($"south ({south.x},{south.y}) is added at firstDot");
                 }
-            } else
-            {
-                if (firstDot) Debug.Log($"south is null at firstDot");
-            }
-
+            } 
+            
             return foundNeighbors;
         }
 
