@@ -17,7 +17,7 @@ public class RoadGen : MonoBehaviour
     private Color[] colorMap;
 
     private float[,] roadMapData;
-    
+
 
     int width;
     int height;
@@ -32,7 +32,7 @@ public class RoadGen : MonoBehaviour
     Dictionary<Vector3[], Color> gizmoPointsDict;
 
     public int entryGapMin = 15;
-    [SerializeField] public float elevationLimitForPathfind =.02f;
+    [SerializeField] public float elevationLimitForPathfind = .02f;
 
     Color[] someColors = { Color.blue, Color.grey, Color.green, Color.red, Color.magenta,
             Color.yellow, Color.cyan, Color.black, Color.white };
@@ -102,13 +102,22 @@ public class RoadGen : MonoBehaviour
 
         List<(int x, int xy)> entryPoints = new List<(int, int)>();
         List<List<Tile>> paths = new List<List<Tile>>();
+        List<List<Tile>> allRegions = new List<List<Tile>>();
         //List<List<(int x, int xy)>> badPaths = new List<List<(int x, int xy)>>();
-        
+
+
+        entryPoints.Add((142, 255));
+        entryPoints.Add((132, 0));
+        entryPoints.Add((192, 0));
+        entryPoints.Add((255, 175));
+        entryPoints.Add((0, 30));
+        entryPoints.Add((0, 177));
+        entryPoints.Add((0, 88));
 
 
         if (showFloodfill || showConvexHull) //if doing either we need the regions
         {
-            List<List<Tile>> allRegions = pathFinding.MarkLandmassRegions(noiseMap, elevationLimitForPathfind);
+            allRegions = pathFinding.MarkLandmassRegions(noiseMap, elevationLimitForPathfind);
 
             int colorIndex = 0;
             //gizmoPointsDict = new Dictionary<Vector3[], Color>();
@@ -129,7 +138,7 @@ public class RoadGen : MonoBehaviour
 
                     if (showConvexHull)
                     {
-                        drawHullGizmos(drawColor); 
+                        drawHullGizmos(drawColor);
                     }
 
                     colorIndex++;
@@ -159,15 +168,12 @@ public class RoadGen : MonoBehaviour
                     }
                 }
             }
+
+            BisectMap(allRegions);
+
         }
 
-        entryPoints.Add((142, 255));  // gets stuck
-        entryPoints.Add((132, 0));
-        entryPoints.Add((192, 0));
-        entryPoints.Add((255, 175));
-        entryPoints.Add((0, 30));
-        entryPoints.Add((0, 177));
-        entryPoints.Add((0, 88));
+
 
         if (showPaths)
         {
@@ -191,7 +197,7 @@ public class RoadGen : MonoBehaviour
             PathfindEachEntry(entryPoints, paths);
 
             int colorIndex = 0;
-            foreach (List<Tile> path in paths) 
+            foreach (List<Tile> path in paths)
             {
                 DrawPathsOnColorMap(path, someColors[colorIndex], true);
                 colorIndex++;
@@ -203,10 +209,10 @@ public class RoadGen : MonoBehaviour
             }
 
             // draw bad paths (if applicable)
-/*            foreach (List<(int x, int y)> path in badPaths)
-            {
-                DrawPathsOnColorMap(path, Color.red, true);
-            }*/
+            /*            foreach (List<(int x, int y)> path in badPaths)
+                        {
+                            DrawPathsOnColorMap(path, Color.red, true);
+                        }*/
         }
 
         if (showEntryPoints)
@@ -240,9 +246,55 @@ public class RoadGen : MonoBehaviour
 
         return colorMap; //returns map to gamemanger, which applies texture
 
-        
+
     }
 
+    private void BisectMap(List<List<Tile>> allRegions)
+    {
+        List<List<Tile>> landmasses = new List<List<Tile>>();
+
+        //Create List of landmasses we are going to be navigating between
+        foreach (List<Tile> region in allRegions)
+        {
+            if (region.Count >= floodfillRegionMinimum)
+            {
+                landmasses.Add(region);
+            }
+        }
+
+        // for every landmass, get bounds of landmass
+        // Note: This will be created during the floodfill eventually
+        for (int i = 0; i < landmasses.Count - 1; i++)
+        {
+            for (int j = 1; j < landmasses.Count; j++)
+            {
+                List<Tile> currentRegion = landmasses[i];
+                List<Tile> compareToRegion = landmasses[j];
+
+                (int curr_n, int curr_e, int curr_s, int curr_w) = GetBounds(currentRegion);
+                (int comp_n, int comp_e, int comp_s, int comp_w) = GetBounds(currentRegion);
+            }
+        }
+
+        (int n, int e, int s, int w) GetBounds(List<Tile> region)
+        {
+            int n = 0;
+            int e = 0;
+            int s = height + 1;
+            int w = width + 1;
+
+            // set bounds values
+            foreach (Tile t in region)
+            {
+                if (t.y > n) n = t.y; // Get n bound (highest Y)
+                if (t.x > e) e = t.x; // Get e bound (highest x)
+                if (t.y < s) s = t.y; // Get s bound (lowest Y)
+                if (t.x < w) w = t.x; // Get w bound (lowest x)
+            }
+            return (n, e, s, w);
+        }
+
+    }
 
     /// <summary>
     /// Loops around edges of noiseMap, finds entry points based on elevation.
@@ -370,9 +422,9 @@ public class RoadGen : MonoBehaviour
     private void PathfindEachEntry(List<(int x, int y)> entryPoints, List<List<Tile>> paths)
     {
         Debug.Log(entryPoints.Count);
-        for (int i = 0; i < entryPoints.Count-1; i++) //stop at second-to-last
+        for (int i = 0; i < entryPoints.Count - 1; i++) //stop at second-to-last
         {
-            for (int j = i+1; j < (entryPoints.Count); j++)
+            for (int j = i + 1; j < (entryPoints.Count); j++)
             {
                 // if x or y is on the same border side, go to next
                 (int x, int y) end = entryPoints[j];
@@ -421,7 +473,7 @@ public class RoadGen : MonoBehaviour
     }
 
     void OnDrawGizmosSelected()
-    {   
+    {
         if (showConvexHull)
         {
             if (gizmoPointsDict != null)
@@ -433,7 +485,7 @@ public class RoadGen : MonoBehaviour
                 }
             }
         }
-        
+
     }
 
     public void runMapGen() //this is so the Editor script can auto update on changes
@@ -441,7 +493,7 @@ public class RoadGen : MonoBehaviour
         lt.gameManager.loadNewData();
     }
 
-   
+
 
 
 

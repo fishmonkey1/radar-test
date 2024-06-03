@@ -1,0 +1,12 @@
+﻿using System.Collections;
+using UnityEngine;
+
+namespace ProcGenTiles
+{
+	public class Region
+	{
+
+
+
+	}
+}
