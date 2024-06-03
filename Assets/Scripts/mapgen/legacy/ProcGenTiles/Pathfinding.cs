@@ -435,8 +435,11 @@ namespace ProcGenTiles
             {
                 return false;
             }
-                
-            
+        }
+
+        private bool TileUnderElevation(Tile t, float elevationLimit)
+        {
+            return !TileOverElevation(t, elevationLimit);
         }
 
         private void AddFourNeighbors(int x, int y, Queue<(int x, int y)> q, List<(int x, int y)> frontier, List<(int x, int y)> path, List<(int x, int y)> badPaths)
