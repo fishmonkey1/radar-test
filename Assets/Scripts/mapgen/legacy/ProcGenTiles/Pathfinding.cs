@@ -18,7 +18,7 @@ namespace ProcGenTiles
 
 
         float[,] noiseMap;
-        float elevationLimit;
+        //float elevationLimit;
 
         public Pathfinding(Map map)
         {
@@ -186,7 +186,7 @@ namespace ProcGenTiles
             while (frontier.Count != 0)
             { //time to start finding neighbors
                 Tile t = frontier.Dequeue();
-                List<Tile> neighbors = GetFourNeighborsList(t.x, t.y, TileOverElevation, checkFloat: elevationLimit);
+                List<Tile> neighbors = GetFourNeighborsList(t.x, t.y, TileOverElevation, eightNeighbors : false, checkFloat: elevationLimit);
                 if (neighbors.Count == 0)
                 {
                     Debug.Log($"No valid neighbors found during the floodfill at {t.x},{t.y}");
@@ -201,7 +201,7 @@ namespace ProcGenTiles
                             continue; //Don't try to mark regions that have already been marked
                         neighbor.ValuesHere.Add("Region", regionNumber);
                         regionTiles.Add(neighbor);
-                        List<Tile> neighborNeighbors = GetFourNeighborsList(neighbor.x, neighbor.y, TileOverElevation, checkFloat: elevationLimit);
+                        List<Tile> neighborNeighbors = GetFourNeighborsList(neighbor.x, neighbor.y, TileOverElevation, eightNeighbors: false, checkFloat: elevationLimit);
                         foreach (Tile tile in neighborNeighbors)
                         {
                             if (!regionTiles.Contains(tile))
@@ -250,7 +250,18 @@ namespace ProcGenTiles
                     var candidate_y = candidate.Item2;
 
                     // if in badPath skip node
-                    if (_badPaths.Contains((candidate_x, candidate_y))) continue;
+                    if (_badPaths.Contains(candidate)) continue;
+
+                    // need to only add neighbor to _badPaths if it's over elevation
+                    // we;re adding to badpaths EVERy time we go backwards.
+                    // THIS IS WHERE THE BUG IS
+                    Tile t = Map.GetTile(_path[_path.Count - 1]);
+                    if (TileOverElevation(t, elevationLimit))
+                    {
+                        _badPaths.Add(candidate);
+                        retracing = true;
+                    }
+                    
 
                     // if not traversible skip this node
                     if (noiseMap[candidate_x, candidate_y] > elevationLimit) 
@@ -301,18 +312,12 @@ namespace ProcGenTiles
                 }
 
                 // if no good nodes found
-                if (lowestCandidate == (int.MaxValue, int.MaxValue))
+                if (lowestCandidate == (int.MaxValue, int.MaxValue) && retracing)
                 {
                     //Debug.Log($"No good node at {path[path.Count-1]}, added to badPaths");                    
-                    retracing = true;
-                    Tile t = Map.GetTile(_path[_path.Count - 1]);
 
-                    // need to only add neighbor to _badPaths if it's over elevation
-                    // we;re adding to badpaths EVERy time we go backwards.
-                    // THIS IS WHERE THE BUG IS
-                    _badPaths.Add((_path[_path.Count - 1]));
-
-                    AddEightNeighbors(lowestCandidate.Item1, lowestCandidate.Item2, null, _frontier, _path, _badPaths);
+                    AddEightNeighbors(_path[_path.Count - 2].x, _path[_path.Count - 2].y, null, _frontier, _path, _badPaths);
+                    _path.RemoveAt(_path.Count - 1);
                 }
                 else
                 {   //Debug.Log($"lowestCandidate is {lowestCandidate}, finding new neighbors...");
@@ -345,7 +350,7 @@ namespace ProcGenTiles
         /// <param name="checkFunction"></param>
         /// <param name="optionalAddList"></param>
         /// <returns>List<(int x, int y)></returns>
-        private List<Tile> GetFourNeighborsList((int x, int y) coords, Func<Tile, float, bool> checkFunction, List<Tile> optionalAddList = null, float checkFloat = 0)
+        private List<Tile> GetFourNeighborsList((int x, int y) coords, Func<Tile, float, bool> checkFunction, bool eightNeighbors, List<Tile> optionalAddList = null, float checkFloat = 0)
         {
             bool debug = false;
             List<Tile> foundNeighbors = null;
@@ -360,53 +365,47 @@ namespace ProcGenTiles
             Tile north = Map.GetTile(coords.x, coords.y + 1);
             Tile south = Map.GetTile(coords.x, coords.y - 1);
 
-            //Run the found tile through the function that checks if we should add it
-            if (east != null)
-            {
-                if (checkFunction(east, checkFloat))
-                {
-                    foundNeighbors.Add(east);
-                }
-                else
-                    debug = true;
+            Tile ne = Map.GetTile(coords.x + 1, coords.y + 1); 
+            Tile se = Map.GetTile(coords.x + 1, coords.y - 1);
+            Tile sw = Map.GetTile(coords.x - 1, coords.y - 1);
+            Tile nw = Map.GetTile(coords.x - 1, coords.y + 1);
 
-            }
-            if (west != null)
-            {
-                if (checkFunction(west, checkFloat))
-                {
-                    foundNeighbors.Add(west);
-                }
-                else
-                    debug = true;
-            }
+            // why the fuck didn't you make this a function lmao
+            CheckNeighbor(west);
+            CheckNeighbor(east);
+            CheckNeighbor(north);
+            CheckNeighbor(south);
 
-            if (north != null)
+            if (eightNeighbors)
             {
-                if (checkFunction(north, checkFloat))
-                {
-                    foundNeighbors.Add(north);
-                }
-                else
-                    debug = true;
+                Debug.Log("TRUE 8");
+                CheckNeighbor(ne);
+                CheckNeighbor(se);
+                CheckNeighbor(sw);
+                CheckNeighbor(nw);
             }
 
-            if (south != null)
+
+            void CheckNeighbor(Tile direction)
             {
-                if (checkFunction(south, checkFloat))
+                if (direction != null)
                 {
-                    foundNeighbors.Add(south);
+                    if (!checkFunction(direction, checkFloat))
+                    {
+                        foundNeighbors.Add(direction);
+                    }
+                    else
+                        debug = true;
                 }
-                else
-                    debug = true;
-            } 
+            }
+  
             
-            if (debug)
+            /*if (debug)
             {
                 Debug.Log($"Neighbors check. Start is {start.x},{start.y} with elevation {start.ValuesHere["Elevation"]}");
                 foreach (var neighbor in foundNeighbors)
-                    Debug.Log($"Found neighbor at {neighbor.x},{neighbor.y} with elevation {neighbor.ValuesHere["Elevation"]}");
-            }
+                    Debug.Log($"Found neighbor at {neighbor.x},{neighbor.y} with elevation {Math.Round( neighbor.ValuesHere["Elevation"] , 4)}");
+            }*/
 
             return foundNeighbors;
         }
@@ -419,11 +418,14 @@ namespace ProcGenTiles
         /// <param name="checkFunction"></param>
         /// <param name="optionalAddList"></param>
         /// <returns></returns>
-        private List<Tile> GetFourNeighborsList(int x, int y, Func<Tile, float, bool> checkFunction, List<Tile> optionalAddList = null, float checkFloat = 0)
+        private List<Tile> GetFourNeighborsList(int x, int y, Func<Tile, float, bool> checkFunction, bool eightNeighbors, List<Tile> optionalAddList = null, float checkFloat = 0 )
         {
-            return GetFourNeighborsList((x, y), checkFunction, optionalAddList, checkFloat);
+            return GetFourNeighborsList((x, y), checkFunction, eightNeighbors, optionalAddList, checkFloat);
         }
 
+        /// <summary>
+        /// Returns true if given tile elevation is GREATER THAN the elevationLimit.
+        /// </summary>
         private bool TileOverElevation(Tile t, float elevationLimit)
         {
             if (t.ValuesHere["Elevation"] > elevationLimit)
@@ -473,5 +475,110 @@ namespace ProcGenTiles
                 frontier.Add((x, y));
             }
         }
+
+
+        public List<Tile> new_Astar(Tile start, Tile end, float elevationLimit)
+        {
+            // https://github.com/SebLague/Pathfinding/blob/master/Episode%2003%20-%20astar/Assets/Scripts/Pathfinding.cs
+
+            List<Tile> finalPath = new List<Tile>();
+
+            List<Tile> openSet = new List<Tile>();
+            HashSet<Tile> closedSet = new HashSet<Tile>();
+            openSet.Add(start);
+
+
+
+            while (openSet.Count > 0)
+            {
+                Tile current = openSet[0];
+
+                current.gCost = Helpers.ManhattanDistance(current.x, start.x, current.y, start.y); //dist to start
+                current.hCost = Helpers.ManhattanDistance(current.x, end.x, current.y, end.y); //dist to end
+                current.fCost = current.gCost + current.hCost; // start dist + end dist
+
+                for (int i = 1; i < openSet.Count; i++)
+                {
+                    var candidate = openSet[i];
+
+                    candidate.gCost = Helpers.ManhattanDistance(candidate.x, start.x, candidate.y, start.y); //dist to start
+                    candidate.hCost = Helpers.ManhattanDistance(candidate.x, end.x, candidate.y, end.y); //dist to end
+                    candidate.fCost = candidate.gCost + candidate.hCost; // start dist + end dist
+
+                    if (candidate.fCost < current.fCost || candidate.fCost == current.fCost)
+                    {
+                        if (candidate.hCost < current.hCost)
+                            current = candidate;
+                    }
+                }
+
+                openSet.Remove(current);
+                closedSet.Add(current);
+
+                if (current == end)
+                {
+                    Debug.Log("got to end");
+                    RetracePath(start, end);
+                    return finalPath;
+                }
+
+                List<Tile> neighbours = GetFourNeighborsList(current.x, current.y, TileOverElevation,eightNeighbors: true, checkFloat: elevationLimit);
+                foreach (Tile neighbour in neighbours)
+                {
+                    if (closedSet.Contains(neighbour)) continue;
+
+                    //set neighbors cost vals 
+                    neighbour.gCost = Helpers.ManhattanDistance(neighbour.x, start.x, neighbour.y, start.y); //dist to start
+                    neighbour.hCost = Helpers.ManhattanDistance(neighbour.x, end.x, neighbour.y, end.y); //dist to end
+                    neighbour.fCost = neighbour.gCost + neighbour.hCost; // start dist + end dist
+
+                    var dist_to_neighbor = Helpers.ManhattanDistance(current.x, neighbour.x, current.y, neighbour.y); //dist to start
+
+                    int newCostToNeighbour = current.gCost + dist_to_neighbor; //lmao                    
+                    if (newCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour))
+                    {
+                        neighbour.gCost = newCostToNeighbour;
+                        neighbour.hCost = Helpers.ManhattanDistance(neighbour.x, end.x, neighbour.y, end.y); //dist to end
+
+
+                        neighbour.pathfindParent = current;
+
+                        //finalPath.Add(neighbour); //using this to see where this thing is going
+
+                        //Debug.Log($"added ({current.x},{current.y})   parent to   ({neighbour.x},{neighbour.y})");
+
+                        if (!openSet.Contains(neighbour))
+                            openSet.Add(neighbour);
+                    }
+                }
+            }
+
+
+            void RetracePath(Tile start, Tile end)
+            {
+                List<Tile> path = new List<Tile>();
+                Tile currentNode = end;
+
+                while (currentNode != start)
+                {
+                    path.Add(currentNode);
+
+                    currentNode = currentNode.pathfindParent;
+                }
+                path.Reverse();
+
+                finalPath = path;
+
+            }
+
+            return finalPath;
+
+        }
+
     }
+
+
+
+
+
 }
