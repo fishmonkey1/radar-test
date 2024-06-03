@@ -137,7 +137,6 @@ GameObject:
   - component: {fileID: 18269055}
   - component: {fileID: 18269050}
   - component: {fileID: 18269056}
-  - component: {fileID: 18269057}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -314,27 +313,6 @@ MonoBehaviour:
   meshRenderer: {fileID: 0}
   Color1: {r: 0, g: 0, b: 0, a: 0}
   Color2: {r: 0, g: 0, b: 0, a: 0}
---- !u!114 &18269057
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 18269049}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3629bb01ffa409047b7f8dc315df9f84, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  layerTerrain: {fileID: 0}
-  ground:
-    serializedVersion: 2
-    m_Bits: 0
-  GreenEnemyPrefab: {fileID: 0}
-  RedEnemyPrefab: {fileID: 0}
-  PlayerPrefab: {fileID: 0}
-  numOfGreen: 10
-  numOfRed: 10
 --- !u!114 &18269058
 MonoBehaviour:
   m_ObjectHideFlags: 0

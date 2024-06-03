@@ -284,12 +284,6 @@ namespace ProcGenTiles
             Tile north = Map.GetTile(coords.x, coords.y + 1);
             Tile south = Map.GetTile(coords.x, coords.y - 1);
 
-            Tile ne = Map.GetTile(coords.x + 1, coords.y + 1); 
-            Tile se = Map.GetTile(coords.x + 1, coords.y - 1);
-            Tile sw = Map.GetTile(coords.x - 1, coords.y - 1);
-            Tile nw = Map.GetTile(coords.x - 1, coords.y + 1);
-
-            // why the fuck didn't you make this a function lmao
             CheckNeighbor(west);
             CheckNeighbor(east);
             CheckNeighbor(north);
@@ -297,13 +291,16 @@ namespace ProcGenTiles
 
             if (eightNeighbors)
             {
-                Debug.Log("TRUE 8");
+                Tile ne = Map.GetTile(coords.x + 1, coords.y + 1);
+                Tile se = Map.GetTile(coords.x + 1, coords.y - 1);
+                Tile sw = Map.GetTile(coords.x - 1, coords.y - 1);
+                Tile nw = Map.GetTile(coords.x - 1, coords.y + 1);
+
                 CheckNeighbor(ne);
                 CheckNeighbor(se);
                 CheckNeighbor(sw);
                 CheckNeighbor(nw);
             }
-
 
             void CheckNeighbor(Tile direction)
             {
@@ -318,14 +315,12 @@ namespace ProcGenTiles
                 }
             }
   
-            
-            /*if (debug)
+            if (debug)
             {
                 Debug.Log($"Neighbors check. Start is {start.x},{start.y} with elevation {start.ValuesHere["Elevation"]}");
                 foreach (var neighbor in foundNeighbors)
                     Debug.Log($"Found neighbor at {neighbor.x},{neighbor.y} with elevation {Math.Round( neighbor.ValuesHere["Elevation"] , 4)}");
-            }*/
-
+            }
             return foundNeighbors;
         }
 
@@ -419,7 +414,8 @@ namespace ProcGenTiles
 
                 current.gCost = Helpers.ManhattanDistance(current.x, start.x, current.y, start.y); //dist to start
                 current.hCost = Helpers.ManhattanDistance(current.x, end.x, current.y, end.y); //dist to end
-                current.fCost = current.gCost + current.hCost; // start dist + end dist
+                //current.fCost = current.gCost + current.hCost; // start dist + end dist
+                current.fCost = current.hCost;
 
                 for (int i = 1; i < openSet.Count; i++)
                 {
@@ -427,7 +423,8 @@ namespace ProcGenTiles
 
                     candidate.gCost = Helpers.ManhattanDistance(candidate.x, start.x, candidate.y, start.y); //dist to start
                     candidate.hCost = Helpers.ManhattanDistance(candidate.x, end.x, candidate.y, end.y); //dist to end
-                    candidate.fCost = candidate.gCost + candidate.hCost; // start dist + end dist
+                    //candidate.fCost = candidate.gCost + candidate.hCost; // start dist + end dist
+                    candidate.fCost = candidate.hCost;
 
                     if (candidate.fCost < current.fCost || candidate.fCost == current.fCost)
                     {
@@ -454,7 +451,8 @@ namespace ProcGenTiles
                     //set neighbors cost vals 
                     neighbor.gCost = Helpers.ManhattanDistance(neighbor.x, start.x, neighbor.y, start.y); //dist to start
                     neighbor.hCost = Helpers.ManhattanDistance(neighbor.x, end.x, neighbor.y, end.y); //dist to end
-                    neighbor.fCost = neighbor.gCost + neighbor.hCost; // start dist + end dist
+                    //neighbor.fCost = neighbor.gCost + neighbor.hCost; // start dist + end dist
+                    neighbor.fCost = neighbor.hCost;
 
                     var dist_to_neighbor = Helpers.ManhattanDistance(current.x, neighbor.x, current.y, neighbor.y); //dist to start
 
@@ -463,12 +461,7 @@ namespace ProcGenTiles
                     {
                         neighbor.gCost = newCostToneighbor;
                         neighbor.hCost = Helpers.ManhattanDistance(neighbor.x, end.x, neighbor.y, end.y); //dist to end
-
-
                         neighbor.pathfindParent = current;
-
-                        //finalPath.Add(neighbor); //using this to see where this thing is going
-
                         //Debug.Log($"added ({current.x},{current.y})   parent to   ({neighbor.x},{neighbor.y})");
 
                         if (!openSet.Contains(neighbor))

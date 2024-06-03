@@ -111,15 +111,12 @@ public class RoadGen : MonoBehaviour
         {
             List<List<Tile>> allRegions = pathFinding.MarkLandmassRegions(noiseMap, elevationLimitForPathfind);
 
-            
             int colorIndex = 0;
-            gizmoPointsDict = new Dictionary<Vector3[], Color>();
-
+            //gizmoPointsDict = new Dictionary<Vector3[], Color>();
             foreach (List<Tile> region in allRegions)
             {
                 if (region.Count >= floodfillRegionMinimum)
                 {
-                    //Color each region with a unique color
                     Color drawColor = someColors[colorIndex];
 
                     if (showFloodfill)
@@ -132,9 +129,8 @@ public class RoadGen : MonoBehaviour
 
                     if (showConvexHull)
                     {
-                        drawHullGizmos(drawColor); //passing in the color so that we can color them the same if we show them
+                        drawHullGizmos(drawColor); 
                     }
-
 
                     colorIndex++;
                     if (colorIndex >= someColors.Length - 1)
@@ -144,7 +140,11 @@ public class RoadGen : MonoBehaviour
 
                     void drawHullGizmos(Color drawColor)
                     {
-                        List<(int x, int y)> hullPoints = ConvexHull.GetConvexHull(region); //TODO: Can you have this return a List<Tile> instead?
+                        List<(int x, int y)> hullPoints = ConvexHull.GetConvexHull(region); // TODO: Can you edit to have this return a List<Tile> instead?
+                                                                                            //       I had a hard time figuring it out.
+                                                                                            //       Obvs we can just iterate over the tuples at the end before returning,
+                                                                                            //       but if we create tiles instead of tuples hell yeah.
+
                         if (hullPoints != null)
                         {
                             Vector3[] gizmoPoints = new Vector3[hullPoints.Count]; //idk why but need to do it like this for the Gizmo stuff?
@@ -156,12 +156,8 @@ public class RoadGen : MonoBehaviour
 
                             gizmoPointsDict.Add(gizmoPoints, drawColor);
                         }
-
                     }
-
                 }
-
-
             }
         }
 
@@ -172,27 +168,18 @@ public class RoadGen : MonoBehaviour
             //entryPoints = GetMapEntries(); // this will populate entry-points automatically
             // need to fix no-path before this will work
             // (makes while loop run forever)
-            // this is just for debug, only works for 256x256 map
-
-            // TODO: If less than 3 Entry points, will not do path. Fix the for loops in PathfindEachEntry()
 
 
+
+
+            // these are just for debug, only works for 256x256 map
             entryPoints.Add((142, 255));  // gets stuck
             entryPoints.Add((132, 0));
-
-            entryPoints.Add((142, 255)); //gets stuck
             entryPoints.Add((192, 0));
-
-            entryPoints.Add((142, 255)); // works
             entryPoints.Add((255, 175));
-
-
-             /*entryPoints.Add((0, 30));
-
-              entryPoints.Add((0, 177));
-              entryPoints.Add((142, 255));
-              entryPoints.Add((0, 88));
-              entryPoints.Add((192, 0));*/
+            entryPoints.Add((0, 30));
+            entryPoints.Add((0, 177));
+            entryPoints.Add((0, 88));
 
             //entryPoints.Add((255, 117)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
 
