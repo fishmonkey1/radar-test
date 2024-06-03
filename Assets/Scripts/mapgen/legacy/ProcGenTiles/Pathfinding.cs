@@ -269,7 +269,7 @@ namespace ProcGenTiles
         /// <param name="checkFunction"></param>
         /// <param name="optionalAddList"></param>
         /// <returns>List<(int x, int y)></returns>
-        private List<Tile> GetNeighbors((int x, int y) coords, Func<Tile, float, bool> checkFunction, bool eightNeighbors, List<Tile> optionalAddList = null, float checkFloat = 0)
+        public List<Tile> GetNeighbors((int x, int y) coords, Func<Tile, float, bool> checkFunction, bool eightNeighbors, List<Tile> optionalAddList = null, float checkFloat = 0)
         {
             bool debug = false;
             List<Tile> foundNeighbors = null;
@@ -306,7 +306,7 @@ namespace ProcGenTiles
             {
                 if (direction != null)
                 {
-                    if (!checkFunction(direction, checkFloat))
+                    if (checkFunction(direction, checkFloat))
                     {
                         foundNeighbors.Add(direction);
                     }
@@ -340,7 +340,7 @@ namespace ProcGenTiles
         /// <summary>
         /// Returns true if given tile elevation is GREATER THAN the elevationLimit.
         /// </summary>
-        private bool TileOverElevation(Tile t, float elevationLimit)
+        public bool TileOverElevation(Tile t, float elevationLimit)
         {
             if (t.ValuesHere["Elevation"] > elevationLimit)
             {
@@ -351,7 +351,7 @@ namespace ProcGenTiles
             }
         }
 
-        private bool TileUnderElevation(Tile t, float elevationLimit)
+        public bool TileUnderElevation(Tile t, float elevationLimit)
         {
             return !TileOverElevation(t, elevationLimit);
         }
@@ -443,7 +443,7 @@ namespace ProcGenTiles
                     return finalPath;
                 }
 
-                List<Tile> neighbors = GetNeighbors(current.x, current.y, TileOverElevation,eightNeighbors: true, checkFloat: elevationLimit);
+                List<Tile> neighbors = GetNeighbors(current.x, current.y, TileUnderElevation,eightNeighbors: true, checkFloat: elevationLimit);
                 foreach (Tile neighbor in neighbors)
                 {
                     if (closedSet.Contains(neighbor)) continue;

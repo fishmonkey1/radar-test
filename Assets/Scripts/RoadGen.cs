@@ -17,9 +17,8 @@ public class RoadGen : MonoBehaviour
     private Color[] colorMap;
 
     private float[,] roadMapData;
-    //private List<(int, int)> entryPoints;
-    //List<List<(int x, int xy)>> paths;
-    //List<List<(int x, int xy)>> badPaths;
+    
+
     int width;
     int height;
 
@@ -101,10 +100,10 @@ public class RoadGen : MonoBehaviour
         roadMapData = new float[width, height];
         gizmoPointsDict = new Dictionary<Vector3[], Color>();
 
-        // these get reset every subsequent run
-        List<List<Tile>> paths = new List<List<Tile>>();
-        List<List<(int x, int xy)>> badPaths = new List<List<(int x, int xy)>>();
         List<(int x, int xy)> entryPoints = new List<(int, int)>();
+        List<List<Tile>> paths = new List<List<Tile>>();
+        //List<List<(int x, int xy)>> badPaths = new List<List<(int x, int xy)>>();
+        
 
 
         if (showFloodfill || showConvexHull) //if doing either we need the regions
@@ -161,6 +160,13 @@ public class RoadGen : MonoBehaviour
             }
         }
 
+        entryPoints.Add((142, 255));  // gets stuck
+        entryPoints.Add((132, 0));
+        entryPoints.Add((192, 0));
+        entryPoints.Add((255, 175));
+        entryPoints.Add((0, 30));
+        entryPoints.Add((0, 177));
+        entryPoints.Add((0, 88));
 
         if (showPaths)
         {
@@ -170,25 +176,22 @@ public class RoadGen : MonoBehaviour
             // (makes while loop run forever)
 
 
-
-
             // these are just for debug, only works for 256x256 map
-            entryPoints.Add((142, 255));  // gets stuck
+            /*entryPoints.Add((142, 255));  // gets stuck
             entryPoints.Add((132, 0));
             entryPoints.Add((192, 0));
             entryPoints.Add((255, 175));
             entryPoints.Add((0, 30));
             entryPoints.Add((0, 177));
-            entryPoints.Add((0, 88));
+            entryPoints.Add((0, 88));*/
 
             //entryPoints.Add((255, 117)); // this is an entry with no exit, for testing no-path exits. TODO: fix no path exits lmao
 
-            PathfindEachEntry(entryPoints, paths, badPaths);
+            PathfindEachEntry(entryPoints, paths);
 
             int colorIndex = 0;
             foreach (List<Tile> path in paths) 
             {
-                
                 DrawPathsOnColorMap(path, someColors[colorIndex], true);
                 colorIndex++;
                 if (colorIndex >= someColors.Length - 1)
@@ -203,33 +206,37 @@ public class RoadGen : MonoBehaviour
             {
                 DrawPathsOnColorMap(path, Color.red, true);
             }*/
-
-            if (showEntryPoints)
-            {
-                if (!showPaths)
-                {
-                    //entryPoints.Add((0, 30));
-                    entryPoints.Add((142, 255));
-                    entryPoints.Add((132, 0));
-                }
-
-                // color map entry points
-                foreach ((int x, int y) points in entryPoints)
-                {
-                    DrawColorAtPoint(points.Item1, points.Item2, Color.cyan);
-                }
-
-                /*foreach (List<Tile> path in paths) //draw end node
-                {
-                    if (showEntryPoints)
-                    {
-                        Tile last = path[path.Count - 1];
-                        DrawColorAtPoint(last.x, last.y, Color.cyan);
-                    }
-                }*/
-            }
         }
-     
+
+        if (showEntryPoints)
+        {
+            if (!showPaths)
+            {
+                //entryPoints.Add((0, 30));
+                //entryPoints.Add((142, 255));
+                // entryPoints.Add((132, 0));
+            }
+
+            // color map entry points
+            foreach ((int x, int y) points in entryPoints)
+            {
+                DrawColorAtPoint(points.Item1, points.Item2, Color.cyan);
+
+                Tile t = lt.finalMap.GetTile(points.x, points.y);
+                var border = pathFinding.GetNeighbors(points, pathFinding.TileOverElevation, true, null, -999f);
+                foreach (Tile tt in border) DrawColorAtPoint(tt.x, tt.y, Color.cyan);
+            }
+
+            /*foreach (List<Tile> path in paths) //draw end node
+            {
+                if (showEntryPoints)
+                {
+                    Tile last = path[path.Count - 1];
+                    DrawColorAtPoint(last.x, last.y, Color.cyan);
+                }
+            }*/
+        }
+
         return colorMap; //returns map to gamemanger, which applies texture
 
         
@@ -359,7 +366,7 @@ public class RoadGen : MonoBehaviour
     /// </summary>
     /*private List<List<(int x, int xy)>> PathfindEachEntry(List<(int x, int y)> entryPoints)
     {*/
-    private void PathfindEachEntry(List<(int x, int y)> entryPoints, List<List<Tile>> paths, List<List<(int x, int xy)>> badPaths)
+    private void PathfindEachEntry(List<(int x, int y)> entryPoints, List<List<Tile>> paths)
     {
         Debug.Log(entryPoints.Count);
         for (int i = 0; i < entryPoints.Count-1; i++) //stop at second-to-last
