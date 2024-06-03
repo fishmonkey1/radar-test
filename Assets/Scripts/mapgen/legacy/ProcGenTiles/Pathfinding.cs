@@ -186,7 +186,7 @@ namespace ProcGenTiles
             while (frontier.Count != 0)
             { //time to start finding neighbors
                 Tile t = frontier.Dequeue();
-                List<Tile> neighbors = GetFourNeighborsList(t.x, t.y, TileOverElevation, eightNeighbors : false, checkFloat: elevationLimit);
+                List<Tile> neighbors = GetNeighbors(t.x, t.y, TileOverElevation, eightNeighbors : false, checkFloat: elevationLimit);
                 if (neighbors.Count == 0)
                 {
                     Debug.Log($"No valid neighbors found during the floodfill at {t.x},{t.y}");
@@ -201,7 +201,7 @@ namespace ProcGenTiles
                             continue; //Don't try to mark regions that have already been marked
                         neighbor.ValuesHere.Add("Region", regionNumber);
                         regionTiles.Add(neighbor);
-                        List<Tile> neighborNeighbors = GetFourNeighborsList(neighbor.x, neighbor.y, TileOverElevation, eightNeighbors: false, checkFloat: elevationLimit);
+                        List<Tile> neighborNeighbors = GetNeighbors(neighbor.x, neighbor.y, TileOverElevation, eightNeighbors: false, checkFloat: elevationLimit);
                         foreach (Tile tile in neighborNeighbors)
                         {
                             if (!regionTiles.Contains(tile))
@@ -350,7 +350,7 @@ namespace ProcGenTiles
         /// <param name="checkFunction"></param>
         /// <param name="optionalAddList"></param>
         /// <returns>List<(int x, int y)></returns>
-        private List<Tile> GetFourNeighborsList((int x, int y) coords, Func<Tile, float, bool> checkFunction, bool eightNeighbors, List<Tile> optionalAddList = null, float checkFloat = 0)
+        private List<Tile> GetNeighbors((int x, int y) coords, Func<Tile, float, bool> checkFunction, bool eightNeighbors, List<Tile> optionalAddList = null, float checkFloat = 0)
         {
             bool debug = false;
             List<Tile> foundNeighbors = null;
@@ -418,9 +418,9 @@ namespace ProcGenTiles
         /// <param name="checkFunction"></param>
         /// <param name="optionalAddList"></param>
         /// <returns></returns>
-        private List<Tile> GetFourNeighborsList(int x, int y, Func<Tile, float, bool> checkFunction, bool eightNeighbors, List<Tile> optionalAddList = null, float checkFloat = 0 )
+        private List<Tile> GetNeighbors(int x, int y, Func<Tile, float, bool> checkFunction, bool eightNeighbors, List<Tile> optionalAddList = null, float checkFloat = 0 )
         {
-            return GetFourNeighborsList((x, y), checkFunction, eightNeighbors, optionalAddList, checkFloat);
+            return GetNeighbors((x, y), checkFunction, eightNeighbors, optionalAddList, checkFloat);
         }
 
         /// <summary>
@@ -478,7 +478,9 @@ namespace ProcGenTiles
 
 
         public List<Tile> new_Astar(Tile start, Tile end, float elevationLimit)
-        {
+        {   
+            // adapted from Sebastian Lague's Pathfinding code.
+            // Going to add comments to make it easier to read.
             // https://github.com/SebLague/Pathfinding/blob/master/Episode%2003%20-%20astar/Assets/Scripts/Pathfinding.cs
 
             List<Tile> finalPath = new List<Tile>();
@@ -522,33 +524,33 @@ namespace ProcGenTiles
                     return finalPath;
                 }
 
-                List<Tile> neighbours = GetFourNeighborsList(current.x, current.y, TileOverElevation,eightNeighbors: true, checkFloat: elevationLimit);
-                foreach (Tile neighbour in neighbours)
+                List<Tile> neighbors = GetNeighbors(current.x, current.y, TileOverElevation,eightNeighbors: true, checkFloat: elevationLimit);
+                foreach (Tile neighbor in neighbors)
                 {
-                    if (closedSet.Contains(neighbour)) continue;
+                    if (closedSet.Contains(neighbor)) continue;
 
                     //set neighbors cost vals 
-                    neighbour.gCost = Helpers.ManhattanDistance(neighbour.x, start.x, neighbour.y, start.y); //dist to start
-                    neighbour.hCost = Helpers.ManhattanDistance(neighbour.x, end.x, neighbour.y, end.y); //dist to end
-                    neighbour.fCost = neighbour.gCost + neighbour.hCost; // start dist + end dist
+                    neighbor.gCost = Helpers.ManhattanDistance(neighbor.x, start.x, neighbor.y, start.y); //dist to start
+                    neighbor.hCost = Helpers.ManhattanDistance(neighbor.x, end.x, neighbor.y, end.y); //dist to end
+                    neighbor.fCost = neighbor.gCost + neighbor.hCost; // start dist + end dist
 
-                    var dist_to_neighbor = Helpers.ManhattanDistance(current.x, neighbour.x, current.y, neighbour.y); //dist to start
+                    var dist_to_neighbor = Helpers.ManhattanDistance(current.x, neighbor.x, current.y, neighbor.y); //dist to start
 
-                    int newCostToNeighbour = current.gCost + dist_to_neighbor; //lmao                    
-                    if (newCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour))
+                    int newCostToneighbor = current.gCost + dist_to_neighbor; //lmao                    
+                    if (newCostToneighbor < neighbor.gCost || !openSet.Contains(neighbor))
                     {
-                        neighbour.gCost = newCostToNeighbour;
-                        neighbour.hCost = Helpers.ManhattanDistance(neighbour.x, end.x, neighbour.y, end.y); //dist to end
+                        neighbor.gCost = newCostToneighbor;
+                        neighbor.hCost = Helpers.ManhattanDistance(neighbor.x, end.x, neighbor.y, end.y); //dist to end
 
 
-                        neighbour.pathfindParent = current;
+                        neighbor.pathfindParent = current;
 
-                        //finalPath.Add(neighbour); //using this to see where this thing is going
+                        //finalPath.Add(neighbor); //using this to see where this thing is going
 
-                        //Debug.Log($"added ({current.x},{current.y})   parent to   ({neighbour.x},{neighbour.y})");
+                        //Debug.Log($"added ({current.x},{current.y})   parent to   ({neighbor.x},{neighbor.y})");
 
-                        if (!openSet.Contains(neighbour))
-                            openSet.Add(neighbour);
+                        if (!openSet.Contains(neighbor))
+                            openSet.Add(neighbor);
                     }
                 }
             }
