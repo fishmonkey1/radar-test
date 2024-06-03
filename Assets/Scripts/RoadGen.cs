@@ -125,6 +125,7 @@ public class RoadGen : MonoBehaviour
                         {
                             DrawColorAtPoint(t.x, t.y, drawColor);
                         }
+                        Debug.Log($"Length of region {region[0].ValuesHere["Region"]} is {region.Count}");
                     }
 
                     if (showConvexHull)
