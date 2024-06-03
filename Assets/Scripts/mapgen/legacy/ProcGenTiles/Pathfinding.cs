@@ -55,7 +55,7 @@ namespace ProcGenTiles
                   //If the tile is over the elevationLimit, do a DFS or BFS on all neighbors above the limit and label
                     Tile t = Map.GetTile(width, height);
                     if (!t.ValuesHere.ContainsKey("Elevation"))
-                    { //Raise an error ifg you run the landmass marking without elevation data set
+                    { //Raise an error if you run the landmass marking without elevation data set
                         throw new System.Exception("Cannot floodfill landmasses without elevation data!");
                     }
                     else
@@ -73,7 +73,6 @@ namespace ProcGenTiles
                         { //The tile is above the elevation limit and needs to be checked
                             if (!t.ValuesHere.ContainsKey("Region"))
                             {//If this hasn't had a region assigned then we need to floodfill this area
-                                t.ValuesHere.Add("Land", 1); //We'll still mark the land here anyways, cause fuggit
                                 //Do something with the returned region later, i guess?
                                 List<Tile> region = FloodfillRegion(regionLabel, width, height, elevationLimit);
    
@@ -94,44 +93,31 @@ namespace ProcGenTiles
 
         private List<Tile> FloodfillRegion(int regionNumber, (int x, int y) coords, float elevationLimit)
         {
-            
             Tile startTile = Map.GetTile(coords);
-            startTile.ValuesHere.Add("Region", regionNumber); //Mark the first tile with the region number
             List<Tile> regionTiles = new List<Tile>(); //For holding all the tiles that are found
-            regionTiles.Add(startTile);
             Queue<Tile> frontier = new Queue<Tile>(); //All eligible neighbors we've found
             frontier.Enqueue(startTile);
 
             while (frontier.Count != 0)
             { //time to start finding neighbors
                 Tile t = frontier.Dequeue();
-                List<Tile> neighbors = GetNeighbors(t.x, t.y, TileOverElevation, eightNeighbors : false, checkFloat: elevationLimit);
+                regionTiles.Add(t);
+                t.ValuesHere.Add("Land", 1);
+                t.ValuesHere.Add("Region", regionNumber);
+                List<Tile> neighbors = GetNeighbors(t.x, t.y, TileOverElevation, eightNeighbors: false, checkFloat: elevationLimit);
                 if (neighbors.Count == 0)
                 {
-                    Debug.Log($"No valid neighbors found during the floodfill at {t.x},{t.y}");
+                    //Debug.Log($"No valid neighbors found during the floodfill at {t.x},{t.y}");
                     continue; //Keep going, we found nothing
                 }
                 
-                foreach (Tile neighbor in neighbors)
-                { //Time to check if the neighbor has been checked already
-                    if (!regionTiles.Contains(neighbor))
-                    { //This is land that hasn't been assigned a region code, so lets fix that
-                        if (neighbor.ValuesHere.ContainsKey("Region"))
-                            continue; //Don't try to mark regions that have already been marked
-                        neighbor.ValuesHere.Add("Region", regionNumber);
-                        regionTiles.Add(neighbor);
-                        List<Tile> neighborNeighbors = GetNeighbors(neighbor.x, neighbor.y, TileOverElevation, eightNeighbors: false, checkFloat: elevationLimit);
-                        foreach (Tile tile in neighborNeighbors)
-                        {
-                            if (!regionTiles.Contains(tile))
-                            { //Make sure we aren't adding tiles we've already marked
-                                frontier.Enqueue(tile);
-                            }
-                        }
-                    }
+                foreach(Tile neighbor in neighbors)
+                {
+                    if (frontier.Contains(neighbor) || regionTiles.Contains(neighbor))
+                        continue; //Don't add tiles that have already been looked at
+                    frontier.Enqueue(neighbor);
                 }
             }
-            //if (regionTiles.Count > 1) Debug.Log("Created region with tile size of: " + regionTiles.Count);
 
             return regionTiles;
         }
