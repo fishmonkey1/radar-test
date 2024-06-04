@@ -254,6 +254,7 @@ public class RoadGen : MonoBehaviour
         List<List<Tile>> landmasses = new List<List<Tile>>();
 
         //Create List of landmasses we are going to be navigating between
+        // ignore anything smaller than the set min
         foreach (List<Tile> region in allRegions)
         {
             if (region.Count >= floodfillRegionMinimum)
@@ -262,18 +263,60 @@ public class RoadGen : MonoBehaviour
             }
         }
 
-        // for every landmass, get bounds of landmass
-        // Note: This will be created during the floodfill eventually
+        // create a list of regions that are neighbors
+        // I know this is a mess lol I had to start somewhere :3
         for (int i = 0; i < landmasses.Count - 1; i++)
         {
-            for (int j = 1; j < landmasses.Count; j++)
-            {
+            List<List<Tile>> regionNeighbors_n = null; // going to be using hullpoints, not the whole list
+            List<List<Tile>> regionNeighbors_e = null;
+            List<List<Tile>> regionNeighbors_s = null;
+            List<List<Tile>> regionNeighbors_w = null;
+
+            for (int j = i+1; j < landmasses.Count; j++) // compare every landmass to every one in front of it in the List. 
+            {                                            // This compares everything with everything else, without duplicates.
                 List<Tile> currentRegion = landmasses[i];
                 List<Tile> compareToRegion = landmasses[j];
 
-                (int curr_n, int curr_e, int curr_s, int curr_w) = GetBounds(currentRegion);
-                (int comp_n, int comp_e, int comp_s, int comp_w) = GetBounds(currentRegion);
+                (int curr_n, int curr_e, int curr_s, int curr_w) = GetBounds(currentRegion); // I'm going to pass in the hullpoints just bear with me lol
+                (int comp_n, int comp_e, int comp_s, int comp_w) = GetBounds(compareToRegion);
+
+                if ((curr_s <= comp_s && comp_s <= curr_n) || (curr_n >= comp_n && comp_n >= curr_s || (curr_n < comp_n && curr_s > comp_s))) // compareToRegion is on the east or west of current region
+                {
+                    if (curr_e < comp_e) regionNeighbors_e.Add(compareToRegion); //it's an east neighbor
+                    if (curr_w > comp_e) regionNeighbors_w.Add(compareToRegion); // it's a west neighbor
+                }
+
+                if ((curr_w <= comp_w && comp_w <= curr_e) || (curr_e >= comp_e && comp_e >= curr_w || (curr_e < comp_e && curr_w > comp_w))) // compareToRegion is on the north or south of current region
+                {
+                    if (curr_n < comp_n) regionNeighbors_n.Add(compareToRegion); //it's an north neighbor
+                    if (curr_s > comp_s) regionNeighbors_s.Add(compareToRegion); // it's a south neighbor
+                }
             }
+
+            // After done looping, store those values in the Region object for each region on the Map (that still needs to be created) 
+
+            // At this point, you have a list of what regions are around you (4 neighbors style, but extending all the way out).
+            // now need to see which of those are CLOSEST (immediately to the sides)
+            /*
+                for row-or-column-both-regions-are-occupying:
+                    get distance between the two along the row/column
+                    get midpoint of that distance.
+                    mark midpoint. 
+                    (Could also do some slope math here with the hull points but brain no worky rn)
+                  
+                Now we have a line of dots between regions. Get the best-fit line for those midpoints.
+                Save the tentative lines.     
+               -- 
+                if you have multiple lines spaced apart in a line w/ ~same slope, make them a single line. (average out all the points to get line)
+                Extend lines out to find intersect points between lines... We are going to use these to make the bezier curves for the road. Really just extend out until it hits something.
+
+                If you've actually coded and implemented this far, go pour a fuckin drink cuz you probs wanna blow your brains out from frustration. 
+
+                
+                  
+                 
+             */
+
         }
 
         (int n, int e, int s, int w) GetBounds(List<Tile> region)
