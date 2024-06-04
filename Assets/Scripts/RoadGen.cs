@@ -161,10 +161,28 @@ public class RoadGen : MonoBehaviour
                         {
                             Vector3[] gizmoPoints = new Vector3[hullPoints.Count]; //idk why but need to do it like this for the Gizmo stuff?
 
+                            int n = 0;
+                            int e = 0;
+                            int s = height + 1;
+                            int w = width + 1;
+
+                            Region reg = map.GetRegion(hullPoints[0].x, hullPoints[0].y);
+
                             for (int i = 0; i < hullPoints.Count; i++)
                             {
                                 gizmoPoints[i] = new Vector3((float)hullPoints[i].y, 1.0f, (float)hullPoints[i].x);
+
+                                if (hullPoints[i].y > n) n = hullPoints[i].y; // Get n bound (highest Y)
+                                if (hullPoints[i].x > e) e = hullPoints[i].x; // Get e bound (highest x)
+                                if (hullPoints[i].y < s) s = hullPoints[i].y; // Get s bound (lowest Y)
+                                if (hullPoints[i].x < w) w = hullPoints[i].x; // Get w bound (lowest x)
+                                
+                                
                             }
+
+                            region.Bounds = new (int, int)[2];
+                            region.Bounds[0] = (w, n);
+                            region.Bounds[1] = (e, s);
 
                             gizmoPointsDict.Add(gizmoPoints, drawColor);
                         }
@@ -172,7 +190,7 @@ public class RoadGen : MonoBehaviour
                 }
             }
 
-            CreateRegionObjects(allRegions);
+            CreateRegionObjects();
 
         }
 
@@ -252,13 +270,13 @@ public class RoadGen : MonoBehaviour
 
     }
 
-    private void CreateRegionObjects(List<Region> allRegions)
+    private void CreateRegionObjects()
     {
         Debug.Log("vicky ur super cute :3333333 I luuuuuvs you!!!!");
         //Create List of landmasses we are going to be navigating between, ignore anything smaller than the set min
         // This shouldn't be done here, we should have a seperate array in Map for the "good" regions I guess.
         List<Region> landmasses = new List<Region>();
-        foreach (Region region in allRegions)
+        foreach (Region region in map.Regions)
         {
             if (region.Tiles.Length >= floodfillRegionMinimum)
             {
@@ -278,21 +296,30 @@ public class RoadGen : MonoBehaviour
 
             Region currentRegion = landmasses[i];
 
+
+            int curr_w = currentRegion.Bounds[0].Item1;
+            int curr_n = currentRegion.Bounds[0].Item2;
+            int curr_e = currentRegion.Bounds[1].Item1;
+            int curr_s = currentRegion.Bounds[1].Item2;
+            
+
             for (int j = i+1; j < landmasses.Count; j++) 
             {                                                        
                 Region compareToRegion = landmasses[j];
 
-                (int curr_n, int curr_e, int curr_s, int curr_w) = GetBoundsofTiles(currentRegion.Tiles); 
-                (int comp_n, int comp_e, int comp_s, int comp_w) = GetBoundsofTiles(compareToRegion.Tiles);
+                int comp_w = compareToRegion.Bounds[0].Item1;
+                int comp_n = compareToRegion.Bounds[0].Item2;
+                int comp_e = compareToRegion.Bounds[1].Item1;
+                int comp_s = compareToRegion.Bounds[1].Item2;
 
-                // if compareToRegion S or N side is between our current region's S or N sides' rows  *OR* compareToRegion's S and N sides are both outside of current regions S or N sides' rows
-                if ((curr_s <= comp_s && comp_s <= curr_n) || (curr_n >= comp_n && comp_n >= curr_s || (curr_n < comp_n && curr_s > comp_s))) // compareToRegion is on the east or west of current region
+
+                if (curr_s <= comp_n && curr_n >= comp_s) // compareToRegion is on the east or west of current region
                 {
                     if (curr_e < comp_e) regionNeighbors_e.Add(compareToRegion); //it's an east neighbor
                     if (curr_w > comp_e) regionNeighbors_w.Add(compareToRegion); // it's a west neighbor
                 }
-                // Same thing but for the other axis
-                if ((curr_w <= comp_w && comp_w <= curr_e) || (curr_e >= comp_e && comp_e >= curr_w || (curr_e < comp_e && curr_w > comp_w))) // compareToRegion is on the north or south of current region
+
+                if (curr_w <= comp_e && curr_e >= comp_w) // compareToRegion is on the north or south of current region
                 {
                     if (curr_n < comp_n) regionNeighbors_n.Add(compareToRegion); //it's a north neighbor
                     if (curr_s > comp_s) regionNeighbors_s.Add(compareToRegion); // it's a south neighbor
@@ -305,35 +332,18 @@ public class RoadGen : MonoBehaviour
             if (regionNeighbors_w != null) { currentRegion.RegionNeighbors.Add("w", regionNeighbors_w.ToArray()); }
         }
 
-
-        CreateMidlines();
-
-
-        // Temporarily get bounds here, this will be done with the Hull data, just haven't gotten to it yet....
-        (int n, int e, int s, int w) GetBoundsofTiles(Tile[] regionTiles)
-        {
-            int n = 0;
-            int e = 0;
-            int s = height + 1;
-            int w = width + 1;
-
-            // set bounds values
-            foreach (Tile t in regionTiles)
-            {
-                if (t.y > n) n = t.y; // Get n bound (highest Y)
-                if (t.x > e) e = t.x; // Get e bound (highest x)
-                if (t.y < s) s = t.y; // Get s bound (lowest Y)
-                if (t.x < w) w = t.x; // Get w bound (lowest x)
-            }
-            return (n, e, s, w);
-        }
-
+        CreateMidlines(landmasses);
     }
 
-    private void CreateMidlines()
-    {
-        foreach (Region region in map.Regions)
+    private void CreateMidlines(List<Region> largeRegions)
+    {   
+        foreach (Region region in largeRegions) 
         {
+            int curr_w = region.Bounds[0].Item1;
+            int curr_n = region.Bounds[0].Item2;
+            int curr_e = region.Bounds[1].Item1;
+            int curr_s = region.Bounds[1].Item2;
+
             foreach (KeyValuePair <string, Region[]> neighbors in region.RegionNeighbors)
             {
                 string direction = neighbors.Key;
@@ -346,15 +356,49 @@ public class RoadGen : MonoBehaviour
                             get midpoint of that distance.
                             mark midpoint. */
 
+                    int comp_w = possibleClosestRegion.Bounds[0].Item1;
+                    int comp_n = possibleClosestRegion.Bounds[0].Item2;
+                    int comp_e = possibleClosestRegion.Bounds[1].Item1;
+                    int comp_s = possibleClosestRegion.Bounds[1].Item2;
+
                     // oof I need to take a break cuz I actually need the proper bounds coords for this,
                     // otherwise this is gonna become a clusterfuck lol
+                    if (direction == "n" || direction == "s")
+                    {
+                        int upper_x = Mathf.Min(curr_e, comp_e);
+                        int lower_x = Mathf.Max(curr_w, comp_w);
 
-                    Debug.Log("got to CreateMidLines() :D :3 <3");
 
-                    if (direction == "n") { };
-                    if (direction == "e") { };
-                    if (direction == "s") { };
-                    if (direction == "w") { };
+                    }
+                    if (direction == "w" || direction == "e") 
+                    {
+                        int curr_size = curr_n - curr_s;
+                        int comp_size = comp_n - comp_s;
+                        
+                        int upper_y = Mathf.Min(curr_n, comp_n);
+                        int lower_y = Mathf.Max(curr_s, comp_s);
+
+                        // see if it's curr_s or comp_s who's S value == lower Y
+                        if (curr_s == lower_y)
+                        {
+                            //we're gonna iterate up from curr_s's lowest hullpoint
+                        } else
+                        {
+                            //we're gonna iterate up from comp_s's lowest hullpoint
+                        }
+
+                        for (int i = lower_y; i < upper_y + 1; i++) // for every y in range of rows we're looking for:
+                        {   
+                            // from start hull point, get point on line at Y value (i)
+                            // get point on line at other hull on same Y value (i)
+                            // middle of those two points is our midpoint. 
+                            // Store the midpoint in a List of midpoints.
+                            // (if ur at the end of the hull point line go to the next one??)
+                            // brain no worky rn lol
+
+                        }
+                    }
+
                 } 
             }
         }
@@ -496,8 +540,6 @@ public class RoadGen : MonoBehaviour
                 if (entryPoints[i].y == end.y) continue;
 
 
-                //Dictionary<string, List<(int x, int y)>> pathData = pathFinding.AStar(entryPoints[i], end, noiseMap, elevationLimitForPathfind);
-                //List<(int x, int xy)> foundPath = pathData["path"];
                 Tile startT = map.GetTile(entryPoints[i].x, entryPoints[i].y);
                 Tile endT = map.GetTile(end.x, end.y);
                 List<Tile> path = pathFinding.new_Astar(startT, endT, elevationLimitForPathfind);

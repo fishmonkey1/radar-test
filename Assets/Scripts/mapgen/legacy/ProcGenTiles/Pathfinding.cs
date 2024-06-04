@@ -81,6 +81,7 @@ namespace ProcGenTiles
 
                                 // create new region and set its tiles to the returned Tiles
                                 Region r = new Region();
+                                
                                 r.Tiles = FloodfillRegion(regionLabel, width, height, elevationLimit, r).ToArray();
                                 AllRegionObj.Add(r); //
                                 regionLabel++;
@@ -89,6 +90,8 @@ namespace ProcGenTiles
                     }
                 }
             }
+
+            Map.Regions = AllRegionObj.ToArray();
             return AllRegionObj;
         }
 

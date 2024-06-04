@@ -19,7 +19,15 @@ public class RoadGenEditor : Editor
                     script.runMapGen();
                 }
             }
-            
+
+        }
+
+        if (GUILayout.Button("Generate"))
+        {
+            RoadGen script = (RoadGen)target;
+            //ResearchMapGenerator script1 = (ResearchMapGenerator)target;
+            script.runMapGen();
+
         }
     }
 }
