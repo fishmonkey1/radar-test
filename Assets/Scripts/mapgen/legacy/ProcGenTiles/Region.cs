@@ -5,7 +5,8 @@ namespace ProcGenTiles
 {
 	public class Region
 	{
-
+		public Tile[,] Tiles { get; set; }
+		
 
 
 	}

@@ -252,7 +252,6 @@ public class RoadGen : MonoBehaviour
     private void BisectMap(List<List<Tile>> allRegions)
     {
         List<List<Tile>> landmasses = new List<List<Tile>>();
-
         //Create List of landmasses we are going to be navigating between
         // ignore anything smaller than the set min
         foreach (List<Tile> region in allRegions)
@@ -280,15 +279,16 @@ public class RoadGen : MonoBehaviour
                 (int curr_n, int curr_e, int curr_s, int curr_w) = GetBounds(currentRegion); // I'm going to pass in the hullpoints just bear with me lol
                 (int comp_n, int comp_e, int comp_s, int comp_w) = GetBounds(compareToRegion);
 
+                // if compareToRegion S or N side is between our current region's S or N sides' rows  *OR* compareToRegion's S and N sides are both outside of current regions S or N sides' rows
                 if ((curr_s <= comp_s && comp_s <= curr_n) || (curr_n >= comp_n && comp_n >= curr_s || (curr_n < comp_n && curr_s > comp_s))) // compareToRegion is on the east or west of current region
                 {
                     if (curr_e < comp_e) regionNeighbors_e.Add(compareToRegion); //it's an east neighbor
                     if (curr_w > comp_e) regionNeighbors_w.Add(compareToRegion); // it's a west neighbor
                 }
-
+                // Same thing but for the other axis
                 if ((curr_w <= comp_w && comp_w <= curr_e) || (curr_e >= comp_e && comp_e >= curr_w || (curr_e < comp_e && curr_w > comp_w))) // compareToRegion is on the north or south of current region
                 {
-                    if (curr_n < comp_n) regionNeighbors_n.Add(compareToRegion); //it's an north neighbor
+                    if (curr_n < comp_n) regionNeighbors_n.Add(compareToRegion); //it's a north neighbor
                     if (curr_s > comp_s) regionNeighbors_s.Add(compareToRegion); // it's a south neighbor
                 }
             }
