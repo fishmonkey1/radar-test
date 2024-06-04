@@ -9,6 +9,7 @@ public class RoadGen : MonoBehaviour
     [SerializeField] LayerTerrain lt;
     [SerializeField] Color roadColor;
     public Pathfinding pathFinding;
+    public Map map;
     //public ConvexHull convexHull;
 
     public bool autoUpdate = true;
@@ -96,7 +97,8 @@ public class RoadGen : MonoBehaviour
         colorMap = colorMcMapFace;
         width = noiseMap.GetLength(0);
         height = noiseMap.GetLength(1);
-        pathFinding = new Pathfinding(lt.finalMap);
+        map = lt.finalMap;
+        pathFinding = new Pathfinding(map);
         roadMapData = new float[width, height];
         gizmoPointsDict = new Dictionary<Vector3[], Color>();
 
@@ -169,7 +171,7 @@ public class RoadGen : MonoBehaviour
                 }
             }
 
-            BisectMap(allRegions);
+            CreateRegionObjects(allRegions);
 
         }
 
@@ -229,7 +231,7 @@ public class RoadGen : MonoBehaviour
             {
                 DrawColorAtPoint(points.Item1, points.Item2, Color.cyan);
 
-                Tile t = lt.finalMap.GetTile(points.x, points.y);
+                Tile t = map.GetTile(points.x, points.y);
                 var border = pathFinding.GetNeighbors(points, pathFinding.TileOverElevation, true, null, -999f);
                 foreach (Tile tt in border) DrawColorAtPoint(tt.x, tt.y, Color.cyan);
             }
@@ -249,35 +251,50 @@ public class RoadGen : MonoBehaviour
 
     }
 
-    private void BisectMap(List<List<Tile>> allRegions)
+    private void CreateRegionObjects(List<List<Tile>> allRegions)
     {
         List<List<Tile>> landmasses = new List<List<Tile>>();
         //Create List of landmasses we are going to be navigating between
         // ignore anything smaller than the set min
+        // This shouldn't be done here, should be done when we floodfill and get all regions
         foreach (List<Tile> region in allRegions)
         {
             if (region.Count >= floodfillRegionMinimum)
             {
                 landmasses.Add(region);
+                
             }
         }
 
-        // create a list of regions that are neighbors
-        // I know this is a mess lol I had to start somewhere :3
-        for (int i = 0; i < landmasses.Count - 1; i++)
+        // TODO: This should be done when we floodfill!!!! Not here!!!
+        // Create all the Region objects for all the correctly-sized landmasses
+        map.Regions = new Region[landmasses.Count];
+        for (int i = 0; i < landmasses.Count; i++) 
         {
-            List<List<Tile>> regionNeighbors_n = null; // going to be using hullpoints, not the whole list
-            List<List<Tile>> regionNeighbors_e = null;
-            List<List<Tile>> regionNeighbors_s = null;
-            List<List<Tile>> regionNeighbors_w = null;
+            map.Regions[i] = new Region();
+            Region region = map.Regions[i];
+            region.Tiles = new Tile[landmasses[i].Count];
+            region.Tiles = landmasses[i].ToArray();
+            region.RegionNeighbors = new Dictionary<string, Region[]>();
+        }
 
-            for (int j = i+1; j < landmasses.Count; j++) // compare every landmass to every one in front of it in the List. 
-            {                                            // This compares everything with everything else, without duplicates.
-                List<Tile> currentRegion = landmasses[i];
-                List<Tile> compareToRegion = landmasses[j];
 
-                (int curr_n, int curr_e, int curr_s, int curr_w) = GetBounds(currentRegion); // I'm going to pass in the hullpoints just bear with me lol
-                (int comp_n, int comp_e, int comp_s, int comp_w) = GetBounds(compareToRegion);
+        // Adds RegionNeighbors to our Regions
+        for (int i = 0; i < map.Regions.Length - 1; i++) // compare every landmass to every one in front of it in the List. 
+        {                                                       // This compares everything with everything else, without duplicates.
+            List<Region> regionNeighbors_n = new List<Region>(); 
+            List<Region> regionNeighbors_e = new List<Region>();
+            List<Region> regionNeighbors_s = new List<Region>();
+            List<Region> regionNeighbors_w = new List<Region>();
+
+            Region currentRegion = map.Regions[i];
+
+            for (int j = i+1; j < map.Regions.Length; j++) 
+            {                                                        
+                Region compareToRegion = map.Regions[j];
+
+                (int curr_n, int curr_e, int curr_s, int curr_w) = GetBoundsofTiles(currentRegion.Tiles); 
+                (int comp_n, int comp_e, int comp_s, int comp_w) = GetBoundsofTiles(compareToRegion.Tiles);
 
                 // if compareToRegion S or N side is between our current region's S or N sides' rows  *OR* compareToRegion's S and N sides are both outside of current regions S or N sides' rows
                 if ((curr_s <= comp_s && comp_s <= curr_n) || (curr_n >= comp_n && comp_n >= curr_s || (curr_n < comp_n && curr_s > comp_s))) // compareToRegion is on the east or west of current region
@@ -293,36 +310,13 @@ public class RoadGen : MonoBehaviour
                 }
             }
 
-            // We need like a Map.GetRegion func? made during the floodfill? so we can pass in a Tile and get a Region...
-
-            // Then we can save the neighbors in the dict I made in Region class...
-            
-
-            // At this point, you have a list of what regions are around you (4 neighbors style, but extending all the way out).
-            // now need to see which of those are CLOSEST (immediately to the sides)
-            /*
-                for row-or-column-both-regions-are-occupying: 
-                    get distance between the two along the row/column
-                    get midpoint of that distance.
-                    mark midpoint. 
-                    (Could also do some slope math here with the hull points but brain no worky rn)
-                  
-                Now we have a line of dots between regions. Get the best-fit line for those midpoints.
-                Save the tentative lines.     
-               -- 
-                if you have multiple lines spaced apart in a line w/ ~same slope, make them a single line. (average out all the points to get line)
-                Extend lines out to find intersect points between lines... We are going to use these to make the bezier curves for the road. Really just extend out until it hits something.
-
-                If you've actually coded and implemented this far, go pour a fuckin drink cuz you probs wanna blow your brains out from frustration. 
-
-                
-                  
-                 
-             */
-
+            if (regionNeighbors_n != null) { currentRegion.RegionNeighbors.Add("n", regionNeighbors_n.ToArray()); }
+            if (regionNeighbors_e != null) { currentRegion.RegionNeighbors.Add("e", regionNeighbors_e.ToArray()); }
+            if (regionNeighbors_s != null) { currentRegion.RegionNeighbors.Add("s", regionNeighbors_s.ToArray()); }
+            if (regionNeighbors_w != null) { currentRegion.RegionNeighbors.Add("w", regionNeighbors_w.ToArray()); }
         }
 
-        (int n, int e, int s, int w) GetBounds(List<Tile> region)
+        (int n, int e, int s, int w) GetBoundsofTiles(Tile[] regionTiles)
         {
             int n = 0;
             int e = 0;
@@ -330,7 +324,7 @@ public class RoadGen : MonoBehaviour
             int w = width + 1;
 
             // set bounds values
-            foreach (Tile t in region)
+            foreach (Tile t in regionTiles)
             {
                 if (t.y > n) n = t.y; // Get n bound (highest Y)
                 if (t.x > e) e = t.x; // Get e bound (highest x)
@@ -340,6 +334,39 @@ public class RoadGen : MonoBehaviour
             return (n, e, s, w);
         }
 
+    }
+
+    private void CreateMidlines()
+    {
+        foreach (Region region in map.Regions)
+        {
+            foreach (KeyValuePair <string, Region[]> neighbors in region.RegionNeighbors)
+            {
+                string direction = neighbors.Key;
+                Region[] regionNeighbors = neighbors.Value;
+
+                foreach (Region possibleClosestRegion in regionNeighbors)
+                {
+                    /* for row-or-column-both-regions-are-occupying: 
+                            get distance between the two along the row/column
+                            get midpoint of that distance.
+                            mark midpoint. */
+
+                    // oof I actually need the proper bounds coords for this.
+                    // I need to pause here, and get the Regions created way earlier, 
+                    // during the floodfill, so that I can set the bounds and get the hullpoints into the object.
+                    // otherwise this is gonna turn into a clusterfuck lol
+
+                    //if (direction == "n") { };
+                    if (direction == "e") 
+                    {
+
+                    };
+                    //if (direction == "s") { };
+                    //if (direction == "w") { };
+                } 
+            }
+        }
     }
 
     /// <summary>
@@ -480,8 +507,8 @@ public class RoadGen : MonoBehaviour
 
                 //Dictionary<string, List<(int x, int y)>> pathData = pathFinding.AStar(entryPoints[i], end, noiseMap, elevationLimitForPathfind);
                 //List<(int x, int xy)> foundPath = pathData["path"];
-                Tile startT = lt.finalMap.GetTile(entryPoints[i].x, entryPoints[i].y);
-                Tile endT = lt.finalMap.GetTile(end.x, end.y);
+                Tile startT = map.GetTile(entryPoints[i].x, entryPoints[i].y);
+                Tile endT = map.GetTile(end.x, end.y);
                 List<Tile> path = pathFinding.new_Astar(startT, endT, elevationLimitForPathfind);
 
                 if (path != null)

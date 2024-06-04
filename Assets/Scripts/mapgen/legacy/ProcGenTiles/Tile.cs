@@ -11,6 +11,8 @@ namespace ProcGenTiles
         public int fCost;
         public Dictionary<string, float> ValuesHere = new Dictionary<string, float>(); //Store generated values in here
 
+        public Region region; // hmmmmm so we're going to want to know if/what region a tile is in? so we can set this during the floodfill?
+
         public Tile(int x, int y)
         {
             this.x = x;

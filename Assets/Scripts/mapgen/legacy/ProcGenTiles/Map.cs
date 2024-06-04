@@ -39,6 +39,30 @@ namespace ProcGenTiles
 			return GetTile((x, y));
 		}
 
+		public Region GetRegion((int x, int y) coords) 
+		{
+			if (IsValidTilePosition(coords.x, coords.y))
+			{	foreach (Region reg in Regions)
+                {	
+					foreach (Tile t in reg.Tiles)
+                    {
+						if (coords == (t.x, t.y))
+                        {
+							return reg;
+                        }
+                    }
+                }
+				return null; // if the coords are not in a region return null
+			}	
+			return null; //If it isn't a valid tile return null
+		}
+
+		public Region GetRegion(int x, int y)
+		{
+			return GetRegion((x, y));
+		}
+
+
 		public float[,] FetchFloatValues(string layer)
 		{
 			float[,] array = new float[Width, Height];
