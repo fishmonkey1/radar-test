@@ -293,12 +293,14 @@ public class RoadGen : MonoBehaviour
                 }
             }
 
-            // After done looping, store those values in the Region object for each region on the Map (that still needs to be created) 
+            //We need like a Map.GetRegion func? made during the floodfill?
+            // Then we can save the neighbors in the dict I made in Region class...
+            
 
             // At this point, you have a list of what regions are around you (4 neighbors style, but extending all the way out).
             // now need to see which of those are CLOSEST (immediately to the sides)
             /*
-                for row-or-column-both-regions-are-occupying:
+                for row-or-column-both-regions-are-occupying: 
                     get distance between the two along the row/column
                     get midpoint of that distance.
                     mark midpoint. 

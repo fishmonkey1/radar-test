@@ -5,6 +5,7 @@ namespace ProcGenTiles
 	public class Map
 	{
 		public Tile[,] Tiles { get; set; }
+		public Region[] Regions { get; set; }
 		public int Width, Height;
 
 		public Map(int width, int height)
