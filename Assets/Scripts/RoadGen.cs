@@ -293,7 +293,8 @@ public class RoadGen : MonoBehaviour
                 }
             }
 
-            //We need like a Map.GetRegion func? made during the floodfill?
+            // We need like a Map.GetRegion func? made during the floodfill? so we can pass in a Tile and get a Region...
+
             // Then we can save the neighbors in the dict I made in Region class...
             
 
