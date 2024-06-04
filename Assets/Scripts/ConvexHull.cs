@@ -18,7 +18,7 @@ public class ConvexHull
 
     /*public static List<(int x, int y)> GetConvexHull(List<(int x, int y)> points)
     {*/
-    public static List<(int x, int y)> GetConvexHull(List<Tile> points)
+   public static List<(int x, int y)> GetConvexHull(List<Tile> points)
     {
         if (points == null)
             return null;

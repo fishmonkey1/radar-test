@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using ProcGenTiles;
+using System.Linq;
 
 
 public class RoadGen : MonoBehaviour
@@ -104,7 +105,7 @@ public class RoadGen : MonoBehaviour
 
         List<(int x, int xy)> entryPoints = new List<(int, int)>();
         List<List<Tile>> paths = new List<List<Tile>>();
-        List<List<Tile>> allRegions = new List<List<Tile>>();
+        List<Region> allRegions = new List<Region>();
         //List<List<(int x, int xy)>> badPaths = new List<List<(int x, int xy)>>();
 
 
@@ -123,19 +124,19 @@ public class RoadGen : MonoBehaviour
 
             int colorIndex = 0;
             //gizmoPointsDict = new Dictionary<Vector3[], Color>();
-            foreach (List<Tile> region in allRegions)
+            foreach (Region region in allRegions)
             {
-                if (region.Count >= floodfillRegionMinimum)
+                if (region.Tiles.Length >= floodfillRegionMinimum)
                 {
                     Color drawColor = someColors[colorIndex];
 
                     if (showFloodfill)
                     {
-                        foreach (Tile t in region)
+                        foreach (Tile t in region.Tiles)
                         {
                             DrawColorAtPoint(t.x, t.y, drawColor);
                         }
-                        Debug.Log($"Length of region {region[0].ValuesHere["Region"]} is {region.Count}");
+                        Debug.Log($"Length of region {""} is {region.Tiles.Length}");
                     }
 
                     if (showConvexHull)
@@ -150,11 +151,11 @@ public class RoadGen : MonoBehaviour
                     }
 
                     void drawHullGizmos(Color drawColor)
-                    {
-                        List<(int x, int y)> hullPoints = ConvexHull.GetConvexHull(region); // TODO: Can you edit to have this return a List<Tile> instead?
-                                                                                            //       I had a hard time figuring it out.
-                                                                                            //       Obvs we can just iterate over the tuples at the end before returning,
-                                                                                            //       but if we create tiles instead of tuples hell yeah.
+                    {                                                               // I HATE THISSSSSSS
+                        List<(int x, int y)> hullPoints = ConvexHull.GetConvexHull(region.Tiles.ToList<Tile>()); // TODO: Can you edit to have this return a List<Tile> instead?
+                                                                                                                 //       I had a hard time figuring it out.
+                                                                                                                    //       Obvs we can just iterate over the tuples at the end before returning,
+                                                                                                                     //       but if we create tiles instead of tuples hell yeah.
 
                         if (hullPoints != null)
                         {
@@ -251,15 +252,16 @@ public class RoadGen : MonoBehaviour
 
     }
 
-    private void CreateRegionObjects(List<List<Tile>> allRegions)
+    private void CreateRegionObjects(List<Region> allRegions)
     {
-        List<List<Tile>> landmasses = new List<List<Tile>>();
+        List<Region> landmasses = new List<Region>();
         //Create List of landmasses we are going to be navigating between
         // ignore anything smaller than the set min
-        // This shouldn't be done here, should be done when we floodfill and get all regions
-        foreach (List<Tile> region in allRegions)
+
+        // This shouldn't be done here, we should have a seperate array in Map for the "good" regions.
+        foreach (Region region in allRegions)
         {
-            if (region.Count >= floodfillRegionMinimum)
+            if (region.Tiles.Length >= floodfillRegionMinimum)
             {
                 landmasses.Add(region);
                 
@@ -268,15 +270,15 @@ public class RoadGen : MonoBehaviour
 
         // TODO: This should be done when we floodfill!!!! Not here!!!
         // Create all the Region objects for all the correctly-sized landmasses
-        map.Regions = new Region[landmasses.Count];
+        /*map.Regions = new Region[landmasses.Count];
         for (int i = 0; i < landmasses.Count; i++) 
         {
             map.Regions[i] = new Region();
             Region region = map.Regions[i];
             region.Tiles = new Tile[landmasses[i].Count];
             region.Tiles = landmasses[i].ToArray();
-            region.RegionNeighbors = new Dictionary<string, Region[]>();
-        }
+            
+        }*/
 
 
         // Adds RegionNeighbors to our Regions
@@ -288,6 +290,7 @@ public class RoadGen : MonoBehaviour
             List<Region> regionNeighbors_w = new List<Region>();
 
             Region currentRegion = map.Regions[i];
+            currentRegion.RegionNeighbors = new Dictionary<string, Region[]>(); // I guess init this here? i dunno
 
             for (int j = i+1; j < map.Regions.Length; j++) 
             {                                                        

@@ -43,9 +43,10 @@ namespace ProcGenTiles
             }
         }
 
-        public List<List<Tile>> MarkLandmassRegions(float[,] noiseMap, float elevationLimit)
+        public List<Region> MarkLandmassRegions(float[,] noiseMap, float elevationLimit)
         {
             List<List<Tile>> allRegions = new List<List<Tile>>();
+            List<Region> AllRegionObj = new List<Region>();
             int regionLabel = 1;
             for (int width = 0; width < Map.Width; width++)
             {
@@ -65,25 +66,45 @@ namespace ProcGenTiles
                             if (!t.ValuesHere.ContainsKey("Region"))
                             {
                                 t.ValuesHere.Add("Land", 0); //This takes a float, but we'll use 0 and 1 anyways :P
+                               
+                                // old
                                 t.ValuesHere.Add("Region", 0); //All flat ground will be region zero, regardless of connection
+                            
+                                // new
+                                // ????
                             }
                             
                         }
                         else
                         { //The tile is above the elevation limit and needs to be checked
+                            // old :c
                             if (!t.ValuesHere.ContainsKey("Region"))
+
+                            // new :3
+                            // if(t.Region == null)
+
                             {//If this hasn't had a region assigned then we need to floodfill this area
                                 //Do something with the returned region later, i guess?
+                                
+                                // old YUCKY :c
                                 List<Tile> region = FloodfillRegion(regionLabel, width, height, elevationLimit);
-   
                                 allRegions.Add(region); //Just stuff it in here for now :c
                                 regionLabel++;
+
+                                // new :3
+                                Region regionObj = new Region();
+                                regionObj.Tiles = FloodfillRegion(regionLabel, width, height, elevationLimit).ToArray();
+                                AllRegionObj.Add(regionObj); //
+
+                               
+
+
                             }
                         }
                     }
                 }
             }
-            return allRegions;
+            return AllRegionObj;
         }
 
         private List<Tile> FloodfillRegion(int regionNumber, int x, int y, float elevationLimit)
@@ -93,8 +114,10 @@ namespace ProcGenTiles
 
         private List<Tile> FloodfillRegion(int regionNumber, (int x, int y) coords, float elevationLimit)
         {
+            ;
+
             Tile startTile = Map.GetTile(coords);
-            List<Tile> regionTiles = new List<Tile>(); //For holding all the tiles that are found
+            List<Tile> regionTiles = new List<Tile>(); //For holding all the tiles that are found, 
             Queue<Tile> frontier = new Queue<Tile>(); //All eligible neighbors we've found
             frontier.Enqueue(startTile);
 
