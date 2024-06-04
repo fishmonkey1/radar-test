@@ -121,7 +121,7 @@ public class RoadGen : MonoBehaviour
         if (showFloodfill || showConvexHull) //if doing either we need the regions
         {
             allRegions = pathFinding.MarkLandmassRegions(noiseMap, elevationLimitForPathfind);
-
+            //Debug.Log($"successfully got {allRegions.Count} regions from floodfill");
             int colorIndex = 0;
             //gizmoPointsDict = new Dictionary<Vector3[], Color>();
             foreach (Region region in allRegions)
@@ -136,7 +136,7 @@ public class RoadGen : MonoBehaviour
                         {
                             DrawColorAtPoint(t.x, t.y, drawColor);
                         }
-                        Debug.Log($"Length of region {""} is {region.Tiles.Length}");
+                       // Debug.Log($"Length of region {""} is {region.Tiles.Length}");
                     }
 
                     if (showConvexHull)
@@ -254,47 +254,33 @@ public class RoadGen : MonoBehaviour
 
     private void CreateRegionObjects(List<Region> allRegions)
     {
+        Debug.Log("vicky ur super cute :3333333 I luuuuuvs you!!!!");
+        //Create List of landmasses we are going to be navigating between, ignore anything smaller than the set min
+        // This shouldn't be done here, we should have a seperate array in Map for the "good" regions I guess.
         List<Region> landmasses = new List<Region>();
-        //Create List of landmasses we are going to be navigating between
-        // ignore anything smaller than the set min
-
-        // This shouldn't be done here, we should have a seperate array in Map for the "good" regions.
         foreach (Region region in allRegions)
         {
             if (region.Tiles.Length >= floodfillRegionMinimum)
             {
+                region.RegionNeighbors = new Dictionary<string, Region[]>(); // I guess init this here? i dunno
                 landmasses.Add(region);
-                
             }
         }
 
-        // TODO: This should be done when we floodfill!!!! Not here!!!
-        // Create all the Region objects for all the correctly-sized landmasses
-        /*map.Regions = new Region[landmasses.Count];
-        for (int i = 0; i < landmasses.Count; i++) 
-        {
-            map.Regions[i] = new Region();
-            Region region = map.Regions[i];
-            region.Tiles = new Tile[landmasses[i].Count];
-            region.Tiles = landmasses[i].ToArray();
-            
-        }*/
 
-
-        // Adds RegionNeighbors to our Regions
-        for (int i = 0; i < map.Regions.Length - 1; i++) // compare every landmass to every one in front of it in the List. 
+        // Adds RegionNeighbors data to our large Regions
+        for (int i = 0; i < landmasses.Count - 1; i++) // compare every landmass to every one in front of it in the List. 
         {                                                       // This compares everything with everything else, without duplicates.
             List<Region> regionNeighbors_n = new List<Region>(); 
             List<Region> regionNeighbors_e = new List<Region>();
             List<Region> regionNeighbors_s = new List<Region>();
             List<Region> regionNeighbors_w = new List<Region>();
 
-            Region currentRegion = map.Regions[i];
-            currentRegion.RegionNeighbors = new Dictionary<string, Region[]>(); // I guess init this here? i dunno
+            Region currentRegion = landmasses[i];
 
-            for (int j = i+1; j < map.Regions.Length; j++) 
+            for (int j = i+1; j < landmasses.Count; j++) 
             {                                                        
-                Region compareToRegion = map.Regions[j];
+                Region compareToRegion = landmasses[j];
 
                 (int curr_n, int curr_e, int curr_s, int curr_w) = GetBoundsofTiles(currentRegion.Tiles); 
                 (int comp_n, int comp_e, int comp_s, int comp_w) = GetBoundsofTiles(compareToRegion.Tiles);
@@ -319,6 +305,11 @@ public class RoadGen : MonoBehaviour
             if (regionNeighbors_w != null) { currentRegion.RegionNeighbors.Add("w", regionNeighbors_w.ToArray()); }
         }
 
+
+        CreateMidlines();
+
+
+        // Temporarily get bounds here, this will be done with the Hull data, just haven't gotten to it yet....
         (int n, int e, int s, int w) GetBoundsofTiles(Tile[] regionTiles)
         {
             int n = 0;
@@ -355,18 +346,15 @@ public class RoadGen : MonoBehaviour
                             get midpoint of that distance.
                             mark midpoint. */
 
-                    // oof I actually need the proper bounds coords for this.
-                    // I need to pause here, and get the Regions created way earlier, 
-                    // during the floodfill, so that I can set the bounds and get the hullpoints into the object.
-                    // otherwise this is gonna turn into a clusterfuck lol
+                    // oof I need to take a break cuz I actually need the proper bounds coords for this,
+                    // otherwise this is gonna become a clusterfuck lol
 
-                    //if (direction == "n") { };
-                    if (direction == "e") 
-                    {
+                    Debug.Log("got to CreateMidLines() :D :3 <3");
 
-                    };
-                    //if (direction == "s") { };
-                    //if (direction == "w") { };
+                    if (direction == "n") { };
+                    if (direction == "e") { };
+                    if (direction == "s") { };
+                    if (direction == "w") { };
                 } 
             }
         }
@@ -497,7 +485,7 @@ public class RoadGen : MonoBehaviour
     {*/
     private void PathfindEachEntry(List<(int x, int y)> entryPoints, List<List<Tile>> paths)
     {
-        Debug.Log(entryPoints.Count);
+        //Debug.Log(entryPoints.Count);
         for (int i = 0; i < entryPoints.Count - 1; i++) //stop at second-to-last
         {
             for (int j = i + 1; j < (entryPoints.Count); j++)
@@ -516,10 +504,10 @@ public class RoadGen : MonoBehaviour
 
                 if (path != null)
                 {
-                    Debug.Log($"Path from {entryPoints[i]} to {end} has length of {path.Count}");
+                    //Debug.Log($"Path from {entryPoints[i]} to {end} has length of {path.Count}");
                     paths.Add(path);
                 }
-                else Debug.Log($"No path for {entryPoints[i]} to {end} !!!!!!");
+               // else Debug.Log($"No path for {entryPoints[i]} to {end} !!!!!!");
             }
         }
 

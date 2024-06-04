@@ -45,7 +45,6 @@ namespace ProcGenTiles
 
         public List<Region> MarkLandmassRegions(float[,] noiseMap, float elevationLimit)
         {
-            List<List<Tile>> allRegions = new List<List<Tile>>();
             List<Region> AllRegionObj = new List<Region>();
             int regionLabel = 1;
             for (int width = 0; width < Map.Width; width++)
@@ -62,43 +61,29 @@ namespace ProcGenTiles
                     else
                     { //There's elevation data here, so we check if it's under the elevation limit
                         if (t.ValuesHere["Elevation"] < elevationLimit )
-                        { //This is not a raised landmass and just needs to have its Land value added as zero
-                            if (!t.ValuesHere.ContainsKey("Region"))
+                        { //This is not a raised landmass
+
+                             if (t.Region == null) // these shouldn't ever have a set region?
                             {
-                                t.ValuesHere.Add("Land", 0); //This takes a float, but we'll use 0 and 1 anyways :P
-                               
-                                // old
-                                t.ValuesHere.Add("Region", 0); //All flat ground will be region zero, regardless of connection
-                            
-                                // new
-                                // ????
+                                t.isBelowElevationLimit = true;
+                            } else
+                            {
+                                Debug.Log($"Error in floodfill: Tile ({t.x},{t.y}) is below height limit and has Region set...");
                             }
+
                             
                         }
                         else
                         { //The tile is above the elevation limit and needs to be checked
-                            // old :c
-                            if (!t.ValuesHere.ContainsKey("Region"))
-
                             // new :3
-                            // if(t.Region == null)
-
+                            if(t.Region == null)
                             {//If this hasn't had a region assigned then we need to floodfill this area
-                                //Do something with the returned region later, i guess?
-                                
-                                // old YUCKY :c
-                                List<Tile> region = FloodfillRegion(regionLabel, width, height, elevationLimit);
-                                allRegions.Add(region); //Just stuff it in here for now :c
+
+                                // create new region and set its tiles to the returned Tiles
+                                Region r = new Region();
+                                r.Tiles = FloodfillRegion(regionLabel, width, height, elevationLimit, r).ToArray();
+                                AllRegionObj.Add(r); //
                                 regionLabel++;
-
-                                // new :3
-                                Region regionObj = new Region();
-                                regionObj.Tiles = FloodfillRegion(regionLabel, width, height, elevationLimit).ToArray();
-                                AllRegionObj.Add(regionObj); //
-
-                               
-
-
                             }
                         }
                     }
@@ -107,15 +92,13 @@ namespace ProcGenTiles
             return AllRegionObj;
         }
 
-        private List<Tile> FloodfillRegion(int regionNumber, int x, int y, float elevationLimit)
+        private List<Tile> FloodfillRegion(int regionNumber, int x, int y, float elevationLimit, Region regionObj)
         { //Provide an override if you want to pass just the ints
-            return FloodfillRegion(regionNumber, (x, y), elevationLimit);
+            return FloodfillRegion(regionNumber, (x, y), elevationLimit, regionObj);
         }
 
-        private List<Tile> FloodfillRegion(int regionNumber, (int x, int y) coords, float elevationLimit)
+        private List<Tile> FloodfillRegion(int regionNumber, (int x, int y) coords, float elevationLimit, Region regionObj)
         {
-            ;
-
             Tile startTile = Map.GetTile(coords);
             List<Tile> regionTiles = new List<Tile>(); //For holding all the tiles that are found, 
             Queue<Tile> frontier = new Queue<Tile>(); //All eligible neighbors we've found
@@ -124,10 +107,17 @@ namespace ProcGenTiles
             while (frontier.Count != 0)
             { //time to start finding neighbors
                 Tile t = frontier.Dequeue();
+
+                t.Region = regionObj; // Setting the tile to the Region object we passed in.
+                                      // All of the tiles in this group will be set to this Region
+
                 regionTiles.Add(t);
-                t.ValuesHere.Add("Land", 1);
-                t.ValuesHere.Add("Region", regionNumber);
+
+                t.ValuesHere.Add("Land", 1);               // Do we still need this ???
+                t.ValuesHere.Add("Region", regionNumber);  // Do we still need this ???
+
                 List<Tile> neighbors = GetNeighbors(t.x, t.y, TileOverElevation, eightNeighbors: false, checkFloat: elevationLimit);
+
                 if (neighbors.Count == 0)
                 {
                     //Debug.Log($"No valid neighbors found during the floodfill at {t.x},{t.y}");
@@ -324,12 +314,12 @@ namespace ProcGenTiles
                 }
             }
   
-            if (debug)
+            /*if (debug)
             {
                 Debug.Log($"Neighbors check. Start is {start.x},{start.y} with elevation {start.ValuesHere["Elevation"]}");
                 foreach (var neighbor in foundNeighbors)
                     Debug.Log($"Found neighbor at {neighbor.x},{neighbor.y} with elevation {Math.Round( neighbor.ValuesHere["Elevation"] , 4)}");
-            }
+            }*/
             return foundNeighbors;
         }
 
@@ -447,7 +437,7 @@ namespace ProcGenTiles
 
                 if (current == end)
                 {
-                    Debug.Log("got to end");
+                    //Debug.Log("got to end");
                     RetracePath(start, end);
                     return finalPath;
                 }
