@@ -8,16 +8,15 @@ namespace ProcGenTiles
 	{
 		public Tile[] Tiles { get; set; }
 		public Tile[] HullPoints { get; set; }
+		public (Tile,Tile)[] HullLines { get; set; } 
 
 
 		/// <summary>
 		/// "n" / "e" / "s" / "w"   :   [region1, region2]   
 		/// </summary>	
-		public Dictionary<string, Region[]> RegionNeighbors { get; set; }   // "n" : [region1, region2]
-																			// "e" : [region1, region2]
-																			// "s" : [ ]
-																			// "w" : [region1]
+		public Dictionary<string, Region[]> RegionNeighbors { get; set; }
 
+		public Dictionary<string, (float, float)[]> NeighborMidpoints { get; set; }
 
 		/// <summary>
 		/// <code>
@@ -25,7 +24,7 @@ namespace ProcGenTiles
 		/// region.Bounds[1] = (e, s); --> bottom-right (x,y) 
 		/// </code> 
 		/// </summary>																
-		public (int,int)[] Bounds { get; set; }
+		public (int x,int y)[] Bounds { get; set; }
 
 
 

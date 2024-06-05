@@ -136,11 +136,33 @@ public class RoadGen : MonoBehaviour
                         {
                             DrawColorAtPoint(t.x, t.y, drawColor);
                         }
-                       // Debug.Log($"Length of region {""} is {region.Tiles.Length}");
+                        // Debug.Log($"Length of region {""} is {region.Tiles.Length}");
                     }
 
-                    if (showConvexHull)
+
+                    // TODO: Can you edit to have this return a List<Tile> instead?
+                    //       Obvs we can just iterate over the tuples at the end before returning,
+                    //       but if we create tiles instead of tuples hell yeah :3
+                    List<(int x, int y)> hullPoints = ConvexHull.GetConvexHull(region.Tiles.ToList<Tile>());
+
+                    if (hullPoints != null)
                     {
+                        List<Tile> hpTiles = new List<Tile>(); // converting to tiles here, I know...
+                        foreach ((int x, int y) point in hullPoints)
+                        {
+                            hpTiles.Add(map.GetTile(point));
+                        }
+
+                        region.HullPoints = hpTiles.ToArray(); //set the hullpoints for this Region.
+
+                        // create and store hullpoint lines for region
+                        region.HullLines = new (Tile, Tile)[region.HullPoints.Length];
+                        for (int i = 0; i < region.HullPoints.Length - 1; i++) // loop through each point and combine w/ next-index point to create a line 
+                        {                                                    // stop at 2nd to last, so we can set the last index to be matched w/ the first index after the for loop
+                            region.HullLines[i] = (region.HullPoints[i], region.HullPoints[i + 1]);
+                        }
+                        region.HullLines[region.HullPoints.Length - 1] = (region.HullPoints[region.HullPoints.Length - 1], region.HullPoints[0]); // set the last line as: the Last and First point in the HullPoints array
+
                         drawHullGizmos(drawColor);
                     }
 
@@ -151,46 +173,40 @@ public class RoadGen : MonoBehaviour
                     }
 
                     void drawHullGizmos(Color drawColor)
-                    {                                                               // I HATE THISSSSSSS
-                        List<(int x, int y)> hullPoints = ConvexHull.GetConvexHull(region.Tiles.ToList<Tile>()); // TODO: Can you edit to have this return a List<Tile> instead?
-                                                                                                                 //       I had a hard time figuring it out.
-                                                                                                                    //       Obvs we can just iterate over the tuples at the end before returning,
-                                                                                                                     //       but if we create tiles instead of tuples hell yeah.
+                    {
 
-                        if (hullPoints != null)
+                        Vector3[] gizmoPoints = new Vector3[hullPoints.Count]; //idk why but need to do it like this for the Gizmo stuff?
+
+                        int n = 0;
+                        int e = 0;
+                        int s = height + 1;
+                        int w = width + 1;
+
+                        //Region reg = map.GetRegion(hullPoints[0].x, hullPoints[0].y);
+
+                        for (int i = 0; i < hullPoints.Count; i++)
                         {
-                            Vector3[] gizmoPoints = new Vector3[hullPoints.Count]; //idk why but need to do it like this for the Gizmo stuff?
+                            gizmoPoints[i] = new Vector3((float)hullPoints[i].y, 1.0f, (float)hullPoints[i].x);
 
-                            int n = 0;
-                            int e = 0;
-                            int s = height + 1;
-                            int w = width + 1;
+                            if (hullPoints[i].y > n) n = hullPoints[i].y; // Get n bound (highest Y)
+                            if (hullPoints[i].x > e) e = hullPoints[i].x; // Get e bound (highest x)
+                            if (hullPoints[i].y < s) s = hullPoints[i].y; // Get s bound (lowest Y)
+                            if (hullPoints[i].x < w) w = hullPoints[i].x; // Get w bound (lowest x)
 
-                            Region reg = map.GetRegion(hullPoints[0].x, hullPoints[0].y);
 
-                            for (int i = 0; i < hullPoints.Count; i++)
-                            {
-                                gizmoPoints[i] = new Vector3((float)hullPoints[i].y, 1.0f, (float)hullPoints[i].x);
-
-                                if (hullPoints[i].y > n) n = hullPoints[i].y; // Get n bound (highest Y)
-                                if (hullPoints[i].x > e) e = hullPoints[i].x; // Get e bound (highest x)
-                                if (hullPoints[i].y < s) s = hullPoints[i].y; // Get s bound (lowest Y)
-                                if (hullPoints[i].x < w) w = hullPoints[i].x; // Get w bound (lowest x)
-                                
-                                
-                            }
-
-                            region.Bounds = new (int, int)[2];
-                            region.Bounds[0] = (w, n);
-                            region.Bounds[1] = (e, s);
-
-                            gizmoPointsDict.Add(gizmoPoints, drawColor);
                         }
+
+                        region.Bounds = new (int, int)[2];
+                        region.Bounds[0] = (w, n);
+                        region.Bounds[1] = (e, s);
+
+                        gizmoPointsDict.Add(gizmoPoints, drawColor);
+
                     }
                 }
             }
 
-            CreateRegionObjects();
+            FilterForLandmassRegions_GetMoreData();
 
         }
 
@@ -270,7 +286,7 @@ public class RoadGen : MonoBehaviour
 
     }
 
-    private void CreateRegionObjects()
+    private void FilterForLandmassRegions_GetMoreData()
     {
         Debug.Log("vicky ur super cute :3333333 I luuuuuvs you!!!!");
         //Create List of landmasses we are going to be navigating between, ignore anything smaller than the set min
@@ -289,22 +305,21 @@ public class RoadGen : MonoBehaviour
         // Adds RegionNeighbors data to our large Regions
         for (int i = 0; i < landmasses.Count - 1; i++) // compare every landmass to every one in front of it in the List. 
         {                                                       // This compares everything with everything else, without duplicates.
-            List<Region> regionNeighbors_n = new List<Region>(); 
+            List<Region> regionNeighbors_n = new List<Region>();
             List<Region> regionNeighbors_e = new List<Region>();
             List<Region> regionNeighbors_s = new List<Region>();
             List<Region> regionNeighbors_w = new List<Region>();
 
             Region currentRegion = landmasses[i];
 
-
             int curr_w = currentRegion.Bounds[0].Item1;
             int curr_n = currentRegion.Bounds[0].Item2;
             int curr_e = currentRegion.Bounds[1].Item1;
             int curr_s = currentRegion.Bounds[1].Item2;
-            
 
-            for (int j = i+1; j < landmasses.Count; j++) 
-            {                                                        
+
+            for (int j = i + 1; j < landmasses.Count; j++)
+            {
                 Region compareToRegion = landmasses[j];
 
                 int comp_w = compareToRegion.Bounds[0].Item1;
@@ -326,8 +341,8 @@ public class RoadGen : MonoBehaviour
                 }
             }
 
-            if (regionNeighbors_n != null) { currentRegion.RegionNeighbors.Add("n", regionNeighbors_n.ToArray()); }
-            if (regionNeighbors_e != null) { currentRegion.RegionNeighbors.Add("e", regionNeighbors_e.ToArray()); }
+            if (regionNeighbors_n != null) { currentRegion.RegionNeighbors.Add("n", regionNeighbors_n.ToArray()); } //oh we can just add these as we go
+            if (regionNeighbors_e != null) { currentRegion.RegionNeighbors.Add("e", regionNeighbors_e.ToArray()); } // no reason to store and then set them
             if (regionNeighbors_s != null) { currentRegion.RegionNeighbors.Add("s", regionNeighbors_s.ToArray()); }
             if (regionNeighbors_w != null) { currentRegion.RegionNeighbors.Add("w", regionNeighbors_w.ToArray()); }
         }
@@ -336,72 +351,333 @@ public class RoadGen : MonoBehaviour
     }
 
     private void CreateMidlines(List<Region> largeRegions)
-    {   
-        foreach (Region region in largeRegions) 
+    {
+        int counter = 1;
+        foreach (Region curr_region in largeRegions) // for every region landmass
         {
-            int curr_w = region.Bounds[0].Item1;
-            int curr_n = region.Bounds[0].Item2;
-            int curr_e = region.Bounds[1].Item1;
-            int curr_s = region.Bounds[1].Item2;
+            int curr_w = curr_region.Bounds[0].Item1;
+            int curr_n = curr_region.Bounds[0].Item2;
+            int curr_e = curr_region.Bounds[1].Item1;
+            int curr_s = curr_region.Bounds[1].Item2;
 
-            foreach (KeyValuePair <string, Region[]> neighbors in region.RegionNeighbors)
+            // init our neighbormidpoints dict for this Region
+            curr_region.NeighborMidpoints = new Dictionary<string, (float, float)[]>();
+
+            foreach (KeyValuePair<string, Region[]> neighbors in curr_region.RegionNeighbors)  // for every neighbor quadrant
             {
-                string direction = neighbors.Key;
+                string neighborDirection = neighbors.Key;
                 Region[] regionNeighbors = neighbors.Value;
 
-                foreach (Region possibleClosestRegion in regionNeighbors)
+
+                //init a new List to store midpoints for this neighbor.
+                List<(float x, float y)> midpoints = new List<(float x, float y)>();
+
+                foreach (Region comp_region in regionNeighbors)                                   //for every Region object in that neighbor quadrant
                 {
-                    /* for row-or-column-both-regions-are-occupying: 
-                            get distance between the two along the row/column
-                            get midpoint of that distance.
-                            mark midpoint. */
+                    List<(Tile, Tile)> filteredCurrLines = new List<(Tile, Tile)>();
+                    List<(Tile, Tile)> filteredCompLines = new List<(Tile, Tile)>();
 
-                    int comp_w = possibleClosestRegion.Bounds[0].Item1;
-                    int comp_n = possibleClosestRegion.Bounds[0].Item2;
-                    int comp_e = possibleClosestRegion.Bounds[1].Item1;
-                    int comp_s = possibleClosestRegion.Bounds[1].Item2;
+                    List<(Tile start, Tile end)> AllCurrLines = new List<(Tile start, Tile end)>();
+                    List<(Tile start, Tile end)> AllCompLines = new List<(Tile start, Tile end)>();
 
-                    // oof I need to take a break cuz I actually need the proper bounds coords for this,
-                    // otherwise this is gonna become a clusterfuck lol
-                    if (direction == "n" || direction == "s")
+
+                    int comp_w = comp_region.Bounds[0].x;
+                    int comp_n = comp_region.Bounds[0].y;
+                    int comp_e = comp_region.Bounds[1].x;
+                    int comp_s = comp_region.Bounds[1].y;
+                    
+                    // Set the row or column bounds we'll be iterating over
+                    int upper_row_y = Mathf.Min(curr_n, comp_n);
+                    int lower_row_y = Mathf.Max(curr_s, comp_s);
+                    int upper_column_x = Mathf.Min(curr_e, comp_e);
+                    int lower_column_x = Mathf.Max(curr_w, comp_w);
+
+                    int iter_from = 0;
+                    int iter_to = 0;
+
+                    // setting values
+                    if (neighborDirection == "n")
                     {
-                        int upper_x = Mathf.Min(curr_e, comp_e);
-                        int lower_x = Mathf.Max(curr_w, comp_w);
-
-
+                        // Create a filtered list of Lines so we aren't iterating over all of them.
+                        filteredCurrLines = FilterHullLines(curr_region, "n");
+                        filteredCompLines = FilterHullLines(comp_region, "s");
+                        iter_from = lower_column_x;
+                        iter_to = upper_column_x;
                     }
-                    if (direction == "w" || direction == "e") 
+                    if (neighborDirection == "s")
                     {
-                        int curr_size = curr_n - curr_s;
-                        int comp_size = comp_n - comp_s;
+                        // Create a filtered list of Lines so we aren't iterating over all of them.
+                        filteredCurrLines = FilterHullLines(curr_region, "s");
+                        filteredCompLines = FilterHullLines(comp_region, "n");
+                        iter_from = lower_column_x;
+                        iter_to = upper_column_x;
+                    }
+
+                    if (neighborDirection == "e")
+                    {
+                        // Create a filtered list of Lines so we aren't iterating over all of them.
+                        filteredCurrLines = FilterHullLines(curr_region, "e");
+                        filteredCompLines = FilterHullLines(comp_region, "w");
+                        iter_from = lower_row_y;
+                        iter_to = upper_row_y;
+                    }
+                    if (neighborDirection == "w")
+                    {
+                        // Create a filtered list of Lines so we aren't iterating over all of them.
+                        filteredCurrLines = FilterHullLines(curr_region, "w");
+                        filteredCompLines = FilterHullLines(comp_region, "e");
+                        iter_from = lower_row_y;
+                        iter_to = upper_row_y;
+                    }
+
+                    for (int iter = iter_from; iter < iter_to + 1; iter++) // for every x or y in range of rows or columns we're looking for:
+                    {
+                        if (neighborDirection == "e" || neighborDirection == "w")
+                        {
+                            AllCurrLines = GetHullLinesAtXorYIntersect(curr_region, row_y_intercept: iter, optionalListOfHullLines: filteredCurrLines);
+                            AllCompLines = GetHullLinesAtXorYIntersect(comp_region, row_y_intercept: iter, optionalListOfHullLines: filteredCompLines);
+                        }
+                        if (neighborDirection == "n" || neighborDirection == "s")
+                        {
+                            AllCurrLines = GetHullLinesAtXorYIntersect(curr_region, column_x_intercept: iter, optionalListOfHullLines: filteredCurrLines);
+                            AllCompLines = GetHullLinesAtXorYIntersect(comp_region, column_x_intercept: iter, optionalListOfHullLines: filteredCompLines);
+                        }
+
+                        // These are the two points we will be calculating for this row or column
+                        // so that we can get their midpoint
+                        // which is the whole point of all this lol
+                        (float x, float y) point1 = (-1,-1);
+                        (float x, float y) point2 = (-1, -1); 
+
+                        // This gets the first point
+                        if (AllCurrLines.Count == 1) // if we only found one line, calc the point1 coord.
+                        {
+                            (int, int) line1_x1y1 = (AllCurrLines[0].start.x, AllCurrLines[0].start.y);
+                            (int, int) line1_x2y2 = (AllCurrLines[0].end.x, AllCurrLines[0].end.y);
+                            
+                            var pt = PointOnLine(line1_x1y1, line1_x2y2, iter);
+                            if (pt != (0f, 0f)) 
+                            {
+                                point1 = pt;
+                            }
+                            else // slope of zero, get whichever point is closest to comp?
+                            {
+                                // for now just going to skip this row
+                                continue;
+                            }
+                           
+                        }
+                        else if (AllCurrLines.Count == 2) // we returned two lines because we are at a vertex, so find the common point and set point1 to that
+                        {
+                            var line1 = AllCurrLines[0];
+                            var line2 = AllCurrLines[1];
+                            // if start of first line equals start/end of the second line, then start of first line is the coord we want.
+                            if ((line1.start.x, line1.start.y) == (line2.start.x, line2.start.y) || (line1.start.x, line1.start.y) == (line2.end.x, line2.end.y))
+                            {
+                                point1 = ((float)line1.start.x, (float)line1.start.y);
+                            }
+                            else // otherwise it's the end of that line that shares the point
+                            {
+                                point1 = ((float)line1.end.x, (float)line1.end.y);
+                            }
+
+                        }
+
+                        // This gets the second point
+                        if (AllCompLines.Count == 1)
+                        {
+                            //Debug.Log($"allcomplines.count == {AllCompLines.Count}");
+/*                            foreach ((Tile one,Tile two) line in AllCompLines)
+                            {
+                                Debug.Log($"got line ({(line.one.x,line.one.y)}) ({(line.two.x,line.two.y)})");
+                            }*/
+
+                            (int, int) line2_x1y1 = (AllCompLines[0].start.x, AllCompLines[0].start.y);
+                            (int, int) line2_x2y2 = (AllCompLines[0].end.x, AllCompLines[0].end.y);
+
+                            var pt = PointOnLine(line2_x1y1, line2_x2y2, iter);
+                            if (pt != (0f, 0f))
+                            {
+                                point2 = pt;
+                            }
+                            else // slope of zero, get whichever point is closest to comp?
+                            {
+                                // for now just going to skip this row
+                                continue;
+                            }
+                             
+                        }
+                        else if (AllCompLines.Count == 2)
+                        {
+                            var line1 = AllCompLines[0];
+                            var line2 = AllCompLines[1];
+                            // if start of first line equals start/end of the second line, then start of first line is the coord we want.
+                            if ((line1.start.x, line1.start.y) == (line2.start.x, line2.start.y) || (line1.start.x, line1.start.y) == (line2.end.x, line2.end.y))
+                            {
+                                point2 = ((float)line1.start.x, (float)line1.start.y);
+                            }
+                            else // otherwise it's the end of that line that shares the point
+                            {
+                                point2 = ((float)line1.end.x, (float)line1.end.y);
+                            }
+                        }
+
+                        // calculating the midpoint of the two found coords
+                        if (point1 != (-1,-1) || point2 != (-1,-1))
+                        {
+                            (float, float) midpoint_coord = ((point1.x + point2.x) / 2, (point1.y + point2.y) / 2);
+
+                            // Add the coord to our midpoints List.
+                            midpoints.Add(midpoint_coord);
+                        }
                         
-                        int upper_y = Mathf.Min(curr_n, comp_n);
-                        int lower_y = Mathf.Max(curr_s, comp_s);
 
-                        // see if it's curr_s or comp_s who's S value == lower Y
-                        if (curr_s == lower_y)
-                        {
-                            //we're gonna iterate up from curr_s's lowest hullpoint
-                        } else
-                        {
-                            //we're gonna iterate up from comp_s's lowest hullpoint
-                        }
+                        //don't need this rn, but this measures dist between two points
+                        //var distance = Mathf.Sqrt(Mathf.Pow(point2.x - point1.x, 2) + Mathf.Pow(point2.y - point1.y, 2));
 
-                        for (int i = lower_y; i < upper_y + 1; i++) // for every y in range of rows we're looking for:
-                        {   
-                            // from start hull point, get point on line at Y value (i)
-                            // get point on line at other hull on same Y value (i)
-                            // middle of those two points is our midpoint. 
-                            // Store the midpoint in a List of midpoints.
-                            // (if ur at the end of the hull point line go to the next one??)
-                            // brain no worky rn lol
-
-                        }
                     }
+                }
 
-                } 
+                // create our dict entry of midpoints for this neighbor using the finished midpoints list.
+                curr_region.NeighborMidpoints.Add(neighborDirection, midpoints.ToArray());
+                Debug.Log($"Region: {counter}, Direction: {neighborDirection}, Number of midpoints found: {midpoints.Count}");
+                
+                
             }
+            //Debug.Log($"Got done with region {counter}");
+            counter++;
         }
+
+
+        /// <Summary>
+        /// Returns a list of ALL lines that a given row OR column intercepts on a given Region obj.
+        /// </Summary>
+        List<(Tile, Tile)> GetHullLinesAtXorYIntersect(Region region, int row_y_intercept = -1, int column_x_intercept = -1, List<(Tile, Tile)> optionalListOfHullLines = null)
+        {
+            List<(Tile, Tile)> intersectedLines = new List<(Tile, Tile)>();
+
+            if (row_y_intercept < 0 && column_x_intercept < 0)
+            {
+                Debug.Log("GetHullLineAtIntersect() requires one intercept parameter. Recieved none.");
+                return intersectedLines;
+            }
+            if (row_y_intercept >= 0 && column_x_intercept >= 0)
+            {
+                Debug.Log("GetHullLineAtIntersect() requires one intercept parameter. Recieved two.");
+                return intersectedLines;
+            }
+
+            var listOfTiles = region.HullLines;
+            if (optionalListOfHullLines != null) listOfTiles = optionalListOfHullLines.ToArray();
+
+            foreach ((Tile point1, Tile point2) hullLine in listOfTiles)
+            {
+                var x1 = hullLine.point1.x;
+                var y1 = hullLine.point1.y;
+
+                var x2 = hullLine.point2.x;
+                var y2 = hullLine.point2.y;
+
+                if (row_y_intercept >= 0)
+                {
+                    if (row_y_intercept <= Mathf.Max(y1, y2) && row_y_intercept >= Mathf.Min(y1, y2)) // if we are intersecting the middle of a line 
+                    {
+                        intersectedLines.Add(hullLine);
+                    }
+                }
+
+                if (column_x_intercept >= 0)
+                {
+                    if (column_x_intercept <= Mathf.Max(x1, x2) && column_x_intercept >= Mathf.Min(x1, x2)) // if we are intersecting the middle of a line 
+                    {
+                        intersectedLines.Add(hullLine);
+                    }
+                }
+            }
+            return intersectedLines;
+        }
+
+        List<(Tile, Tile)> FilterHullLines(Region region, string direction_to_filter)
+        {
+            List<(Tile, Tile)> filteredLines = new List<(Tile, Tile)>();
+
+            (int x, int y) n = (0, 0);
+            (int x, int y) e = (0, 0);
+            (int x, int y) s = (0, int.MaxValue);
+            (int x, int y) w = (int.MaxValue, 0);
+
+            // TODO: this is how the region.Bounds SHOULD be stored, idk wtf I was thinking before.
+            for (int i = 0; i < region.HullPoints.Length; i++)
+            {
+                if (region.HullPoints[i].y > n.y) n = (region.HullPoints[i].x, region.HullPoints[i].y); // Get n bound (highest Y)
+                if (region.HullPoints[i].x > e.x) e = (region.HullPoints[i].x, region.HullPoints[i].y); // Get e bound (highest x)
+                if (region.HullPoints[i].y < s.y) s = (region.HullPoints[i].x, region.HullPoints[i].y); // Get s bound (lowest Y)
+                if (region.HullPoints[i].x < w.x) w = (region.HullPoints[i].x, region.HullPoints[i].y); // Get w bound (lowest x)
+            }
+
+            if (direction_to_filter == "n")
+            {
+                for (int i = 0; i < region.HullLines.Length; i++)
+                {
+                    if (Mathf.Min(region.HullLines[i].Item1.y, region.HullLines[i].Item2.y) >= Mathf.Min(e.y, w.y))
+                    {
+                        filteredLines.Add(region.HullLines[i]);
+                    }
+                }
+            }
+            if (direction_to_filter == "e")
+            {
+                for (int i = 0; i < region.HullLines.Length; i++)
+                {
+                    if (Mathf.Min(region.HullLines[i].Item1.x, region.HullLines[i].Item2.x) >= Mathf.Min(n.x, s.x))
+                    {
+                        filteredLines.Add(region.HullLines[i]);
+                    }
+                }
+            }
+            if (direction_to_filter == "s")
+            {
+                for (int i = 0; i < region.HullLines.Length; i++)
+                {
+                    if (Mathf.Max(region.HullLines[i].Item1.y, region.HullLines[i].Item2.y) <= Mathf.Min(e.y, w.y))
+                    {
+                        filteredLines.Add(region.HullLines[i]);
+                    }
+                }
+            }
+            if (direction_to_filter == "w")
+            {
+                for (int i = 0; i < region.HullLines.Length; i++)
+                {
+                    if (Mathf.Max(region.HullLines[i].Item1.x, region.HullLines[i].Item2.x) <= Mathf.Max(n.x, s.x))
+                    {
+                        filteredLines.Add(region.HullLines[i]);
+                    }
+                }
+            }
+
+            return filteredLines;
+        }
+
+        (float x, float y) PointOnLine((int x, int y) start, (int x, int y) end, int given_Y)
+        {   
+            
+
+            var x1 = start.x;
+            var y1 = start.y;
+            var x2 = end.x;
+            var y2 = end.y;
+
+            if (y2 - y1 == 0 || x2 - x1 == 0) Debug.Log("div by zero trying to get point on line uhh  handle for this"); return (0f, 0f); // if it's a horizontal line then slope fails
+
+            float slope = (y2 - y1) / (x2 - x1);
+            var X_for_coord_along_line = ((given_Y - y1) / slope) + x1;
+            var point_along_line = (X_for_coord_along_line, given_Y);
+
+            return point_along_line;
+        }
+
+
     }
 
     /// <summary>
@@ -549,7 +825,7 @@ public class RoadGen : MonoBehaviour
                     //Debug.Log($"Path from {entryPoints[i]} to {end} has length of {path.Count}");
                     paths.Add(path);
                 }
-               // else Debug.Log($"No path for {entryPoints[i]} to {end} !!!!!!");
+                // else Debug.Log($"No path for {entryPoints[i]} to {end} !!!!!!");
             }
         }
 

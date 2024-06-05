@@ -8,9 +8,6 @@ using ProcGenTiles;
 public class ConvexHull
 {
 
-    private LayerTerrain lt;
-    Map Map;
-
     public static double cross((int x, int y) O, (int x, int y) A, (int x, int y) B)
     {
         return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x);
