@@ -10,7 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5722200009539327714}
   - component: {fileID: 5687026011274704578}
-  m_Layer: 0
+  - component: {fileID: 2564303671532688496}
+  - component: {fileID: 2244549377210450793}
+  m_Layer: 11
   m_Name: Radar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25,8 +27,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 451429178785678581}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.010000229, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -48,7 +50,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radar: {fileID: 5722200009539327714}
   playerCamera: {fileID: 4969665628972088254}
-  radarCamera: {fileID: 1628270010805581001}
+  radarCamera: {fileID: 5307594165468646048}
   Player_MinimapIcon: {fileID: 5534909089177727489}
   radarSweepLine: {fileID: 6364268284853662820}
   SweepLine: {fileID: 1483010689136470199}
@@ -62,10 +64,58 @@ MonoBehaviour:
   sweepLineWidth: 0.5
   sweepLineColor: {r: 0.042452812, g: 1, b: 0.13898845, a: 0}
   sweepLineOpacity: 1
-  zoom1_y: 40
-  zoom2_y: 50
-  zoom3_y: 60
-  blipScale: 10
+  zoom1_y: 75
+  zoom2_y: 125
+  zoom3_y: 175
+  blipScale: 15
+--- !u!65 &2564303671532688496
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 451429178785678581}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 50, z: 200}
+  m_Center: {x: 0, y: 20, z: 100}
+--- !u!54 &2244549377210450793
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 451429178785678581}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 32
+  m_CollisionDetection: 0
 --- !u!1 &1483010689136470199
 GameObject:
   m_ObjectHideFlags: 0
@@ -202,98 +252,6 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
---- !u!1 &1628270010805581001
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3251466204213230471}
-  - component: {fileID: 8479933441075031625}
-  - component: {fileID: 7732473339958968421}
-  m_Layer: 0
-  m_Name: Radar Camera
-  m_TagString: MainCamera
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3251466204213230471
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1628270010805581001}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 20.01, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8145815548147361805}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
---- !u!20 &8479933441075031625
-Camera:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1628270010805581001}
-  m_Enabled: 0
-  serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
-  m_projectionMatrixMode: 1
-  m_GateFitMode: 2
-  m_FOVAxisMode: 0
-  m_Iso: 200
-  m_ShutterSpeed: 0.005
-  m_Aperture: 16
-  m_FocusDistance: 10
-  m_FocalLength: 50
-  m_BladeCount: 5
-  m_Curvature: {x: 2, y: 11}
-  m_BarrelClipping: 0.25
-  m_Anamorphism: 0
-  m_SensorSize: {x: 36, y: 24}
-  m_LensShift: {x: 0, y: 0}
-  m_NormalizedViewPortRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
-  field of view: 60
-  orthographic: 0
-  orthographic size: 5
-  m_Depth: -1
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 256
-  m_RenderingPath: -1
-  m_TargetTexture: {fileID: 8400000, guid: 2d81f13b80ac44f49b6711f9cc3a257c, type: 2}
-  m_TargetDisplay: 0
-  m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
-  m_AllowDynamicResolution: 0
-  m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
-  m_StereoConvergence: 10
-  m_StereoSeparation: 0.022
---- !u!81 &7732473339958968421
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1628270010805581001}
-  m_Enabled: 0
 --- !u!1 &3114046138796388596
 GameObject:
   m_ObjectHideFlags: 0
@@ -450,7 +408,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 55
+    m_Bits: 3255
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -469,7 +427,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4969665628972088254}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!1 &5307594165468646048
 GameObject:
   m_ObjectHideFlags: 0
@@ -481,8 +439,8 @@ GameObject:
   - component: {fileID: 8609131221571207044}
   - component: {fileID: 1566363141109643815}
   - component: {fileID: 7990423543701039207}
-  m_Layer: 0
-  m_Name: Minimap Camera
+  m_Layer: 8
+  m_Name: Radar Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -573,7 +531,9 @@ GameObject:
   - component: {fileID: 8145815548147361805}
   - component: {fileID: 6254653454235699705}
   - component: {fileID: 8747254282360873927}
-  m_Layer: 0
+  - component: {fileID: 6186735044646548275}
+  - component: {fileID: 6035431670919734540}
+  m_Layer: 11
   m_Name: Tank
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -595,7 +555,6 @@ Transform:
   m_Children:
   - {fileID: 2837195427000143170}
   - {fileID: 2882862591070544593}
-  - {fileID: 3251466204213230471}
   - {fileID: 3610531609251916944}
   - {fileID: 7050558836372403632}
   - {fileID: 8609131221571207044}
@@ -615,13 +574,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3a250e49ee786d4ba651c88af9899ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controller: {fileID: 0}
-  maxSpeed: 50
+  controller: {fileID: 6186735044646548275}
+  overHeadCam: {fileID: 8732088058347948995}
+  firstPersonCam: {fileID: 328608520402597086}
+  radarCanvas: {fileID: 0}
+  maxSpeed: 20
   maxReverseSpeed: -2
-  turnAngleMin: 20
-  turnAngleMax: 50
-  acceleration: 2
-  decceleration: 5
+  turnAngleMin: 2
+  turnAngleMax: 15
+  acceleration: 3
+  decceleration: 4
+  quatLerp: 0.07
   currSpeed: 0
   turnAngle: 0
   currPitch: 0
@@ -643,10 +606,66 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 2, y: 1, z: 4}
   m_Center: {x: 0, y: 0.55, z: -0.9}
+--- !u!143 &6186735044646548275
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5516816870391900691}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 3895
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 0.75
+  m_Radius: 0.34
+  m_SlopeLimit: 45
+  m_StepOffset: 0.01
+  m_SkinWidth: 0.5
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0.56, z: 0}
+--- !u!114 &6035431670919734540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5516816870391900691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 40f1fbb82f8966347a6da17d0803f540, type: 3}
+  m_NotificationBehavior: 1
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &5534909089177727489
 GameObject:
   m_ObjectHideFlags: 0
@@ -742,7 +761,7 @@ GameObject:
   - component: {fileID: 2882862591070544593}
   - component: {fileID: 6264031607142906255}
   - component: {fileID: 5933062056076729136}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Turret
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -759,7 +778,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
   m_LocalPosition: {x: -0.0013308864, y: 0.71919656, z: -0.9551816}
-  m_LocalScale: {x: 1, y: 1.2996329, z: 0.2720036}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8732563656045534381}
@@ -832,7 +851,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7050558836372403632
 Transform:
   m_ObjectHideFlags: 0
@@ -918,7 +937,7 @@ GameObject:
   - component: {fileID: 2837195427000143170}
   - component: {fileID: 8331372049786698401}
   - component: {fileID: 419918223792392771}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -935,7 +954,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
   m_LocalPosition: {x: -0, y: 0, z: -1}
-  m_LocalScale: {x: 0.9413235, y: 1.9869384, z: 0.40741295}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8145815548147361805}
@@ -1002,7 +1021,7 @@ GameObject:
   - component: {fileID: 8732563656045534381}
   - component: {fileID: 7503187651815172626}
   - component: {fileID: 1630998572704890626}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Barrel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1018,8 +1037,8 @@ Transform:
   m_GameObject: {fileID: 9150186174651022729}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.00077600795, y: -0.88830614, z: 0.9399924}
-  m_LocalScale: {x: 0.35053223, y: 0.7694483, z: 1.3811681}
+  m_LocalPosition: {x: 0, y: -1.158, z: 0.269}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2882862591070544593}
