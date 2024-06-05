@@ -10,6 +10,9 @@ namespace ProcGenTiles
 		public Tile[] HullPoints { get; set; }
 		public (Tile,Tile)[] HullLines { get; set; } 
 
+		public Color Color { get; set; }
+		public string colorName { get; set; }
+
 
 		/// <summary>
 		/// "n" / "e" / "s" / "w"   :   [region1, region2]   

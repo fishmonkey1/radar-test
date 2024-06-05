@@ -332,6 +332,7 @@ MonoBehaviour:
   showEntryPoints: 1
   showFloodfill: 1
   showConvexHull: 1
+  showMidpoints: 0
   floodfillRegionMinimum: 200
   entryGapMin: 21
   elevationLimitForPathfind: 0.02
@@ -447,7 +448,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 713792254}
+        m_Texture: {fileID: 750105867}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -782,7 +783,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!28 &713792254
+--- !u!28 &750105867
 Texture2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

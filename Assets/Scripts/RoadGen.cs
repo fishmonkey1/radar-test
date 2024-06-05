@@ -28,6 +28,8 @@ public class RoadGen : MonoBehaviour
     public bool showEntryPoints = false;
     public bool showFloodfill = false;
     public bool showConvexHull = false;
+    public bool showMidpoints = false;
+
     [Tooltip("Limits the region drawing to regions larger than the minimum")]
     public int floodfillRegionMinimum = 0;
 
@@ -38,6 +40,15 @@ public class RoadGen : MonoBehaviour
 
     Color[] someColors = { Color.blue, Color.grey, Color.green, Color.red, Color.magenta,
             Color.yellow, Color.cyan, Color.black, Color.white };
+
+    Dictionary<Color, string> someColorsdict = new Dictionary<Color, string> {
+        { Color.blue, "blue"}, {Color.grey, "grey" }, { Color.green,  "green" },
+        { Color.red, "red" }, { Color.magenta, "magenta" }, {  Color.yellow, "yellow" },
+        { Color.cyan, "cyan" }, { Color.black, "black" }, { Color.white, "white" } };
+
+    public List<List<(float, float)>> allmidpointsDEBUG = new List<List<(float, float)>>();
+
+
 
     /* 
        1) Find map entries: loop around exterior of terrain. Find all of the low-elevation levels.
@@ -128,13 +139,14 @@ public class RoadGen : MonoBehaviour
             {
                 if (region.Tiles.Length >= floodfillRegionMinimum)
                 {
-                    Color drawColor = someColors[colorIndex];
+                    region.Color = someColors[colorIndex];
+                    region.colorName = someColorsdict[region.Color];
 
                     if (showFloodfill)
                     {
                         foreach (Tile t in region.Tiles)
                         {
-                            DrawColorAtPoint(t.x, t.y, drawColor);
+                            DrawColorAtPoint(t.x, t.y, region.Color);
                         }
                         // Debug.Log($"Length of region {""} is {region.Tiles.Length}");
                     }
@@ -163,7 +175,7 @@ public class RoadGen : MonoBehaviour
                         }
                         region.HullLines[region.HullPoints.Length - 1] = (region.HullPoints[region.HullPoints.Length - 1], region.HullPoints[0]); // set the last line as: the Last and First point in the HullPoints array
 
-                        drawHullGizmos(drawColor);
+                        drawHullGizmos(region.Color);
                     }
 
                     colorIndex++;
@@ -431,7 +443,10 @@ public class RoadGen : MonoBehaviour
                     }
 
                     for (int iter = iter_from; iter < iter_to + 1; iter++) // for every x or y in range of rows or columns we're looking for:
-                    {
+                    {   
+                        // DEBUG
+                        //if (iter == iter_from) Debug.Log($"curr: {curr_region.colorName}  comp: {comp_region.colorName}   direction: {neighborDirection}");
+
                         if (neighborDirection == "e" || neighborDirection == "w")
                         {
                             AllCurrLines = GetHullLinesAtXorYIntersect(curr_region, row_y_intercept: iter, optionalListOfHullLines: filteredCurrLines);
@@ -536,11 +551,15 @@ public class RoadGen : MonoBehaviour
                         //var distance = Mathf.Sqrt(Mathf.Pow(point2.x - point1.x, 2) + Mathf.Pow(point2.y - point1.y, 2));
 
                     }
+                    // DEBUG
+                    //Debug.Log($"found {midpoints.Count} for ^^^^");
+
                 }
 
                 // create our dict entry of midpoints for this neighbor using the finished midpoints list.
                 curr_region.NeighborMidpoints.Add(neighborDirection, midpoints.ToArray());
-                Debug.Log($"Region: {counter}, Direction: {neighborDirection}, Number of midpoints found: {midpoints.Count}");
+                allmidpointsDEBUG.Add(midpoints);
+                //Debug.Log($"Region: {curr_region.colorName}, Direction: {neighborDirection}, Number of midpoints found: {midpoints.Count}");
                 
                 
             }
@@ -668,7 +687,11 @@ public class RoadGen : MonoBehaviour
             var x2 = end.x;
             var y2 = end.y;
 
-            if (y2 - y1 == 0 || x2 - x1 == 0) Debug.Log("div by zero trying to get point on line uhh  handle for this"); return (0f, 0f); // if it's a horizontal line then slope fails
+            if (y2 - y1 == 0 || x2 - x1 == 0)
+            {   // if it's a horizontal line then slope fails
+                //Debug.Log("div by zero trying to get point on line uhh  handle for this");
+                return (0f, 0f);
+            }
 
             float slope = (y2 - y1) / (x2 - x1);
             var X_for_coord_along_line = ((given_Y - y1) / slope) + x1;
@@ -864,6 +887,27 @@ public class RoadGen : MonoBehaviour
                 {
                     Gizmos.color = gizmoPoints.Value;
                     Gizmos.DrawLineStrip(gizmoPoints.Key, true);
+                }
+            }
+        }
+
+        if (showMidpoints)
+        {
+            
+            if (allmidpointsDEBUG != null)
+            {
+
+                foreach (List<(float,float)> midline in allmidpointsDEBUG)
+                {
+                    Vector3[] arrr = new Vector3[midline.Count];
+
+                    var i = 0;
+                    foreach ((float,float) xy in midline)
+                    {
+                        arrr[i] = new Vector3(xy.Item1, 1, xy.Item2);
+                    }
+                    Gizmos.color = Color.magenta;
+                    Gizmos.DrawLineStrip(arrr, false);
                 }
             }
         }
