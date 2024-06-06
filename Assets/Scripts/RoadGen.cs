@@ -300,7 +300,7 @@ public class RoadGen : MonoBehaviour
 
     private void FilterForLandmassRegions_GetMoreData()
     {
-        Debug.Log("vicky ur super cute :3333333 I luuuuuvs you!!!!");
+        
         //Create List of landmasses we are going to be navigating between, ignore anything smaller than the set min
         // This shouldn't be done here, we should have a seperate array in Map for the "good" regions I guess.
         List<Region> landmasses = new List<Region>();
@@ -313,7 +313,8 @@ public class RoadGen : MonoBehaviour
             }
         }
 
-
+        // UwU
+        //Debug.Log("vicky ur super cute :3333333 I luuuuuvs you!!!!");
         // Adds RegionNeighbors data to our large Regions
         for (int i = 0; i < landmasses.Count - 1; i++) // compare every landmass to every one in front of it in the List. 
         {                                                       // This compares everything with everything else, without duplicates.
@@ -445,7 +446,7 @@ public class RoadGen : MonoBehaviour
                     for (int iter = iter_from; iter < iter_to + 1; iter++) // for every x or y in range of rows or columns we're looking for:
                     {   
                         // DEBUG
-                        //if (iter == iter_from) Debug.Log($"curr: {curr_region.colorName}  comp: {comp_region.colorName}   direction: {neighborDirection}");
+                        if (iter == iter_from) Debug.Log($"curr: {curr_region.colorName}  comp: {comp_region.colorName}   direction: {neighborDirection}");
 
                         if (neighborDirection == "e" || neighborDirection == "w")
                         {
@@ -538,7 +539,7 @@ public class RoadGen : MonoBehaviour
                         }
 
                         // calculating the midpoint of the two found coords
-                        if (point1 != (-1,-1) || point2 != (-1,-1))
+                        if (point1 != (-1,-1) && point2 != (-1,-1))
                         {
                             (float, float) midpoint_coord = ((point1.x + point2.x) / 2, (point1.y + point2.y) / 2);
 
@@ -559,12 +560,13 @@ public class RoadGen : MonoBehaviour
                 // create our dict entry of midpoints for this neighbor using the finished midpoints list.
                 curr_region.NeighborMidpoints.Add(neighborDirection, midpoints.ToArray());
                 allmidpointsDEBUG.Add(midpoints);
-                //Debug.Log($"Region: {curr_region.colorName}, Direction: {neighborDirection}, Number of midpoints found: {midpoints.Count}");
+                Debug.Log($"Region: {curr_region.colorName}, Direction: {neighborDirection}, Number of midpoints found: {midpoints.Count}");
                 
                 
             }
             //Debug.Log($"Got done with region {counter}");
             counter++;
+            if (counter == 2) break; // so we only do the first one for debug.
         }
 
 
