@@ -24,7 +24,7 @@ public class PlayerInfo : MonoBehaviour
 
     public void Awake()
     {
-        if (instance ! == null)
+        if (instance != null)
         {
             throw new System.Exception("You have more than one PlayerInfo component in the scene!");
         }
@@ -36,7 +36,7 @@ public class PlayerInfo : MonoBehaviour
     {
         int currentRoleIndex = Array.IndexOf(CrewRoles.ImplementedRoles, CurrentRole);
         currentRoleIndex++; //Increment to get the next role
-        if (currentRoleIndex >= CrewRoles.ImplementedRoles.Length - 1)
+        if (currentRoleIndex >= CrewRoles.ImplementedRoles.Length)
             currentRoleIndex = 0;
 
         PickRole(CrewRoles.ImplementedRoles[currentRoleIndex]); //Cycle the role over to the newly picked one

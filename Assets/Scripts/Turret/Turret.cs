@@ -32,6 +32,16 @@ public class Turret : MonoBehaviour, IRoleNeeded
     void Update()
     {
         //TODO: Do turret translation in here next time I code
+        if (!Mathf.Approximately(0, turretInput.x))
+        { //Only turn the turret if we have input to use
+            turret.Rotate(Vector3.forward, turretInput.x * rotationSensitivity * Time.deltaTime);
+        }
+
+        if (!Mathf.Approximately(0, turretInput.y))
+        {
+            barrel.Rotate(Vector3.left, turretInput.y * rotationSensitivity * Time.deltaTime);
+        }
+
     }
 
 }

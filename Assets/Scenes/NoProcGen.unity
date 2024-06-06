@@ -715,7 +715,7 @@ GameObject:
   - component: {fileID: 1596879798}
   - component: {fileID: 1596879797}
   - component: {fileID: 1596879796}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: TempGround
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -809,6 +809,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1630611792 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6274800289480575919, guid: 3b48ccf84b6a90b4eb9c8eec600abbb4, type: 3}
+  m_PrefabInstance: {fileID: 2558351157055049953}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2558351157055049953
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -915,6 +920,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5516816870391900691, guid: 3b48ccf84b6a90b4eb9c8eec600abbb4, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1467513470}
+    - targetCorrespondingSourceObject: {fileID: 6274800289480575919, guid: 3b48ccf84b6a90b4eb9c8eec600abbb4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2558351157055049960}
   m_SourcePrefab: {fileID: 100100000, guid: 3b48ccf84b6a90b4eb9c8eec600abbb4, type: 3}
 --- !u!4 &2558351157055049954 stripped
 Transform:
@@ -926,6 +934,21 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2882862591070544593, guid: 3b48ccf84b6a90b4eb9c8eec600abbb4, type: 3}
   m_PrefabInstance: {fileID: 2558351157055049953}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2558351157055049960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1630611792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2317a94762a5c6542a0a72564b0dd449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turret: {fileID: 2558351157055049955}
+  barrel: {fileID: 2558351157055049954}
+  rotationSensitivity: 20
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
