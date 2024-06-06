@@ -14,6 +14,7 @@ public class Turret : MonoBehaviour, IRoleNeeded
     float rotationSensitivity = 1f; //For determining how quickly the turret rotates with user input
 
     Vector2 turretInput = Vector2.zero;
+    Camera currentCam;
 
     public Role RoleNeeded => CrewRoles.Gunner;
 
@@ -26,7 +27,33 @@ public class Turret : MonoBehaviour, IRoleNeeded
 
     public void OnFire()
     {
+        if (!((IRoleNeeded)this).HaveRole(PlayerInfo.Instance.CurrentRole))
+            return;
         //TODO: Handle shooting logic here next time
+    }
+
+    public void OnRoleChange(Role oldRole, Role newRole)
+    {
+        if (newRole != RoleNeeded) return;
+
+        //Otherwise we do any setup in here
+        currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded);
+    }
+
+    public void OnCameraToggle()
+    {
+        if (!((IRoleNeeded)this).HaveRole(PlayerInfo.Instance.CurrentRole))
+            return;
+
+        currentCam = CamCycle.Instance.GetNextCamera(RoleNeeded, currentCam);
+    }
+
+    void Start()
+    {
+        if (PlayerInfo.Instance.OnRoleChange == null)
+            PlayerInfo.Instance.OnRoleChange = new PlayerInfo.RoleChangeDelegate(OnRoleChange);
+        else
+            PlayerInfo.Instance.OnRoleChange = OnRoleChange;
     }
 
     void Update()

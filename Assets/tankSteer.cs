@@ -6,9 +6,8 @@ using UnityEngine.InputSystem;
 public class tankSteer : MonoBehaviour, IRoleNeeded
 {
     [SerializeField] private CharacterController controller;
-    [SerializeField] private Camera overHeadCam;
-    [SerializeField] private Camera firstPersonCam;
     [SerializeField] private Canvas radarCanvas;
+    private Camera currentCam;
 
 
     [Header("Tank Settings")]
@@ -43,8 +42,14 @@ public class tankSteer : MonoBehaviour, IRoleNeeded
     private void Start()
     {
         layerMask = LayerMask.GetMask("Terrain");
-        firstPersonCam.enabled = true;
-        overHeadCam.enabled = false;
+        if (PlayerInfo.Instance.OnRoleChange == null)
+            PlayerInfo.Instance.OnRoleChange = new PlayerInfo.RoleChangeDelegate(OnRoleChange);
+        else
+            PlayerInfo.Instance.OnRoleChange = OnRoleChange;
+        //We have to fetch a camera in Start since the debug stuff assumes you start as the driver
+        //PlayerInfo does the PickRole stuff for the driver before this class registers for the delegate
+        //So we can't just handle it normally in OnRoleChange for now until there's UI for picking roles
+        currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded);
     }
 
     private void FixedUpdate()
@@ -96,6 +101,14 @@ public class tankSteer : MonoBehaviour, IRoleNeeded
 
     }
 
+    public void OnRoleChange(Role oldRole, Role newRole)
+    {
+        if (newRole != RoleNeeded) return;
+
+        //Otherwise we do any setup in here
+        currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded); //Fetch the camera for the driver so it's active
+    }
+
     public void OnMove(InputValue value)
     {
         if (!((IRoleNeeded)this).HaveRole(PlayerInfo.Instance.CurrentRole))
@@ -105,16 +118,10 @@ public class tankSteer : MonoBehaviour, IRoleNeeded
 
     public void OnCameraToggle()
     {
-        if (firstPersonCam.enabled)
-        {
-            firstPersonCam.enabled = false;
-            overHeadCam.enabled = true;
-        }
-        else
-        {
-            firstPersonCam.enabled = true;
-            overHeadCam.enabled = false;
-        }
+        if (!((IRoleNeeded)this).HaveRole(PlayerInfo.Instance.CurrentRole))
+            return;
+
+        currentCam = CamCycle.Instance.GetNextCamera(RoleNeeded, currentCam);
     }
 
     public void OnToggleRadarMinimap()

@@ -8,4 +8,7 @@ public interface IRoleNeeded
         else
             return false;
     }
+
+    public void OnRoleChange(Role oldRole, Role newrole);
+
 }

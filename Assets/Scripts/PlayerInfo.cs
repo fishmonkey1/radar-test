@@ -10,11 +10,18 @@ public class PlayerInfo : MonoBehaviour
     public Role CurrentRole { get; private set; }
     static PlayerInfo instance; //Hold the singleton during debug testing and remove this when multiplayer is added
     public static PlayerInfo Instance => instance; //Return the singleton
+    public delegate void RoleChangeDelegate(Role oldRole, Role newRole);
+    public RoleChangeDelegate OnRoleChange;
 
     public void PickRole(Role role)
     {
         //This will later need checks to make sure the picked role isn't over the limit
+        Role oldRole = CurrentRole;
         CurrentRole = role;
+        if (OnRoleChange != null)
+        {
+            OnRoleChange(oldRole, role);
+        }
     }
 
     public void PickName(string name)
