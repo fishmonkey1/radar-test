@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class tankSteer : MonoBehaviour
+public class tankSteer : MonoBehaviour, IRoleNeeded
 {
     [SerializeField] private CharacterController controller;
     [SerializeField] private Camera overHeadCam;
@@ -26,7 +26,7 @@ public class tankSteer : MonoBehaviour
     [SerializeField] float currPitch;
     [SerializeField] float engineForce;
 
-
+    public Role RoleNeeded => CrewRoles.Driver;
 
 
     //[SerializeField] private GameManager gm;
@@ -98,6 +98,8 @@ public class tankSteer : MonoBehaviour
 
     public void OnMove(InputValue value)
     {
+        if (!((IRoleNeeded)this).HaveRole(PlayerInfo.Instance.CurrentRole))
+            return; //Don't allow driving inputs if you don't have the driver role selected
         driverInput = value.Get<Vector2>();
     }
 
