@@ -12,13 +12,9 @@ public class LayerTerrain : MonoBehaviour
     // Then I'll likely want to check my Pathfinding code and see if I can check for regions that arent reachable and start marking them.
     // It would be cool to add canals or valleys between the water regions so everything is accessable by boat. :3
     
-    // TO check
-    persistance (eo3)
+
 
      */
-
-    private float lastTimeInterval; //used for debug
-    private bool timeExecutionDebug = false;
 
     public DrawMode drawMode;
     public DrawType drawType;
@@ -165,6 +161,11 @@ public class LayerTerrain : MonoBehaviour
         Debug.Log("finalMap array [0,21]:  " + finalMap.FetchFloatValues(LayersEnum.Elevation) [0,21]);
         Debug.Log($"finalMap GetTile(21,0):  ({finalMap.GetTile(21,0).ValuesHere["Elevation"]}");
         Debug.Log($"finalMap GetTile(0,21):  ({finalMap.GetTile(0,21).ValuesHere["Elevation"]}");
+        Debug.Log($"terrainData.GetHeight(21,0): "+terrainData.GetHeight(21,0));
+        Debug.Log($"terrainData.GetHeight(0,21): " + terrainData.GetHeight(0,21));
+        Debug.Log($"terrainData.GetHeights()[21,0]: " + terrainData.GetHeights(0, 0, X, Y)[21, 0]);
+        Debug.Log($"terrainData.GetHeights()[0,21]: " + terrainData.GetHeights(0, 0, X, Y)[0,21]);
+
 
 
         CreateTerrainFromHeightmap();
@@ -221,9 +222,9 @@ public class LayerTerrain : MonoBehaviour
         highest_e = -100;
         lowest_e = 100;
         noisePair.Map = new Map(X, Y); //The map isn't being generated in the inspector, so it must be created here
-        for (int x = 0; x < X; x++)
+        for (int y = 0; y < Y; y++)
         {
-            for (int y = 0; y < Y; y++)
+            for (int x = 0; x < X; x++)
             { //Inner for loop does most of the heavy lifting
                 Tile tile = noisePair.Map.Tiles[x, y]; //Get the tile at the location
 
@@ -268,9 +269,9 @@ public class LayerTerrain : MonoBehaviour
         float lowest_after = 100;
         float highest_after = -100;
 
-        for (int x = 0; x < X; x++)
+        for (int y = 0; y < Y; y++)
         {
-            for (int y = 0; y < Y; y++)
+            for (int x = 0; x < X; x++)
             {
                 Tile finalTile = finalMap.GetTile(x, y);
 
