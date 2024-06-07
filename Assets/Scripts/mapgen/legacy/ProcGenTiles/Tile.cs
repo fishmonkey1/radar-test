@@ -14,6 +14,11 @@ namespace ProcGenTiles
         public Region Region; // hmmmmm so we're going to want to know if/what region a tile is in? so we can set this during the floodfill?
         public bool isBelowElevationLimit;
 
+        public bool is69;
+        public bool is420;
+        public bool is42069;
+
+
         public Tile(int x, int y)
         {
             this.x = x;

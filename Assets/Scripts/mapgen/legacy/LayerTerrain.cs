@@ -110,7 +110,6 @@ public class LayerTerrain : MonoBehaviour
         if (terrain == null) Debug.Log("layerTerrain has no terrain obj");//Should already be assigned, but nab it otherwise
         Debug.Log(terrain);
 
-        lastTimeInterval = Time.realtimeSinceStartup;
     }
 
     public void GenerateBiome() // MOVE
@@ -140,12 +139,11 @@ public class LayerTerrain : MonoBehaviour
 
     //stays
     public void GenerateTerrain() //main entry
-    {
+    {   
         if (drawType == DrawType.Terrain) SetTerrainSize();
 
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
         pathfinding = new Pathfinding(finalMap); //Init the pathfinding for adjusting regions after they're created
-        float tt = Time.realtimeSinceStartup; lastTimeInterval = tt;
 
         for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
         {
@@ -156,44 +154,26 @@ public class LayerTerrain : MonoBehaviour
             }
             ReadNoiseParams(pair.NoiseParams); //Feed the generator this layer's info
 
-            //if (i == 0) { minValue = pair.NoiseParams.minValue; raisedPower = pair.NoiseParams.raisedPower; };
-
             GenerateHeightmap(pair, LayersEnum.Elevation); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable
-            //if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - GenerateHeightmap(): {t - lastTimeInterval}"); lastTimeInterval = t; }
+                                                 
         }
-        //if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - Generating All Heightmaps: {t - tt}"); lastTimeInterval = t; }
-
         NormalizeFinalMap(LayersEnum.Elevation, elevationLayers.NoisePairs[0].NoiseParams.minValue, elevationLayers.NoisePairs[0].NoiseParams.raisedPower); //Make the final map only span from 0 to 1
-        //if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - NormalizeFinalMap(): {t - lastTimeInterval}"); lastTimeInterval = t; }
 
-        /*if (!DrawInEditor)
-        {   
-            GenerateBiome();
-            if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - GenerateBiome(): {t - lastTimeInterval}"); lastTimeInterval = t; }
-        }*/
+
+        // Layers are now in finalMap.
+        Debug.Log("finalMap array [21,0]:  "+finalMap.FetchFloatValues(LayersEnum.Elevation) [21,0]);
+        Debug.Log("finalMap array [0,21]:  " + finalMap.FetchFloatValues(LayersEnum.Elevation) [0,21]);
+        Debug.Log($"finalMap GetTile(21,0):  ({finalMap.GetTile(21,0).ValuesHere["Elevation"]}");
+        Debug.Log($"finalMap GetTile(0,21):  ({finalMap.GetTile(0,21).ValuesHere["Elevation"]}");
 
 
         CreateTerrainFromHeightmap();
-        //if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - CreateTerrainFromHeightmap(): {t - lastTimeInterval}"); lastTimeInterval = t; }
 
-        Debug.Log("NOT doing landwaterfloodfill() in GenerateTerrain()");
-        /*if (!makeTerrainTextureTopo)
-        {   
-            pathfinding.LandWaterFloodfill(0, 0, biomes);
-            if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - LandWaterFloodfill(): {t - lastTimeInterval}"); lastTimeInterval = t; }
-        }*/
 
-        //genTopo.createTopoTextures(0, 0, X, Y, false);
-        // For now keep, but will be kicked off to topography script for coloring soon
-        /*if (!DrawInEditor)
-        {
-            ApplyTextures(0, 0, X, Y, false);
-            if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - ApplyTextures(): {t - lastTimeInterval}"); lastTimeInterval = t; }
-        }*/
 
 
         //pathfinding.MarkAllRegions(); // turned off until optimized
-
+        
         if (print_debug)
         {
             Debug.Log($"Number of regions marked: {pathfinding.regionSizes.Keys.Count}");
@@ -214,6 +194,7 @@ public class LayerTerrain : MonoBehaviour
         terrainData.heightmapResolution = X -1;
         terrainData.size = new Vector3(X, depth, Y);
         terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
+        
 
     }
 

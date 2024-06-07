@@ -43,7 +43,7 @@ namespace ProcGenTiles
             }
         }
 
-        public List<Region> MarkLandmassRegions(float[,] noiseMap, float elevationLimit)
+        public List<Region> MarkLandmassRegions(float elevationLimit)
         {
             List<Region> AllRegionObj = new List<Region>();
             int regionLabel = 1;

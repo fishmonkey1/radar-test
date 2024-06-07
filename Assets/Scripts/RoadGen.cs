@@ -104,6 +104,8 @@ public class RoadGen : MonoBehaviour
     {
         Debug.Log("=============== RoadGen GetArterialPaths() =======================");
 
+        
+
         // setting values
         noiseMap = noisyMcNoiseFace;
         colorMap = colorMcMapFace;
@@ -113,6 +115,9 @@ public class RoadGen : MonoBehaviour
         pathFinding = new Pathfinding(map);
         roadMapData = new float[width, height];
         gizmoPointsDict = new Dictionary<Vector3[], Color>();
+
+
+
 
         List<(int x, int xy)> entryPoints = new List<(int, int)>();
         List<List<Tile>> paths = new List<List<Tile>>();
@@ -131,7 +136,7 @@ public class RoadGen : MonoBehaviour
 
         if (showFloodfill || showConvexHull) //if doing either we need the regions
         {
-            allRegions = pathFinding.MarkLandmassRegions(noiseMap, elevationLimitForPathfind);
+            allRegions = pathFinding.MarkLandmassRegions(elevationLimitForPathfind);
             //Debug.Log($"successfully got {allRegions.Count} regions from floodfill");
             int colorIndex = 0;
             //gizmoPointsDict = new Dictionary<Vector3[], Color>();
@@ -198,7 +203,7 @@ public class RoadGen : MonoBehaviour
 
                         for (int i = 0; i < hullPoints.Count; i++)
                         {
-                            gizmoPoints[i] = new Vector3((float)hullPoints[i].y, 1.0f, (float)hullPoints[i].x);
+                            gizmoPoints[i] = new Vector3((float)hullPoints[i].x, 1.0f, (float)hullPoints[i].y);
 
                             if (hullPoints[i].y > n) n = hullPoints[i].y; // Get n bound (highest Y)
                             if (hullPoints[i].x > e) e = hullPoints[i].x; // Get e bound (highest x)
@@ -906,9 +911,11 @@ public class RoadGen : MonoBehaviour
                     var i = 0;
                     foreach ((float,float) xy in midline)
                     {
-                        arrr[i] = new Vector3(xy.Item1, 1, xy.Item2);
+                        arrr[i] = new Vector3(xy.Item1, 5, xy.Item2);
+                        
                     }
-                    Gizmos.color = Color.magenta;
+                    
+                    Gizmos.color = Color.blue;
                     Gizmos.DrawLineStrip(arrr, false);
                 }
             }
