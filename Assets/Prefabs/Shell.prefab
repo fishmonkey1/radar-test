@@ -61,6 +61,9 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8a11d93b52990e7469d27f0664fff238, type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 8701038289932250556}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8a11d93b52990e7469d27f0664fff238, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3499655768687380449}
   m_SourcePrefab: {fileID: 100100000, guid: 8a11d93b52990e7469d27f0664fff238, type: 3}
@@ -69,6 +72,48 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 8a11d93b52990e7469d27f0664fff238, type: 3}
   m_PrefabInstance: {fileID: 2319185103526750379}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8701038289932250556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3237541956323890682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41206757c01885449ba779025a974cb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage:
+    Damage: 100
+    SphereRadius: 5
+    AreaDamageType: 1
+    DamageFalloffCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: -0
+        value: 0.99997205
+        inSlope: 0.18395773
+        outSlope: 0.18395773
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.21280606
+      - serializedVersion: 3
+        time: 1
+        value: 0.0011138916
+        inSlope: -0.26525137
+        outSlope: -0.26525137
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.11299425
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  speed: 5
+  explosionPrefab: {fileID: 0}
 --- !u!65 &3499655768687380449
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -12,6 +12,7 @@ public class Turret : MonoBehaviour, IRoleNeeded
     Transform barrel; //The barrel moves along the x axis
     [SerializeField]
     float rotationSensitivity = 1f; //For determining how quickly the turret rotates with user input
+    [SerializeField] GameObject projectilePrefab; //This will need to be fetched later when there are different ammos
 
     Vector2 turretInput = Vector2.zero;
     Camera currentCam;
