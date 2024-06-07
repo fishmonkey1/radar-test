@@ -44,13 +44,15 @@ public class GameManager: MonoBehaviour
         layerTerrain.GenerateTerrain(); // runs all of layerTerrain's stuff, new noiseMap
 
         noiseMap = layerTerrain.finalMap.FetchFloatValues(LayersEnum.Elevation);
-        noiseMap_ReversedYXarray = layerTerrain.finalMap.FetchFloatValues_ReversedYXarray(LayersEnum.Elevation); //store reversed for later
+        noiseMap_ReversedYXarray = layerTerrain.finalMap.FetchFloatValues_ReversedYXarray(LayersEnum.Elevation); //store reversed 
 
-        layerTerrain.genTopo.createTopoTextures(0, 0, layerTerrain.X, layerTerrain.Y, false, noiseMap_ReversedYXarray);
+        layerTerrain.genTopo.createTopoTextures(0, 0, layerTerrain.X, layerTerrain.Y, false, noiseMap);
+        //layerTerrain.genTopo.createTopoTextures(0, 0, layerTerrain.X, layerTerrain.Y, false, noiseMap_ReversedYXarray); //new <--------- SET AS REVERSED ARRAY!!
 
         if (layerTerrain.drawMode == LayerTerrain.DrawMode.ColorMap)
         {   
-            colorMap = mapGenerator.GenerateColorMap(noiseMap_ReversedYXarray);
+            colorMap = mapGenerator.GenerateColorMap(noiseMap); 
+            //colorMap = mapGenerator.GenerateColorMap(noiseMap_ReversedYXarray); // new  <--------------------------------------------------- SET AS REVERSED ARRAY!!
         }
 
         RefreshObject();
@@ -60,8 +62,10 @@ public class GameManager: MonoBehaviour
     {
         if (layerTerrain.drawType == LayerTerrain.DrawType.Terrain)
         {
-            colorMap = mapGenerator.GenerateColorMap(noiseMap_ReversedYXarray);
-            colorMap = roadGen.GetArterialPaths(noiseMap_ReversedYXarray, colorMap);
+            colorMap = mapGenerator.GenerateColorMap(noiseMap);
+            colorMap = roadGen.GetArterialPaths(noiseMap, colorMap);
+            //colorMap = mapGenerator.GenerateColorMap(noiseMap_ReversedYXarray); //new   <--------------------------------------------------------- SET AS REVERSED ARRAY!!
+            //colorMap = roadGen.GetArterialPaths(noiseMap_ReversedYXarray, colorMap); //new   <-------------------------------------------------------- SET AS REVERSED ARRAY!!
 
             Texture2D texture = TextureGenerator.TextureFromColorMap(colorMap, layerTerrain.X, layerTerrain.Y);
             SetTextureOnTerrain(texture);
