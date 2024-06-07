@@ -83,6 +83,26 @@ namespace ProcGenTiles
 			}
 			return array;
 		}
+		public float[,] FetchFloatValues_ReversedYXarray(string layer)
+		{
+			float[,] array = new float[Width, Height];
+			for (int y = 0; y < Height; y++)
+			{
+				for (int x = 0; x < Width; x++)
+				{
+					Tile tile = GetTile(x, y);
+					if (!tile.ValuesHere.ContainsKey(layer))
+					{
+						throw new System.ArgumentException("No such layer is present on the tile to fetch!"); //This should crash the function and alert the editor.
+					}
+					else
+					{
+						array[y, x] = tile.ValuesHere[layer];
+					}
+				}
+			}
+			return array;
+		}
 
 		public float[,] FetchFloatValuesSlice(string layer, int minY, int maxY, int minX, int maxX)
 		{

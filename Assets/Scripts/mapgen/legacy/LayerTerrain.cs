@@ -157,14 +157,14 @@ public class LayerTerrain : MonoBehaviour
 
 
         // Layers are now in finalMap.
-        Debug.Log("finalMap array [21,0]:  "+finalMap.FetchFloatValues(LayersEnum.Elevation) [21,0]);
+        /*Debug.Log("finalMap array [21,0]:  "+finalMap.FetchFloatValues(LayersEnum.Elevation) [21,0]);
         Debug.Log("finalMap array [0,21]:  " + finalMap.FetchFloatValues(LayersEnum.Elevation) [0,21]);
         Debug.Log($"finalMap GetTile(21,0):  ({finalMap.GetTile(21,0).ValuesHere["Elevation"]}");
         Debug.Log($"finalMap GetTile(0,21):  ({finalMap.GetTile(0,21).ValuesHere["Elevation"]}");
         Debug.Log($"terrainData.GetHeight(21,0): "+terrainData.GetHeight(21,0));
         Debug.Log($"terrainData.GetHeight(0,21): " + terrainData.GetHeight(0,21));
         Debug.Log($"terrainData.GetHeights()[21,0]: " + terrainData.GetHeights(0, 0, X, Y)[21, 0]);
-        Debug.Log($"terrainData.GetHeights()[0,21]: " + terrainData.GetHeights(0, 0, X, Y)[0,21]);
+        Debug.Log($"terrainData.GetHeights()[0,21]: " + terrainData.GetHeights(0, 0, X, Y)[0,21]);*/
 
 
 
@@ -194,9 +194,11 @@ public class LayerTerrain : MonoBehaviour
         terrainData.alphamapResolution = X + 1;
         terrainData.heightmapResolution = X -1;
         terrainData.size = new Vector3(X, depth, Y);
-        terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
-        
 
+        // old
+        terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
+        //new
+        //terrainData.SetHeights(0, 0, finalMap.FetchFloatValues_ReversedYXarray(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
     }
 
     public void ReadNoiseParams(NoiseParams noiseParams) //STAYS
