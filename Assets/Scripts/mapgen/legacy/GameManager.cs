@@ -10,12 +10,10 @@ using UnityEditor;
 public class GameManager: MonoBehaviour
 {
     [SerializeField] private MapGenerator mapGenerator;
-    private Renderer terrainTextureRender;
-    private Renderer meshTextureRender;
-    private Renderer planeTextureRender;
+    [SerializeField] private RoadGen roadGen;
 
     [SerializeField] private LayerTerrain layerTerrain;
-    [SerializeField] private Biomes biomes;
+    //[SerializeField] private Biomes biomes;
 
 
     public Dictionary<string, int> texturesDict = new Dictionary<string, int>();
@@ -28,32 +26,31 @@ public class GameManager: MonoBehaviour
     public static List<Vector3> enemyLoadPositions = new List<Vector3>();
 
     public float[,] noiseMap;
+    public float[,] noiseMap_ReversedYXarray;
     Color[] colorMap;
-
 
 
     public void Awake()
     {
         AssetDatabase.DeleteAsset("Assets/Textures_and_Models/Resources/TerrainTextures/topo/layers/Topographic.terrainlayer");
         AssetDatabase.Refresh();
-        /*if (layerTerrain.drawType == LayerTerrain.DrawType.Terrain)
-        {
-            CreateTerrainObject();
-        }*/
+
         loadNewData();
-        LoadEnemies(); //spawnb in enemies once terrain is made
+        //LoadEnemies();
     }
 
     public void loadNewData()
     {
         layerTerrain.GenerateTerrain(); // runs all of layerTerrain's stuff, new noiseMap
+
         noiseMap = layerTerrain.finalMap.FetchFloatValues(LayersEnum.Elevation);
+        noiseMap_ReversedYXarray = layerTerrain.finalMap.FetchFloatValues_ReversedYXarray(LayersEnum.Elevation); //store reversed 
 
         layerTerrain.genTopo.createTopoTextures(0, 0, layerTerrain.X, layerTerrain.Y, false, noiseMap);
 
         if (layerTerrain.drawMode == LayerTerrain.DrawMode.ColorMap)
         {   
-            colorMap = mapGenerator.GenerateColorMap(noiseMap);
+            colorMap = mapGenerator.GenerateColorMap(noiseMap); 
         }
 
         RefreshObject();
@@ -62,10 +59,11 @@ public class GameManager: MonoBehaviour
     public void RefreshObject()
     {
         if (layerTerrain.drawType == LayerTerrain.DrawType.Terrain)
-        {   
-            layerTerrain.terrain.terrainData.SetHeights(0,0,noiseMap);
+        {
+            colorMap = mapGenerator.GenerateColorMap(noiseMap);
+            colorMap = roadGen.GetArterialPaths(noiseMap, colorMap);
 
-            Texture2D texture = TextureGenerator.TextureFromColorMap(mapGenerator.GenerateColorMap(noiseMap), layerTerrain.X, layerTerrain.Y);
+            Texture2D texture = TextureGenerator.TextureFromColorMap(colorMap, layerTerrain.X, layerTerrain.Y);
             SetTextureOnTerrain(texture);
         }
     }
@@ -79,38 +77,6 @@ public class GameManager: MonoBehaviour
         TerrainLayer[] newlayerlist = new TerrainLayer[1];
         newlayerlist[0] = newlayer;
         layerTerrain.terrain.terrainData.terrainLayers = newlayerlist;
-    }
-
-
-    public void CreateTerrainObject()
-    {
-        Debug.Log("Creating Initial Terrain Object...");
-        // Creates new terrain GameObject
-        // sets our Terrain for all of our scripts
-        // to an instance of this terrain
-
-        TerrainData terrainData = new TerrainData();
-        terrainData.alphamapResolution = layerTerrain.X + 1;
-        terrainData.heightmapResolution = layerTerrain.X + 1;
-        terrainData.size = new Vector3(layerTerrain.X, layerTerrain.depth, layerTerrain.Y);
-
-        GameObject terrainGO = Terrain.CreateTerrainGameObject(terrainData);
-        terrainGO.layer = LayerMask.NameToLayer("Terrain");
-        //GameObject terrainInstance = Instantiate(terrainGO);
-
-
-        layerTerrain.terrain = terrainGO.GetComponent<Terrain>();
-
-        terrainTextureRender = layerTerrain.terrain.GetComponent<Renderer>();
-
-        if (layerTerrain.terrain == null)
-        {
-            Debug.Log("Unable to create Terrain object.");
-        }
-        //else Debug.Log("Created Terrain Object:   " + layerTerrain.terrain);
-        
-
-        
     }
 
     public void LoadTerrainTextures()
@@ -172,15 +138,6 @@ public class GameManager: MonoBehaviour
     {
         List<Vector3> points = new List<Vector3>();
 
-        /*while (navmeshPoints.Count < numOfGreen + numOfRed)
-        {
-            NavMeshHit hit;
-            Vector3 randomPoint = new Vector3(Random.Range(0, layerTerrain.X - 1), 1.5f, Random.Range(0, layerTerrain.Y - 1));
-            if (NavMesh.SamplePosition(randomPoint, out hit, 25, 1))
-            {
-                navmeshPoints.Add(hit.position);
-            }
-        }*/
         Vector3 randomPoint = new Vector3(Random.Range(0, layerTerrain.X - 1), layerTerrain.depth+5, Random.Range(0, layerTerrain.Y - 1));
         int count = 0;
         for (int i = 0; i < numOfGreen; i++)

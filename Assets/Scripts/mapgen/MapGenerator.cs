@@ -4,21 +4,11 @@ using UnityEngine;
 
 public class MapGenerator : MonoBehaviour
 {
-	public enum DrawMode
-    {
-		NoiseMap,
-		ColorMap,
-		TopoMap,
-		Mesh
-    }
-
-	//public DrawMode drawMode;
 
 	public TerrainType[] regions;
 
 	[SerializeField] private LayerTerrain lt;
 
-	//public float meshHeightMultiplier;
 
 
 
@@ -38,7 +28,9 @@ public class MapGenerator : MonoBehaviour
 				{
 					if (elevation <= regions[j].height)
 					{
-						colorMap[x * lt.X + y] = regions[j].color;
+						//colorMap[x * lt.X + y] = regions[j].color;
+						colorMap[y * lt.X + x] = regions[j].color; // <--- swapped to this, this is the correct one I think
+
 						break; 
 					}
 				}

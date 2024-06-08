@@ -5,6 +5,7 @@ namespace ProcGenTiles
 	public class Map
 	{
 		public Tile[,] Tiles { get; set; }
+		public Region[] Regions { get; set; }
 		public int Width, Height;
 
 		public Map(int width, int height)
@@ -12,9 +13,9 @@ namespace ProcGenTiles
 			Width = width;
 			Height = height;
 			Tiles = new Tile[width, height];
-			for (int x = 0; x < width; x++){
-				for (int y = 0; y < height; y++){
-					Tiles[x,y] = new Tile();
+			for (int y = 0; y < height; y++){
+				for (int x = 0; x < width; x++){
+					Tiles[x,y] = new Tile(x, y);
 				}
 			}
 		}
@@ -38,21 +39,65 @@ namespace ProcGenTiles
 			return GetTile((x, y));
 		}
 
+		public Region GetRegion((int x, int y) coords) 
+		{
+			if (IsValidTilePosition(coords.x, coords.y))
+			{	foreach (Region reg in Regions)
+                {	
+					foreach (Tile t in reg.Tiles)
+                    {
+						if (coords == (t.x, t.y))
+                        {
+							return reg;
+                        }
+                    }
+                }
+				return null; // if the coords are not in a region return null
+			}	
+			return null; //If it isn't a valid tile return null
+		}
+
+		public Region GetRegion(int x, int y)
+		{
+			return GetRegion((x, y));
+		}
+
+
 		public float[,] FetchFloatValues(string layer)
 		{
 			float[,] array = new float[Width, Height];
-			for (int i = 0; i < Width; i++)
+			for (int y = 0; y < Height; y++)
 			{
-				for (int j = 0; j < Height; j++)
+				for (int x = 0; x < Width; x++)
 				{
-					Tile tile = GetTile(i, j);
+					Tile tile = GetTile(x, y);
 					if (!tile.ValuesHere.ContainsKey(layer))
 					{
 						throw new System.ArgumentException("No such layer is present on the tile to fetch!"); //This should crash the function and alert the editor.
 					}
 					else
 					{
-						array[i, j] = tile.ValuesHere[layer];
+						array[x, y] = tile.ValuesHere[layer];
+					}
+				}
+			}
+			return array;
+		}
+		public float[,] FetchFloatValues_ReversedYXarray(string layer)
+		{
+			float[,] array = new float[Width, Height];
+			for (int y = 0; y < Height; y++)
+			{
+				for (int x = 0; x < Width; x++)
+				{
+					Tile tile = GetTile(x, y);
+					if (!tile.ValuesHere.ContainsKey(layer))
+					{
+						throw new System.ArgumentException("No such layer is present on the tile to fetch!"); //This should crash the function and alert the editor.
+					}
+					else
+					{
+						array[y, x] = tile.ValuesHere[layer];
 					}
 				}
 			}
@@ -63,9 +108,9 @@ namespace ProcGenTiles
 		{
 			float[,] array = new float[maxX - minX, maxY - minY];
 
-			for (int x = 0; x < maxX - minX; x++)
+			for (int y = 0; y < maxY - minY; y++)
 			{
-				for (int y = 0; y < maxY - minY; y++)
+				for (int x = 0; x < maxX - minX; x++)
 				{
 					Tile tile = GetTile(x + minX, y + minY);
                     if (!tile.ValuesHere.ContainsKey(layer))

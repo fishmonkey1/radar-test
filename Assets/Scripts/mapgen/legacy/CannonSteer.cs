@@ -1,6 +1,6 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Composites;
+//using UnityEngine.InputSystem;
+//using UnityEngine.InputSystem.Composites;
 
 public class CannonSteer : MonoBehaviour
 {
@@ -83,13 +83,13 @@ void Update()
         steerInput = value.Get<Vector2>(); //Store the new vector any time the move vector changes
     }*/
 
-    void OnCannonPower(InputValue value)
+   /* void OnCannonPower(InputValue value)
     {
         
         launchForce += value.Get<float>();
         //launchForce = Mathf.Clamp(launchForce, minPower, maxPower);
         
-    }
+    }*/
 
     void OnFire()
     {

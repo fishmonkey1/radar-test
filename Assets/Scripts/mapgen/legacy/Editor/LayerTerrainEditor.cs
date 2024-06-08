@@ -16,6 +16,8 @@ public class LayerTerrainEditor : Editor
                 script.runResearchMapGen();
             }
         }
+
+
         
 
         if (GUILayout.Button("Serialize Params to JSON"))

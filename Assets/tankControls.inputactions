@@ -13,33 +13,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
-                },
-                {
-                    "name": "CameraToggle",
-                    "type": "Button",
-                    "id": "ed761698-7eb7-4674-94b6-0f00a1a32b0c",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "ChangeZoom",
-                    "type": "Button",
-                    "id": "6c293c1d-8518-4d25-8263-d519162794ab",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "ToggleRadarMinimap",
-                    "type": "Button",
-                    "id": "d9899221-44da-4345-bb33-53f491edf2eb",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -97,39 +70,6 @@
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
-                },
-                {
-                    "name": "",
-                    "id": "21eb2d26-8abc-444c-94d8-77c36e4da9a5",
-                    "path": "<Keyboard>/c",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "CameraToggle",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "939af15e-bf70-402f-9e9d-5a5a12cbcddd",
-                    "path": "<Keyboard>/z",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ChangeZoom",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "85fefd8d-b2ca-4571-b0b9-2e03e04381e7",
-                    "path": "<Keyboard>/r",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ToggleRadarMinimap",
-                    "isComposite": false,
-                    "isPartOfComposite": false
                 }
             ]
         }
