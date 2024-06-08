@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using ProcGenTiles;
 using System.Linq;
-using UnityEngine.InputSystem;
+//using UnityEngine.InputSystem;
 
 public class TerrainFromTilemap : MonoBehaviour
 {
@@ -28,27 +28,12 @@ public class TerrainFromTilemap : MonoBehaviour
     [SerializeField]
     private Terrain terrain;
 
-    [SerializeField]
-    private bool terrainPics = false;
-
     //Test field for now, needs to be removed
     [SerializeField]
     Transform BoatPos;
 
     public void Start()
     {
-        if (terrainPics == true)
-        {
-            makeTerrainPics();
-
-            //take pic
-            //load next value
-            //take pic, splice to prev. pic
-            //load next value
-            //take pic, splice to prev. pic
-            //etc.
-        };
-
         map = new Map(width, height);
         if (terrain == null)
             terrain = GetComponent<Terrain>(); //Should already be assigned, but nab it otherwise
@@ -57,8 +42,6 @@ public class TerrainFromTilemap : MonoBehaviour
 
     private void Update()
     {
-
-
         if (Input.GetMouseButtonDown(0))
         {
             if (BoatPos.position.x <= width && BoatPos.position.x >= 0 && BoatPos.position.z <= height && BoatPos.position.z >= 0)
@@ -190,29 +173,6 @@ public class TerrainFromTilemap : MonoBehaviour
         }
 
         return heightmap;
-    }
-
-
-
-    /* so the idea is to take new values for terrain gen
-     * and create a strip of pics
-     * so that we can compare different values side by side
-     * 
-     * 
-     */
-    void makeTerrainPics()
-    {
-
-
-        //for amount of pics
-        //Take pic
-        //edit pic with value settings
-        //add to strip of pics
-
-
-        Debug.Log("pics taken! :D");
-        //ScreenCapture.CaptureScreenshot("SomeLevel.png");
-
     }
 
 }

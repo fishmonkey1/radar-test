@@ -169,35 +169,36 @@ public class Radar : MonoBehaviour
 
         // scroll radar w/ mouse wheel
         radarCamera.transform.position += new Vector3(0, Input.mouseScrollDelta.y *10, 0);
-        
-        //Zoom code for levels changed to OnChangeZoom function
-
-    }
-
-    public void OnChangeZoom()
-    {
-        radarZoomLevel++;
-        if (radarZoomLevel > 3) //I dislike this magic number. It would be nicer to have a list of zooms instead
-            radarZoomLevel = 1; //Roll the value back to zero
-        float zoom_scale = 0;
-        float zoom_y = 0;
-        switch (radarZoomLevel)
-        { //Ew, assigning the scale like this feels dirty, but oh well
-            case 1:
-                zoom_scale = zoom1_scale;
-                zoom_y = zoom1_y;
-                break;
-            case 2:
-                zoom_scale = zoom2_scale;
-                zoom_y = zoom2_y;
-                break;
-            case 3:
-                zoom_scale = zoom3_scale;
-                zoom_y = zoom3_y;
-                break;
+ 
+        if (Input.GetKey(KeyCode.Alpha1))
+        {
+            if (radarZoomLevel != 1)
+            {
+                radarCamera.transform.position = new Vector3(radarCamera.transform.position.x, zoom1_y, radarCamera.transform.position.z);
+                radarZoomLevel = 1;
+                changeRadarIconScale(zoom1_scale);
+            }
         }
-        radarCamera.transform.position = new Vector3(radarCamera.transform.position.x, zoom_y, radarCamera.transform.position.z);
-        changeRadarIconScale(zoom_scale);
+
+        if (Input.GetKey(KeyCode.Alpha2))
+        {
+            if (radarZoomLevel != 2)
+            {
+                radarCamera.transform.position = new Vector3(radarCamera.transform.position.x, zoom2_y, radarCamera.transform.position.z);
+                radarZoomLevel = 2;
+                changeRadarIconScale(zoom2_scale);
+            }
+        }
+
+        if (Input.GetKey(KeyCode.Alpha3))
+        {
+            if (radarZoomLevel != 3)
+            {
+                radarCamera.transform.position = new Vector3(radarCamera.transform.position.x, zoom3_y, radarCamera.transform.position.z); ;
+                radarZoomLevel = 3;
+                changeRadarIconScale(zoom3_scale);
+            }
+        }
     }
 
     private void changeRadarIconScale(float newScale)

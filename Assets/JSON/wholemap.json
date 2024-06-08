@@ -1,17 +1,17 @@
 {
     "drawMode": 1,
     "drawType": 0,
-    "terrainSize": 0,
-    "X": 1024,
-    "Y": 1024,
-    "depth": 40,
+    "terrainSize": 2,
+    "X": 256,
+    "Y": 256,
+    "depth": 10,
     "elevationLayers": {
         "NoisePairs": [
             {
                 "NoiseParams": {
                     "noiseType": 3,
                     "seed": 10,
-                    "noiseScale": 2.0,
+                    "noiseScale": 8.0,
                     "frequency": 0.00139999995008111,
                     "fractalType": 3,
                     "fractalOctaves": 5,
@@ -22,7 +22,7 @@
                     "minValue": 0.18000000715255738
                 },
                 "JSON": {
-                    "instanceID": 23680
+                    "instanceID": 23926
                 },
                 "UseJsonFile": false
             },
@@ -30,7 +30,7 @@
                 "NoiseParams": {
                     "noiseType": 3,
                     "seed": 10,
-                    "noiseScale": 2.0,
+                    "noiseScale": 8.0,
                     "frequency": 0.00139999995008111,
                     "fractalType": 3,
                     "fractalOctaves": 5,
@@ -41,7 +41,7 @@
                     "minValue": 0.18000000715255738
                 },
                 "JSON": {
-                    "instanceID": 23680
+                    "instanceID": 23926
                 },
                 "UseJsonFile": false
             }
@@ -64,22 +64,22 @@
                     "minValue": 0.0
                 },
                 "JSON": {
-                    "instanceID": 23346
+                    "instanceID": 23928
                 },
                 "UseJsonFile": true
             }
         ]
     },
     "terrain": {
-        "instanceID": 23280
+        "instanceID": 23860
     },
     "terrainData": {
-        "instanceID": 23224
+        "instanceID": 23802
     },
     "gameManager": {
-        "instanceID": 23240
+        "instanceID": 23818
     },
-    "highest_e": 1.9419066905975342,
+    "highest_e": 1.9306213855743409,
     "waterheight_int": 1.0,
     "rmg": {
         "instanceID": 0
@@ -87,10 +87,10 @@
     "DrawInEditor": true,
     "autoUpdate": false,
     "genTopo": {
-        "instanceID": 23308
+        "instanceID": 23888
     },
     "topoObject": {
-        "instanceID": 23298
+        "instanceID": 23878
     },
     "numberOfTopoLevels": 5,
     "topoColor1": {
