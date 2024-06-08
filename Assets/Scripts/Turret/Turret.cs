@@ -13,6 +13,7 @@ public class Turret : MonoBehaviour, IRoleNeeded
     [SerializeField]
     float rotationSensitivity = 1f; //For determining how quickly the turret rotates with user input
     [SerializeField] GameObject projectilePrefab; //This will need to be fetched later when there are different ammos
+    [SerializeField] Transform projectileSpawn;
 
     Vector2 turretInput = Vector2.zero;
     Camera currentCam;
