@@ -58,6 +58,7 @@ public class CamCycle : MonoBehaviour
         {
             cam.gameObject.SetActive(false);
         }
+        Debug.Log($"Disabled cameras for {lastRole.Name} role");
     }
 
 }

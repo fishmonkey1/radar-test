@@ -32,6 +32,10 @@ public class Turret : MonoBehaviour, IRoleNeeded
         if (!((IRoleNeeded)this).HaveRole(PlayerInfo.Instance.CurrentRole))
             return;
         //TODO: Handle shooting logic here next time
+        GameObject projectileObject = GameObject.Instantiate(projectilePrefab, projectileSpawn.position, Quaternion.identity);
+        Projectile projectile = projectileObject.GetComponent<Projectile>();
+        projectile.shooter = gameObject;
+        projectileObject.transform.rotation = Quaternion.LookRotation(projectileSpawn.forward, projectileSpawn.up);
     }
 
     public void OnRoleChange(Role oldRole, Role newRole)
@@ -40,6 +44,7 @@ public class Turret : MonoBehaviour, IRoleNeeded
 
         //Otherwise we do any setup in here
         currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded);
+        Debug.Log($"Got first camera for {RoleNeeded.Name} role");
     }
 
     public void OnCameraToggle()
@@ -53,9 +58,15 @@ public class Turret : MonoBehaviour, IRoleNeeded
     void Start()
     {
         if (PlayerInfo.Instance.OnRoleChange == null)
+        {
             PlayerInfo.Instance.OnRoleChange = new PlayerInfo.RoleChangeDelegate(OnRoleChange);
+            Debug.Log("Assigned Turret RoleChange to new delegate");
+        }
         else
-            PlayerInfo.Instance.OnRoleChange = OnRoleChange;
+        {
+            PlayerInfo.Instance.OnRoleChange += OnRoleChange;
+            Debug.Log("Assigned Turret RoleChange to existing delegate");
+        }
     }
 
     void Update()

@@ -18,6 +18,8 @@ public class PlayerInfo : MonoBehaviour
         //This will later need checks to make sure the picked role isn't over the limit
         Role oldRole = CurrentRole;
         CurrentRole = role;
+        CamCycle.Instance.ChangeRoles(oldRole, role);
+        Debug.Log($"Changed role from {oldRole.Name} to {role.Name}");
         if (OnRoleChange != null)
         {
             OnRoleChange(oldRole, role);
@@ -36,7 +38,7 @@ public class PlayerInfo : MonoBehaviour
             throw new System.Exception("You have more than one PlayerInfo component in the scene!");
         }
         instance = this; //Lazy singleton instantiation for now
-        PickRole(CrewRoles.Driver); //For now we'll always start you as the driver during our testing
+        CurrentRole = CrewRoles.Driver; //For now we'll always start you as the driver during our testing
     }
 
     public void OnDebugChangeRoles()

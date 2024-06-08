@@ -327,6 +327,7 @@ GameObject:
   - component: {fileID: 7213405029133117340}
   - component: {fileID: 8151297035941834243}
   - component: {fileID: 4893906970467236755}
+  - component: {fileID: 3555978119938050469}
   m_Layer: 11
   m_Name: HornyTank
   m_TagString: Untagged
@@ -419,6 +420,8 @@ MonoBehaviour:
   turret: {fileID: 2790542888827762521}
   barrel: {fileID: 1031065864697385284}
   rotationSensitivity: 1
+  projectilePrefab: {fileID: 3237541956323890682, guid: bb121984466ce824084205ec73e2212b, type: 3}
+  projectileSpawn: {fileID: 4482881809028802051}
 --- !u!65 &1465766852227838111
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -508,6 +511,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e787ab58bfba8d46a067fccfad22b06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3555978119938050469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2483706619068642667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f63365037180304badca42fd6743395, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxHealth: 150
+  CurrentHealth: 0
 --- !u!1 &3032102696608165598
 GameObject:
   m_ObjectHideFlags: 0
@@ -540,6 +557,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7260533002703892485}
+  - {fileID: 4482881809028802051}
   m_Father: {fileID: 2790542888827762521}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &7369176766330806961
@@ -906,7 +924,6 @@ GameObject:
   - component: {fileID: 2790542888827762521}
   - component: {fileID: 7994573899708234566}
   - component: {fileID: 2853201165214210050}
-  - component: {fileID: 4047039021576444164}
   m_Layer: 11
   m_Name: Turret
   m_TagString: Untagged
@@ -982,21 +999,37 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &4047039021576444164
-MonoBehaviour:
+--- !u!1 &6770036699355316705
+GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5938526742582822271}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2317a94762a5c6542a0a72564b0dd449, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turret: {fileID: 2790542888827762521}
-  barrel: {fileID: 1031065864697385284}
-  rotationSensitivity: 20
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4482881809028802051}
+  m_Layer: 12
+  m_Name: ProjectileSpawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4482881809028802051
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6770036699355316705}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: -1.364, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1031065864697385284}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &7029601096686845529
 GameObject:
   m_ObjectHideFlags: 0

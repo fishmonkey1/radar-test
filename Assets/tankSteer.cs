@@ -45,7 +45,7 @@ public class tankSteer : MonoBehaviour, IRoleNeeded
         if (PlayerInfo.Instance.OnRoleChange == null)
             PlayerInfo.Instance.OnRoleChange = new PlayerInfo.RoleChangeDelegate(OnRoleChange);
         else
-            PlayerInfo.Instance.OnRoleChange = OnRoleChange;
+            PlayerInfo.Instance.OnRoleChange += OnRoleChange;
         //We have to fetch a camera in Start since the debug stuff assumes you start as the driver
         //PlayerInfo does the PickRole stuff for the driver before this class registers for the delegate
         //So we can't just handle it normally in OnRoleChange for now until there's UI for picking roles
@@ -107,6 +107,7 @@ public class tankSteer : MonoBehaviour, IRoleNeeded
 
         //Otherwise we do any setup in here
         currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded); //Fetch the camera for the driver so it's active
+        Debug.Log($"Got first camera for {RoleNeeded.Name} role");
     }
 
     public void OnMove(InputValue value)
