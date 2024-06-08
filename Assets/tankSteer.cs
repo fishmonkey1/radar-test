@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class tankSteer : MonoBehaviour
+public class tankSteer : MonoBehaviour, IRoleNeeded
 {
     [SerializeField] private CharacterController controller;
-    [SerializeField] private Camera overHeadCam;
-    [SerializeField] private Camera firstPersonCam;
     [SerializeField] private Canvas radarCanvas;
+    private Camera currentCam;
 
 
     [Header("Tank Settings")]
@@ -26,7 +25,7 @@ public class tankSteer : MonoBehaviour
     [SerializeField] float currPitch;
     [SerializeField] float engineForce;
 
-
+    public Role RoleNeeded => CrewRoles.Driver;
 
 
     //[SerializeField] private GameManager gm;
@@ -43,8 +42,14 @@ public class tankSteer : MonoBehaviour
     private void Start()
     {
         layerMask = LayerMask.GetMask("Terrain");
-        firstPersonCam.enabled = true;
-        overHeadCam.enabled = false;
+        if (PlayerInfo.Instance.OnRoleChange == null)
+            PlayerInfo.Instance.OnRoleChange = new PlayerInfo.RoleChangeDelegate(OnRoleChange);
+        else
+            PlayerInfo.Instance.OnRoleChange += OnRoleChange;
+        //We have to fetch a camera in Start since the debug stuff assumes you start as the driver
+        //PlayerInfo does the PickRole stuff for the driver before this class registers for the delegate
+        //So we can't just handle it normally in OnRoleChange for now until there's UI for picking roles
+        currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded);
     }
 
     private void FixedUpdate()
@@ -96,37 +101,40 @@ public class tankSteer : MonoBehaviour
 
     }
 
-    private void Update()
+    public void OnRoleChange(Role oldRole, Role newRole)
     {
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            if (firstPersonCam.enabled)
-            {
-                firstPersonCam.enabled = false;
-                overHeadCam.enabled = true;
-            } else
-            {
-                firstPersonCam.enabled = true;
-                overHeadCam.enabled = false;
-            }
-        }
+        if (newRole != RoleNeeded) return;
 
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            if (radarCanvas.enabled)
-            {
-                radarCanvas.enabled = false;
-            }
-            else
-            {
-                radarCanvas.enabled = true;
-            }
-        }
+        //Otherwise we do any setup in here
+        currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded); //Fetch the camera for the driver so it's active
+        Debug.Log($"Got first camera for {RoleNeeded.Name} role");
     }
 
-    private void OnMove(InputValue value)
+    public void OnMove(InputValue value)
     {
+        if (!((IRoleNeeded)this).HaveRole(PlayerInfo.Instance.CurrentRole))
+            return; //Don't allow driving inputs if you don't have the driver role selected
         driverInput = value.Get<Vector2>();
+    }
+
+    public void OnCameraToggle()
+    {
+        if (!((IRoleNeeded)this).HaveRole(PlayerInfo.Instance.CurrentRole))
+            return;
+
+        currentCam = CamCycle.Instance.GetNextCamera(RoleNeeded, currentCam);
+    }
+
+    public void OnToggleRadarMinimap()
+    {
+        if (radarCanvas.enabled)
+        {
+            radarCanvas.enabled = false;
+        }
+        else
+        {
+            radarCanvas.enabled = true;
+        }
     }
 
 }
