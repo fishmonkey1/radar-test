@@ -47,12 +47,10 @@ public class GameManager: MonoBehaviour
         noiseMap_ReversedYXarray = layerTerrain.finalMap.FetchFloatValues_ReversedYXarray(LayersEnum.Elevation); //store reversed 
 
         layerTerrain.genTopo.createTopoTextures(0, 0, layerTerrain.X, layerTerrain.Y, false, noiseMap);
-        //layerTerrain.genTopo.createTopoTextures(0, 0, layerTerrain.X, layerTerrain.Y, false, noiseMap_ReversedYXarray); //new <--------- SET AS REVERSED ARRAY!!
 
         if (layerTerrain.drawMode == LayerTerrain.DrawMode.ColorMap)
         {   
             colorMap = mapGenerator.GenerateColorMap(noiseMap); 
-            //colorMap = mapGenerator.GenerateColorMap(noiseMap_ReversedYXarray); // new  <--------------------------------------------------- SET AS REVERSED ARRAY!!
         }
 
         RefreshObject();
@@ -64,8 +62,6 @@ public class GameManager: MonoBehaviour
         {
             colorMap = mapGenerator.GenerateColorMap(noiseMap);
             colorMap = roadGen.GetArterialPaths(noiseMap, colorMap);
-            //colorMap = mapGenerator.GenerateColorMap(noiseMap_ReversedYXarray); //new   <--------------------------------------------------------- SET AS REVERSED ARRAY!!
-            //colorMap = roadGen.GetArterialPaths(noiseMap_ReversedYXarray, colorMap); //new   <-------------------------------------------------------- SET AS REVERSED ARRAY!!
 
             Texture2D texture = TextureGenerator.TextureFromColorMap(colorMap, layerTerrain.X, layerTerrain.Y);
             SetTextureOnTerrain(texture);

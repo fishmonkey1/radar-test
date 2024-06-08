@@ -28,7 +28,9 @@ public class MapGenerator : MonoBehaviour
 				{
 					if (elevation <= regions[j].height)
 					{
-						colorMap[x * lt.X + y] = regions[j].color;
+						//colorMap[x * lt.X + y] = regions[j].color;
+						colorMap[y * lt.X + x] = regions[j].color; // <--- swapped to this, this is the correct one I think
+
 						break; 
 					}
 				}

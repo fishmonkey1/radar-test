@@ -47,9 +47,9 @@ namespace ProcGenTiles
         {
             List<Region> AllRegionObj = new List<Region>();
             int regionLabel = 1;
-            for (int width = 0; width < Map.Width; width++)
+            for (int height = 0; height < Map.Height; height++)
             {
-                for (int height = 0; height < Map.Height; height++)
+                for (int width = 0; width < Map.Width; width++)
                 { //Loop through all tiles on the map
                   //Check if the tile has a land code and assign it based on the elevationLimit
                   //If the tile is over the elevationLimit, do a DFS or BFS on all neighbors above the limit and label
@@ -78,7 +78,7 @@ namespace ProcGenTiles
                             // new :3
                             if(t.Region == null)
                             {//If this hasn't had a region assigned then we need to floodfill this area
-
+                                Debug.Log($"floodfill found region at tile: {t.x},{t.y} ");
                                 // create new region and set its tiles to the returned Tiles
                                 Region r = new Region();
                                 

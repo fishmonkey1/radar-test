@@ -881,7 +881,7 @@ public class RoadGen : MonoBehaviour
 
     public void DrawColorAtPoint(int x, int y, Color color)
     {
-        colorMap[x * width + y] = color;
+        colorMap[y * width + x] = color;
     }
 
     void OnDrawGizmosSelected()
