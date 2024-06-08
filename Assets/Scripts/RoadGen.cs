@@ -153,9 +153,7 @@ public class RoadGen : MonoBehaviour
                         {
                             DrawColorAtPoint(t.x, t.y, region.Color);
                         }
-                        // Debug.Log($"Length of region {""} is {region.Tiles.Length}");
                     }
-
 
                     // TODO: Can you edit to have this return a List<Tile> instead?
                     //       Obvs we can just iterate over the tuples at the end before returning,
@@ -191,15 +189,12 @@ public class RoadGen : MonoBehaviour
 
                     void drawHullGizmos(Color drawColor)
                     {
-
                         Vector3[] gizmoPoints = new Vector3[hullPoints.Count]; //idk why but need to do it like this for the Gizmo stuff?
 
                         int n = 0;
                         int e = 0;
                         int s = height + 1;
                         int w = width + 1;
-
-                        //Region reg = map.GetRegion(hullPoints[0].x, hullPoints[0].y);
 
                         for (int i = 0; i < hullPoints.Count; i++)
                         {
@@ -209,8 +204,6 @@ public class RoadGen : MonoBehaviour
                             if (hullPoints[i].x > e) e = hullPoints[i].x; // Get e bound (highest x)
                             if (hullPoints[i].y < s) s = hullPoints[i].y; // Get s bound (lowest Y)
                             if (hullPoints[i].x < w) w = hullPoints[i].x; // Get w bound (lowest x)
-
-
                         }
 
                         region.Bounds = new (int, int)[2];

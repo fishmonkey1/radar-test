@@ -1,31 +1,18 @@
 using UnityEngine;
 using ProcGenTiles;
-using System.Linq;
 using System.IO;
 using System.Collections.Generic;
-using UnityEngine.AI;
+
 
 public class LayerTerrain : MonoBehaviour
 {
-    /* I want to create a map with the noise library and set a TerrainData up for rendering the backing data.
-    // I'll use the same method of putting the heights in an "Elevation" layer and using that to put the islands together.
-    // Then I'll likely want to check my Pathfinding code and see if I can check for regions that arent reachable and start marking them.
-    // It would be cool to add canals or valleys between the water regions so everything is accessable by boat. :3
-    
-
-
-     */
-
     public DrawMode drawMode;
     public DrawType drawType;
-
-    //[SerializeField] public Biomes biomes;
-
     public TerrainSize terrainSize;
+
     [SerializeField] public int X;
     [SerializeField] public int Y;
     [SerializeField] public int depth; //Maybe rename to height instead? depth is kinda lame
-
 
     private float noiseScale; //For transforming the int coords into smaller float values to sample the noise better. Functions as zoom in effect
 
@@ -40,12 +27,8 @@ public class LayerTerrain : MonoBehaviour
 
     [SerializeField] public GameManager gameManager;
 
-    //public TerrainData terrainData;
-
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
     public Pathfinding pathfinding;
-
-
 
     public Dictionary<string, MapLayers> layersDict = new Dictionary<string, MapLayers>();
 
@@ -101,28 +84,9 @@ public class LayerTerrain : MonoBehaviour
     }
     public void Start()
     {
-
-
         if (terrain == null) Debug.Log("layerTerrain has no terrain obj");//Should already be assigned, but nab it otherwise
-        Debug.Log(terrain);
-
     }
 
-    public void GenerateBiome() // MOVE
-    {
-        for (int i = 0; i < moistureLayers.NoisePairs.Count; i++)
-        {
-            MapNoisePair pair = moistureLayers.NoisePairs[i];
-            if (pair.UseJsonFile)
-            {
-                pair.NoiseParams = JsonUtility.FromJson<NoiseParams>(pair.JSON.text);
-            }
-            ReadNoiseParams(pair.NoiseParams); //Feed the generator this layer's info
-            GenerateHeightmap(pair, LayersEnum.Moisture); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable
-        }
-        NormalizeFinalMap(LayersEnum.Moisture, 0, 1); //Make the final map only span from 0 to 1
-        //CreateTerrainFromHeightmap();
-    }
 
     public void SetTerrainSize()
     {
@@ -133,9 +97,8 @@ public class LayerTerrain : MonoBehaviour
         if (terrainSize == TerrainSize._64) { X = 64; Y = 64; }
     }
 
-    //stays
     public void GenerateTerrain() //main entry
-    {   
+    {
         if (drawType == DrawType.Terrain) SetTerrainSize();
 
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
@@ -149,57 +112,26 @@ public class LayerTerrain : MonoBehaviour
                 pair.NoiseParams = JsonUtility.FromJson<NoiseParams>(pair.JSON.text);
             }
             ReadNoiseParams(pair.NoiseParams); //Feed the generator this layer's info
-
-            GenerateHeightmap(pair, LayersEnum.Elevation); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable
-                                                 
+            GenerateHeightmap(pair, LayersEnum.Elevation); //This function handles adding the layer into the finalMap, but it's not very clear. Needs cleaning up to be more readable                                    
         }
+
         NormalizeFinalMap(LayersEnum.Elevation, elevationLayers.NoisePairs[0].NoiseParams.minValue, elevationLayers.NoisePairs[0].NoiseParams.raisedPower); //Make the final map only span from 0 to 1
 
-
-        // Layers are now in finalMap.
-        Debug.Log("finalMap array [21,0]:  "+finalMap.FetchFloatValues(LayersEnum.Elevation) [21,0]);
-        Debug.Log("finalMap array [0,21]:  " + finalMap.FetchFloatValues(LayersEnum.Elevation) [0,21]);
-        Debug.Log($"finalMap GetTile(21,0):  ({finalMap.GetTile(21,0).ValuesHere["Elevation"]}");
-        Debug.Log($"finalMap GetTile(0,21):  ({finalMap.GetTile(0,21).ValuesHere["Elevation"]}");
-        Debug.Log($"terrainData.GetHeight(21,0): "+terrainData.GetHeight(21,0));
-        Debug.Log($"terrainData.GetHeight(0,21): " + terrainData.GetHeight(0,21));
-        Debug.Log($"terrainData.GetHeights()[21,0]: " + terrainData.GetHeights(0, 0, X, Y)[21, 0]);
-        Debug.Log($"terrainData.GetHeights()[0,21]: " + terrainData.GetHeights(0, 0, X, Y)[0,21]);
-
-
-
         CreateTerrainFromHeightmap();
-
-
-
-
-        //pathfinding.MarkAllRegions(); // turned off until optimized
-        
-        if (print_debug)
-        {
-            Debug.Log($"Number of regions marked: {pathfinding.regionSizes.Keys.Count}");
-            for (int i = 0; i < pathfinding.regionSizes.Count; i++)
-            {
-                Debug.Log($"Region {i} contains {pathfinding.regionSizes[i]} tiles");
-            }
-        }
-        //if (timeExecutionDebug) { float t = Time.realtimeSinceStartup; Debug.Log($"DEBUG Timer - TOTAL TIME GenerateTerrain(): {t - tt}"); lastTimeInterval = t; }
     }
+
 
     public void CreateTerrainFromHeightmap()
     {
-
-        //Debug.Log("Creating Terrain Surface From Heightmap");
         terrainData = terrain.terrainData;
         terrainData.alphamapResolution = X + 1;
-        terrainData.heightmapResolution = X -1;
+        terrainData.heightmapResolution = X - 1;
         terrainData.size = new Vector3(X, depth, Y);
 
-        // old
-        //terrainData.SetHeights(0, 0, finalMap.FetchFloatValues(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
-        //new
-        terrainData.SetHeights(0, 0, finalMap.FetchFloatValues_ReversedYXarray(LayersEnum.Elevation)); //SetHeights, I hate you so much >_<
+        // SetHeights takes in an array indexed as [y,x] so it needs a reversed version of our float values array.
+        terrainData.SetHeights(0, 0, finalMap.FetchFloatValues_ReversedYXarray(LayersEnum.Elevation)); //SetHeights, I hate you SO SO SO SO SO SO much >_<
     }
+
 
     public void ReadNoiseParams(NoiseParams noiseParams) //STAYS
     {
@@ -219,6 +151,7 @@ public class LayerTerrain : MonoBehaviour
         noise.SetFractalWeightedStrength(noiseParams.weightedStrength);
     }
 
+
     public void GenerateHeightmap(MapNoisePair noisePair, string layer) //STAYS
     {
         highest_e = -100;
@@ -230,12 +163,8 @@ public class LayerTerrain : MonoBehaviour
             { //Inner for loop does most of the heavy lifting
                 Tile tile = noisePair.Map.Tiles[x, y]; //Get the tile at the location
 
-                //old
                 float noiseValue = noise.GetNoise(x * noiseScale, y * noiseScale); //Grab the value between -1 and 1
                 noiseValue = Mathf.InverseLerp(-1, 1, noiseValue); //set to 0  and 1 scale
-
-
-
 
                 //Set the elevation to the normalized value by checking if we've already set elevation data
                 if (tile.ValuesHere.ContainsKey(layer))
@@ -253,7 +182,6 @@ public class LayerTerrain : MonoBehaviour
                 { //Otherwise we add it with the value from the first layer
                     finalTile.ValuesHere.Add(layer, noiseValue); //Create the entry and assign the first layer's value
                 }
-
 
                 //track highest lowest values for later
                 if (finalTile.ValuesHere[layer] < lowest_e) { lowest_e = finalTile.ValuesHere[layer]; };
@@ -296,7 +224,6 @@ public class LayerTerrain : MonoBehaviour
                 // just for debug
                 if (finalTile.ValuesHere[layer] < lowest_after) lowest_after = finalTile.ValuesHere[layer];
                 if (finalTile.ValuesHere[layer] > highest_after) highest_after = finalTile.ValuesHere[layer];
-
             }
         }
 
@@ -358,10 +285,7 @@ public class LayerTerrain : MonoBehaviour
 
         // Write the JSON string to the file
         File.WriteAllText(filePath, json);
-
         Debug.Log($"wholemap JSON file saved to: {filePath}");
-
-
     }
 
     public void LoadNoiseParamsFromJson() //MOVE

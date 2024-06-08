@@ -78,7 +78,7 @@ namespace ProcGenTiles
                             // new :3
                             if(t.Region == null)
                             {//If this hasn't had a region assigned then we need to floodfill this area
-                                Debug.Log($"floodfill found region at tile: {t.x},{t.y} ");
+                                //Debug.Log($"floodfill found region at tile: {t.x},{t.y} ");
                                 // create new region and set its tiles to the returned Tiles
                                 Region r = new Region();
                                 
