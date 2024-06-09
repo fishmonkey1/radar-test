@@ -19,7 +19,7 @@ namespace ProcGenTiles
 		/// </summary>	
 		public Dictionary<string, Region[]> RegionNeighbors { get; set; }
 
-		public Dictionary<string, (float, float)[]> NeighborMidpoints { get; set; }
+		public Dictionary<string, List<(float, float)[]>> NeighborMidpoints { get; set; }
 
 		/// <summary>
 		/// <code>

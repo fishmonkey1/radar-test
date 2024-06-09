@@ -34,6 +34,8 @@ public class RoadGen : MonoBehaviour
     public int floodfillRegionMinimum = 0;
 
     Dictionary<Vector3[], Color> gizmoPointsDict;
+    Dictionary<Vector3[], Color> midPointsDict;
+
 
     public int entryGapMin = 15;
     [SerializeField] public float elevationLimitForPathfind = .02f;
@@ -48,6 +50,8 @@ public class RoadGen : MonoBehaviour
 
     public List<List<(float, float)>> allmidpointsDEBUG = new List<List<(float, float)>>();
 
+    public Vector3 mousePos;
+    public float ignoreMidpointdistanceXpercOfMapSize = .25f;
 
 
     /* 
@@ -104,7 +108,7 @@ public class RoadGen : MonoBehaviour
     {
         Debug.Log("=============== RoadGen GetArterialPaths() =======================");
 
-        
+
 
         // setting values
         noiseMap = noisyMcNoiseFace;
@@ -115,6 +119,7 @@ public class RoadGen : MonoBehaviour
         pathFinding = new Pathfinding(map);
         roadMapData = new float[width, height];
         gizmoPointsDict = new Dictionary<Vector3[], Color>();
+        midPointsDict = new Dictionary<Vector3[], Color>();
 
 
 
@@ -189,7 +194,7 @@ public class RoadGen : MonoBehaviour
 
                     void drawHullGizmos(Color drawColor)
                     {
-                        Vector3[] gizmoPoints = new Vector3[hullPoints.Count]; //idk why but need to do it like this for the Gizmo stuff?
+                        Vector3[] gizmoPoints = new Vector3[hullPoints.Count]; //Gizmos needs an array of Vec3
 
                         int n = 0;
                         int e = 0;
@@ -298,7 +303,7 @@ public class RoadGen : MonoBehaviour
 
     private void FilterForLandmassRegions_GetMoreData()
     {
-        
+
         //Create List of landmasses we are going to be navigating between, ignore anything smaller than the set min
         // This shouldn't be done here, we should have a seperate array in Map for the "good" regions I guess.
         List<Region> landmasses = new List<Region>();
@@ -312,7 +317,7 @@ public class RoadGen : MonoBehaviour
         }
 
         // UwU
-        //Debug.Log("vicky ur super cute :3333333 I luuuuuvs you!!!!");
+        Debug.Log("vicky ur super cute :3333333 I luuuuuvs you!!!!");
         // Adds RegionNeighbors data to our large Regions
         for (int i = 0; i < landmasses.Count - 1; i++) // compare every landmass to every one in front of it in the List. 
         {                                                       // This compares everything with everything else, without duplicates.
@@ -372,19 +377,24 @@ public class RoadGen : MonoBehaviour
             int curr_s = curr_region.Bounds[1].Item2;
 
             // init our neighbormidpoints dict for this Region
-            curr_region.NeighborMidpoints = new Dictionary<string, (float, float)[]>();
+            curr_region.NeighborMidpoints = new Dictionary<string, List<(float, float)[]>>();
 
             foreach (KeyValuePair<string, Region[]> neighbors in curr_region.RegionNeighbors)  // for every neighbor quadrant
             {
                 string neighborDirection = neighbors.Key;
                 Region[] regionNeighbors = neighbors.Value;
 
+                //if (neighborDirection == "e" || neighborDirection == "w") continue; //skipping e/w for now
+
 
                 //init a new List to store midpoints for this neighbor.
-                List<(float x, float y)> midpoints = new List<(float x, float y)>();
+                List<(float x, float y)[]> midpoints = new List<(float x, float y)[]>();
+                
 
                 foreach (Region comp_region in regionNeighbors)                                   //for every Region object in that neighbor quadrant
                 {
+                    List<(float, float)> tempList = new List<(float, float)>(); //this gets filled then converted to list
+
                     List<(Tile, Tile)> filteredCurrLines = new List<(Tile, Tile)>();
                     List<(Tile, Tile)> filteredCompLines = new List<(Tile, Tile)>();
 
@@ -396,7 +406,7 @@ public class RoadGen : MonoBehaviour
                     int comp_n = comp_region.Bounds[0].y;
                     int comp_e = comp_region.Bounds[1].x;
                     int comp_s = comp_region.Bounds[1].y;
-                    
+
                     // Set the row or column bounds we'll be iterating over
                     int upper_row_y = Mathf.Min(curr_n, comp_n);
                     int lower_row_y = Mathf.Max(curr_s, comp_s);
@@ -442,10 +452,10 @@ public class RoadGen : MonoBehaviour
                     }
 
                     for (int iter = iter_from; iter < iter_to + 1; iter++) // for every x or y in range of rows or columns we're looking for:
-                    {   
+                    {
                         // DEBUG
-                        if (iter == iter_from) Debug.Log($"curr: {curr_region.colorName}  comp: {comp_region.colorName}   direction: {neighborDirection}");
-
+                        if (iter == iter_from) Debug.Log($"curr: {curr_region.colorName}  comp: {comp_region.colorName}   direction: {neighborDirection}    iter_from: {iter_from}");
+                        //Debug.Log($"============== iter {iter}");
                         if (neighborDirection == "e" || neighborDirection == "w")
                         {
                             AllCurrLines = GetHullLinesAtXorYIntersect(curr_region, row_y_intercept: iter, optionalListOfHullLines: filteredCurrLines);
@@ -460,17 +470,18 @@ public class RoadGen : MonoBehaviour
                         // These are the two points we will be calculating for this row or column
                         // so that we can get their midpoint
                         // which is the whole point of all this lol
-                        (float x, float y) point1 = (-1,-1);
-                        (float x, float y) point2 = (-1, -1); 
+                        (float x, float y) point1 = (-1, -1);
+                        (float x, float y) point2 = (-1, -1);
 
                         // This gets the first point
                         if (AllCurrLines.Count == 1) // if we only found one line, calc the point1 coord.
                         {
                             (int, int) line1_x1y1 = (AllCurrLines[0].start.x, AllCurrLines[0].start.y);
                             (int, int) line1_x2y2 = (AllCurrLines[0].end.x, AllCurrLines[0].end.y);
-                            
-                            var pt = PointOnLine(line1_x1y1, line1_x2y2, iter);
-                            if (pt != (0f, 0f)) 
+                            //Debug.Log($"Line1_x1y1: {line1_x1y1}  line1_x2y2: {line1_x2y2}");
+
+                            var pt = PointOnLine(line1_x1y1, line1_x2y2, neighborDirection, iter);
+                            if (pt.x >= 0f && pt.y >= 0f)
                             {
                                 point1 = pt;
                             }
@@ -479,12 +490,13 @@ public class RoadGen : MonoBehaviour
                                 // for now just going to skip this row
                                 continue;
                             }
-                           
+
                         }
                         else if (AllCurrLines.Count == 2) // we returned two lines because we are at a vertex, so find the common point and set point1 to that
                         {
                             var line1 = AllCurrLines[0];
                             var line2 = AllCurrLines[1];
+
                             // if start of first line equals start/end of the second line, then start of first line is the coord we want.
                             if ((line1.start.x, line1.start.y) == (line2.start.x, line2.start.y) || (line1.start.x, line1.start.y) == (line2.end.x, line2.end.y))
                             {
@@ -494,6 +506,16 @@ public class RoadGen : MonoBehaviour
                             {
                                 point1 = ((float)line1.end.x, (float)line1.end.y);
                             }
+                            //Debug.Log($"AllCurrLines:  1 = ({line1.start.x},{line1.start.y}) ({line1.end.x},{line1.end.y})  2 = ({line2.start.x},{line2.start.y}) ({line2.end.x},{line2.end.y})   picked: {point1}");
+
+                        } else
+                        {
+                            Debug.Log("AllCurrLines contains: "+AllCurrLines.Count+" at iter: "+iter);
+                            // We are getting back three+ lines
+                            var line1 = AllCurrLines[0];
+                            var line2 = AllCurrLines[1];
+                            var line3 = AllCurrLines[2];
+                            continue;
 
                         }
 
@@ -501,16 +523,18 @@ public class RoadGen : MonoBehaviour
                         if (AllCompLines.Count == 1)
                         {
                             //Debug.Log($"allcomplines.count == {AllCompLines.Count}");
-/*                            foreach ((Tile one,Tile two) line in AllCompLines)
-                            {
-                                Debug.Log($"got line ({(line.one.x,line.one.y)}) ({(line.two.x,line.two.y)})");
-                            }*/
+                            /*                            foreach ((Tile one,Tile two) line in AllCompLines)
+                                                        {
+                                                            Debug.Log($"got line ({(line.one.x,line.one.y)}) ({(line.two.x,line.two.y)})");
+                                                        }*/
 
                             (int, int) line2_x1y1 = (AllCompLines[0].start.x, AllCompLines[0].start.y);
                             (int, int) line2_x2y2 = (AllCompLines[0].end.x, AllCompLines[0].end.y);
+                            //Debug.Log($"Line2_x1y1: {line2_x1y1}  line2_x2y2: {line2_x2y2}");
 
-                            var pt = PointOnLine(line2_x1y1, line2_x2y2, iter);
-                            if (pt != (0f, 0f))
+                            var pt = PointOnLine(line2_x1y1, line2_x2y2, neighborDirection, iter);
+
+                            if (pt.x >= 0f && pt.y >= 0f)
                             {
                                 point2 = pt;
                             }
@@ -519,12 +543,13 @@ public class RoadGen : MonoBehaviour
                                 // for now just going to skip this row
                                 continue;
                             }
-                             
+
                         }
                         else if (AllCompLines.Count == 2)
                         {
                             var line1 = AllCompLines[0];
                             var line2 = AllCompLines[1];
+
                             // if start of first line equals start/end of the second line, then start of first line is the coord we want.
                             if ((line1.start.x, line1.start.y) == (line2.start.x, line2.start.y) || (line1.start.x, line1.start.y) == (line2.end.x, line2.end.y))
                             {
@@ -534,37 +559,57 @@ public class RoadGen : MonoBehaviour
                             {
                                 point2 = ((float)line1.end.x, (float)line1.end.y);
                             }
+                            //Debug.Log($"AllCompLines:  1 = ({line1.start.x},{line1.start.y}) ({line1.end.x},{line1.end.y})  2 = ({line2.start.x},{line2.start.y}) ({line2.end.x},{line2.end.y})   picked: {point2}");
+                        } else
+                        {
+                            //we got back 3+ lines...
+                            // for now just continue
+                            continue;
                         }
 
                         // calculating the midpoint of the two found coords
-                        if (point1 != (-1,-1) && point2 != (-1,-1))
+                        if (point1.x > 0 || point2.x > 0) //need at least one to be above zero so we never div by zero
                         {
-                            (float, float) midpoint_coord = ((point1.x + point2.x) / 2, (point1.y + point2.y) / 2);
+                            if (point1.y > 0 || point2.y > 0)
+                            {   
+                                var distanceBetweenPoints = Mathf.Sqrt(Mathf.Pow(point2.x - point1.x, 2) + Mathf.Pow(point2.y - point1.y, 2));
+                                if (distanceBetweenPoints <= (ignoreMidpointdistanceXpercOfMapSize * width)) //ignore if distance is too large (percentage of map size)
+                                {
+                                    (float x, float y) midpoint_coord = ((point1.x + point2.x) / 2, (point1.y + point2.y) / 2);
+                                    if (midpoint_coord.x >= 0f || midpoint_coord.y >= 0f)
+                                    {
+                                        //Debug.Log($"point1: {point1}   point2: {point2}   midpoint coord: {midpoint_coord}");
+                                    }
 
-                            // Add the coord to our midpoints List.
-                            midpoints.Add(midpoint_coord);
+                                    // Add the coord to our midpoints List.
+                                    tempList.Add(midpoint_coord);
+                                } 
+                                
+                            }
                         }
-                        
+
+
 
                         //don't need this rn, but this measures dist between two points
                         //var distance = Mathf.Sqrt(Mathf.Pow(point2.x - point1.x, 2) + Mathf.Pow(point2.y - point1.y, 2));
 
                     }
                     // DEBUG
-                    //Debug.Log($"found {midpoints.Count} for ^^^^");
+                    Debug.Log($"found {tempList.Count} for ^^^^");
+                    midpoints.Add(tempList.ToArray());
 
                 }
 
                 // create our dict entry of midpoints for this neighbor using the finished midpoints list.
-                curr_region.NeighborMidpoints.Add(neighborDirection, midpoints.ToArray());
-                allmidpointsDEBUG.Add(midpoints);
-                Debug.Log($"Region: {curr_region.colorName}, Direction: {neighborDirection}, Number of midpoints found: {midpoints.Count}");
-                
-                
+                curr_region.NeighborMidpoints.Add(neighborDirection, midpoints);
+                //allmidpointsDEBUG.Add(midpoints);
+                //Debug.Log($"Region: {curr_region.colorName}, Direction: {neighborDirection}, Number of midpoints found: {midpoints.Count}");
+
+
             }
             //Debug.Log($"Got done with region {counter}");
             counter++;
-            if (counter == 2) break; // so we only do the first one for debug.
+            //if (counter == 2) break; // so we only do the first one for debug.
         }
 
 
@@ -658,7 +703,7 @@ public class RoadGen : MonoBehaviour
             {
                 for (int i = 0; i < region.HullLines.Length; i++)
                 {
-                    if (Mathf.Max(region.HullLines[i].Item1.y, region.HullLines[i].Item2.y) <= Mathf.Min(e.y, w.y))
+                    if (Mathf.Max(region.HullLines[i].Item1.y, region.HullLines[i].Item2.y) <= Mathf.Max(e.y, w.y))
                     {
                         filteredLines.Add(region.HullLines[i]);
                     }
@@ -678,26 +723,38 @@ public class RoadGen : MonoBehaviour
             return filteredLines;
         }
 
-        (float x, float y) PointOnLine((int x, int y) start, (int x, int y) end, int given_Y)
-        {   
-            
+        (float x, float y) PointOnLine((int x, int y) start, (int x, int y) end, string neighborDirection, int value)
+        {
 
-            var x1 = start.x;
-            var y1 = start.y;
-            var x2 = end.x;
-            var y2 = end.y;
+
+            var x1 = (float)start.x;
+            var y1 = (float)start.y;
+            var x2 = (float)end.x;
+            var y2 = (float)end.y;
+
+
+            (float, float) foundPoint = (0f, 0f);
+            float slope = (y2 - y1) / (x2 - x1);
 
             if (y2 - y1 == 0 || x2 - x1 == 0)
             {   // if it's a horizontal line then slope fails
                 //Debug.Log("div by zero trying to get point on line uhh  handle for this");
-                return (0f, 0f);
+                return (-1f, -1f);
             }
 
-            float slope = (y2 - y1) / (x2 - x1);
-            var X_for_coord_along_line = ((given_Y - y1) / slope) + x1;
-            var point_along_line = (X_for_coord_along_line, given_Y);
+            if (neighborDirection == "e" || neighborDirection == "w")
+            {
+                var X_for_coord_along_line = (((float)value - y1) / slope) + x1;  // -16 / .16 + 44
+                foundPoint = (X_for_coord_along_line, value);
+            }
 
-            return point_along_line;
+            if (neighborDirection == "n" || neighborDirection == "s")
+            {
+                var b = y1 - (slope * value);
+                var Y_for_coord_along_line = (slope * value) + b;
+                foundPoint = (value, Y_for_coord_along_line);
+            }
+            return foundPoint;
         }
 
 
@@ -893,27 +950,38 @@ public class RoadGen : MonoBehaviour
 
         if (showMidpoints)
         {
-            
-            if (allmidpointsDEBUG != null)
+            if (map != null)
             {
-
-                foreach (List<(float,float)> midline in allmidpointsDEBUG)
+                if (map.Regions != null)
                 {
-                    Vector3[] arrr = new Vector3[midline.Count];
-
-                    var i = 0;
-                    foreach ((float,float) xy in midline)
+                    foreach (Region region in map.Regions)
                     {
-                        arrr[i] = new Vector3(xy.Item1, 5, xy.Item2);
-                        
+                        if (region.NeighborMidpoints != null)
+                        {
+                            foreach (KeyValuePair<string, List<(float, float)[]>> gizmoPointsList in region.NeighborMidpoints)
+                            {
+                                foreach ((float, float)[] coordsArr in gizmoPointsList.Value)
+                                {
+                                    Vector3[] Vec3arr = new Vector3[coordsArr.Length]; // now we need to convert (float,float)[] --> Vector3[]
+                                    var i = 0;
+                                    foreach ((float x,float y) coord in  coordsArr)
+                                    {
+                                        Vec3arr[i] = new Vector3(coord.x, 1, coord.y);
+                                        i++;
+                                    }
+                                    Gizmos.color = region.Color;
+                                    Gizmos.DrawLineStrip(Vec3arr, false);
+                                }
+
+                                
+                            }
+                        }
+
                     }
-                    
-                    Gizmos.color = Color.blue;
-                    Gizmos.DrawLineStrip(arrr, false);
+
                 }
             }
         }
-
     }
 
     public void runMapGen() //this is so the Editor script can auto update on changes
