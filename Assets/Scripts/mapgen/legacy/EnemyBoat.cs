@@ -229,7 +229,7 @@ public class EnemyBoat : MonoBehaviour
         Vector3 randomPointInCircle = Vector3.zero;
 
         while (!foundPosition)
-        {
+        { 
 
             randomPointInCircle = Random.insideUnitSphere * radius; // specifying unityengine because using System temporarily
             randomPointInCircle = transform.position + randomPointInCircle;
