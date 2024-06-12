@@ -11,13 +11,14 @@ public static class CrewRoles
 
 }
 
+[System.Serializable]
 public class Role
 {
-    public string Name { get; private set; }
-    public uint ID { get; private set; }
-    public uint Limit { get; private set; }
+    public string Name;
+    public int ID;
+    public int Limit;
 
-    public Role(string name, uint id, uint limit)
+    public Role(string name, int id, int limit)
     {
         Name = name;
         ID = id;
