@@ -13,24 +13,11 @@ public class MoveRandom : MonoBehaviour
     [SerializeField] private float NextMoveRadius = 20;
     [SerializeField] private float speed;
 
-
-
-    public Dictionary<string, float> statusDict;
-
     Vector3 nextPosition;
 
     private void Start()
     {
-
-
         nextPosition = transform.position;
-
-        statusDict = new Dictionary<string, float>();
-
-        statusDict.Add("color", 0f); // all are green, unless they are red
-        if (GetComponent<Renderer>().material.name == "red (Instance)") statusDict["color"] = 1f;
-
-        statusDict.Add("isVisible", 1f); // so we can set it as invisible to radar in the future
     }
 
     private void Update()
@@ -41,8 +28,6 @@ public class MoveRandom : MonoBehaviour
             nextPosition = randomPointsGen.randomPoint(transform.position, NextMoveRadius);
             var step = speed * Time.deltaTime; // calculate distance to move
             transform.position = Vector3.MoveTowards(transform.position, nextPosition, step);
-
-
         }
     }
 }

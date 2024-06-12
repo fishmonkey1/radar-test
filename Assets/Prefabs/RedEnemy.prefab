@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 2427655408903921132}
   - component: {fileID: 6598403491354471535}
   - component: {fileID: 6767720100232338111}
+  - component: {fileID: 3850597070117051519}
   m_Layer: 10
   m_Name: RedEnemy
   m_TagString: Untagged
@@ -170,3 +171,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NextMoveRadius: 20
+  speed: 0
+--- !u!114 &3850597070117051519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 128191738815701424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3718667d57360d44993400ca6edc8078, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsRadarVisible: 1
+  MinimapIconPrefab: {fileID: 6369738844036222702, guid: 95bbf540ef70a4541b6c46f25f10c83a, type: 3}
+  MinimapIconColor: {r: 1, g: 0, b: 0, a: 1}

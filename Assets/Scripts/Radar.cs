@@ -11,7 +11,6 @@ public class Radar : MonoBehaviour
     [SerializeField] GameObject Player_MinimapIcon;
     [SerializeField] LineRenderer radarSweepLine;
     [SerializeField] GameObject SweepLine;
-    [SerializeField] GameObject MinimapIcon;
 
     [Tooltip("The mask the radar is on. Should stay on Minimap")]
     [SerializeField] LayerMask layerMask;
@@ -119,15 +118,13 @@ public class Radar : MonoBehaviour
         if (!collidedList.Contains(collider))
         {
             collidedList.Add(collider);
-            var enemy = collider.GetComponent<MoveRandom>(); //this will be Enemy not MoveRandom
-            if (enemy != null)
+            var radarTarget = collider.GetComponent<RadarTarget>();
+            if (radarTarget != null)
             {
-                Dictionary<string, float> status = enemy.statusDict;
-
-                if (status["isVisible"] == 1f) // ship may be hidden from radar temporarily
+                if (radarTarget.IsRadarVisible) // ship may be hidden from radar temporarily
                 {
                     Vector3 location = collider.transform.position;
-                    pingOnRadar(status, location);
+                    pingOnRadar(radarTarget, location);
                 }
             }
 
@@ -136,22 +133,15 @@ public class Radar : MonoBehaviour
     }
 
 
-    private void pingOnRadar(Dictionary<string, float> status, Vector3 location)
+    private void pingOnRadar(RadarTarget radarTarget, Vector3 location)
     {
-        GameObject blip = (GameObject)Instantiate(MinimapIcon, location, Quaternion.Euler(new Vector3(90, 0, 0)));
+        GameObject blip = (GameObject)Instantiate(radarTarget.MinimapIconPrefab, location, Quaternion.Euler(new Vector3(90, 0, 0)));
 
         // Set Color
-        if (status["color"] == 0f)
-        {
-            blip.GetComponent<SpriteRenderer>().color = Color.green;
-        }
-        else blip.GetComponent<SpriteRenderer>().color = Color.red;
+        blip.GetComponent<SpriteRenderer>().color = radarTarget.MinimapIconColor;
 
         // Set Scale
         blip.transform.localScale = new Vector3(blipScale, blipScale, blipScale);
-
-        // Set to Visible when ready
-        blip.SetActive(true);
 
         // Add to currently tracked blips dict
         currentBlipsDict.Add(blip, Time.fixedTime);

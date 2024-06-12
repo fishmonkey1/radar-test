@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7651620387641101686}
   - component: {fileID: 7483962558241308446}
   - component: {fileID: 7975982934200861989}
+  - component: {fileID: 3767759678293300627}
   m_Layer: 10
   m_Name: GreenEnemy
   m_TagString: Untagged
@@ -170,3 +171,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NextMoveRadius: 20
+  speed: 0
+--- !u!114 &3767759678293300627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4150585140477163999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3718667d57360d44993400ca6edc8078, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsRadarVisible: 1
+  MinimapIconPrefab: {fileID: 6369738844036222702, guid: 95bbf540ef70a4541b6c46f25f10c83a, type: 3}
+  MinimapIconColor: {r: 0, g: 1, b: 0, a: 1}
