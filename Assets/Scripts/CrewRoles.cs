@@ -20,6 +20,16 @@ public static class CrewRoles
         throw new System.Exception($"No Role ID exists for passed ID {id} in CrewRoles!");
     }
 
+    public static Role GetRoleByName(string name)
+    {
+        foreach (Role role in AllRoles)
+        {
+            if (role.Name == name)
+                return role;
+        }
+        throw new System.Exception($"No Role named {name} exists in CrewRoles!");
+    }
+
 }
 
 [System.Serializable]
@@ -28,6 +38,8 @@ public class Role
     public string Name;
     public uint ID;
     public uint Limit;
+
+    public Role() { }
 
     public Role(string name, uint id, uint limit)
     {
