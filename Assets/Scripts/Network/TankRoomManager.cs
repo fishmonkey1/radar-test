@@ -15,6 +15,11 @@ public class TankRoomManager : NetworkRoomManager
     List<Role> Roles = CrewRoles.ImplementedRoles.ToList(); //TODO: Change to CrewRoles.AllRoles when all are implemented
 
     Dictionary<Role, NetworkConnectionToClient> pickedRoles = new Dictionary<Role, NetworkConnectionToClient>();
+
+    public void PlayerPickedRole(Role role)
+    {
+
+    }
     
 }
  
