@@ -62,9 +62,11 @@ MonoBehaviour:
   disconnectInactiveTimeout: 60
   authenticator: {fileID: 0}
   playerPrefab: {fileID: 5769884122884430119, guid: 8515113540764d9459a5ed9a2af2d4c5, type: 3}
-  autoCreatePlayer: 0
+  autoCreatePlayer: 1
   playerSpawnMethod: 0
-  spawnPrefabs: []
+  spawnPrefabs:
+  - {fileID: 2914714321878191827, guid: e7abf2eefe24d60489fabd76d7ce86c9, type: 3}
+  - {fileID: 3664771775739345355, guid: 0a4f643c655b4604eaa8ae5aeac61bd6, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
@@ -88,6 +90,7 @@ MonoBehaviour:
   _allPlayersReady: 0
   roomSlots: []
   clientIndex: 0
+  canvasPrefab: {fileID: 2914714321878191827, guid: e7abf2eefe24d60489fabd76d7ce86c9, type: 3}
 --- !u!114 &606322544417988642
 MonoBehaviour:
   m_ObjectHideFlags: 0

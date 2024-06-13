@@ -16,4 +16,9 @@ public class TankRoomPlayer : NetworkRoomPlayer
         
     }
 
+    public override void OnGUI()
+    {
+        base.OnGUI();
+    }
+
 }

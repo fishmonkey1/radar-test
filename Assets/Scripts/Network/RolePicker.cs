@@ -25,11 +25,6 @@ public class RolePicker : NetworkBehaviour
             buttonScript.onClick.AddListener(() => SelectRole(role.Name));
             buttons.Add(newButton);
         }
-        if (isServer)
-        {
-            Debug.Log("Spawning canvas on the server");
-            NetworkServer.Spawn(gameObject); //Create the RolePicker's canvas object across the network
-        }
         if (isClient && isServer)
         {
             Debug.Log("Detected host and subscribed to callback");
