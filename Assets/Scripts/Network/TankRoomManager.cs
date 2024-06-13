@@ -10,5 +10,17 @@ public class TankRoomManager : NetworkRoomManager
     /// Don't let players ready up unless they have a role picked
     /// Figure out how I'm linking up roles with their associated scripts at some point :c
 
+    public static new TankRoomManager singleton => NetworkManager.singleton as TankRoomManager;
+
+    public override void OnRoomStopClient()
+    {
+        base.OnRoomStopClient();
+    }
+
+    public override void OnRoomStopServer()
+    {
+        base.OnRoomStopServer();
+    }
+
 }
  

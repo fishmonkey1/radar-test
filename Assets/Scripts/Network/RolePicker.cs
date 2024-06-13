@@ -10,7 +10,7 @@ public class RolePicker : NetworkBehaviour
     RectTransform RoleButtonPanel; // Set the button panel in the inspector
     [SerializeField]
     GameObject RoleButtonPrefab;
-    public readonly SyncDictionary<Role, NetworkIdentity> pickedRoles = new();
+    public readonly SyncDictionary<Role, int> pickedRoles = new();
 
     List<GameObject> buttons = new List<GameObject>();
 
@@ -25,35 +25,49 @@ public class RolePicker : NetworkBehaviour
             buttonScript.onClick.AddListener(() => SelectRole(role.Name));
             buttons.Add(newButton);
         }
+        if (isServer)
+        {
+            Debug.Log("Spawning canvas on the server");
+            NetworkServer.Spawn(gameObject); //Create the RolePicker's canvas object across the network
+        }
+        if (isClient && isServer)
+        {
+            Debug.Log("Detected host and subscribed to callback");
+            pickedRoles.Callback += OnPickedRoleChanged;
+        }
     }
 
     void SelectRole(string roleName)
     {
         //Fetch the local owner
-        NetworkIdentity owner = NetworkClient.connection.identity;
-        CmdSelectRole(roleName, owner); //Send this to the server
+        int ownerID = NetworkClient.connection.connectionId;
+        Debug.Log($"Called select role with role name of {roleName} and an owner with value {ownerID}");
+        CmdSelectRole(roleName, ownerID); //Send this to the server
     }
 
     [Command(requiresAuthority = false)]
-    void CmdSelectRole(string roleName, NetworkIdentity owner)
+    void CmdSelectRole(string roleName, int ownerID)
     { //Called on the server to pick a role and add to the SyncDict
+        Debug.Log("Server ran the select role and updated the sync dict");
         Role pickedRole = CrewRoles.GetRoleByName(roleName);
-        pickedRoles.Add(pickedRole, owner);
+        pickedRoles.Add(pickedRole, ownerID);
     }
 
     public override void OnStartClient()
     {
+        Debug.Log("Subscribed to sync dict callback");
         pickedRoles.Callback += OnPickedRoleChanged;
     }
 
-    void OnPickedRoleChanged(SyncDictionary<Role, NetworkIdentity>.Operation op, Role role, NetworkIdentity owner)
+    void OnPickedRoleChanged(SyncDictionary<Role, int>.Operation op, Role role, int ownerID)
     { //Called on observing clients when the dictionary has changed
+        Debug.Log($"SyncDict changed. Values are operation: {op.ToString()}, Role: {role.Name}, owner: {ownerID}");
         switch (op) 
         {
-            case SyncIDictionary<Role, NetworkIdentity>.Operation.OP_ADD:
+            case SyncIDictionary<Role, int>.Operation.OP_ADD:
                 ChangeRoleButton(role, false); //Disable the picked role
                 break;
-            case SyncIDictionary<Role, NetworkIdentity>.Operation.OP_REMOVE:
+            case SyncIDictionary<Role, int>.Operation.OP_REMOVE:
                 ChangeRoleButton(role, true); //Enable the picked role since its removed
                 break;
         }
@@ -66,7 +80,8 @@ public class RolePicker : NetworkBehaviour
             TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
             if (text.text == role.Name)
             { //We found it
-                button.SetActive(enable);
+                Button buttonComp = button.GetComponent<Button>();
+                buttonComp.interactable = enable;
                 break;
             }
         }
