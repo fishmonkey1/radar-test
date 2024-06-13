@@ -34,7 +34,7 @@ public class RolePicker : NetworkBehaviour
         CmdSelectRole(roleName, owner); //Send this to the server
     }
 
-    [Command]
+    [Command(requiresAuthority = false)]
     void CmdSelectRole(string roleName, NetworkIdentity owner)
     { //Called on the server to pick a role and add to the SyncDict
         Role pickedRole = CrewRoles.GetRoleByName(roleName);
