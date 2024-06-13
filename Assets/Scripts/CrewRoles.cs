@@ -9,6 +9,17 @@ public static class CrewRoles
     //The AllRoles array might not be all that important, but I'm leaving it in for now
     public static readonly Role[] AllRoles = new Role[] { Driver, Gunner, Spotter, Radar };
 
+    public static Role GetRoleByID(uint id)
+    {
+        foreach (Role role in AllRoles)
+        {
+            if (role.ID == id)
+                return role;
+        }
+        //Yeet an error at them if no role is found
+        throw new System.Exception($"No Role ID exists for passed ID {id} in CrewRoles!");
+    }
+
 }
 
 [System.Serializable]
