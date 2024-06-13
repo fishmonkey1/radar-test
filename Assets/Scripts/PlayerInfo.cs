@@ -1,7 +1,8 @@
 using System;
 using UnityEngine;
+using Mirror;
 
-public class PlayerInfo : MonoBehaviour
+public class PlayerInfo : NetworkBehaviour
 {
     /// <summary>
     /// Meant to be hold information that will be more relevant when the game becomes multiplayer
@@ -33,6 +34,11 @@ public class PlayerInfo : MonoBehaviour
 
     public void Awake()
     {
+        if (!isLocalPlayer)
+        {
+            //Remove playerInfo components from other player objects
+            GameObject.Destroy(this);
+        }
         if (instance != null)
         {
             throw new System.Exception("You have more than one PlayerInfo component in the scene!");
