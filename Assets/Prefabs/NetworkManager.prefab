@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 3162481371258705236}
   - component: {fileID: 866066013436264815}
+  - component: {fileID: 606322544417988642}
+  - component: {fileID: 1491553044709321355}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -53,14 +55,14 @@ MonoBehaviour:
   autoConnectClientBuild: 0
   offlineScene: Assets/Scenes/MenuScene.unity
   onlineScene: Assets/Scenes/RoomScene.unity
-  transport: {fileID: 0}
+  transport: {fileID: 606322544417988642}
   networkAddress: localhost
   maxConnections: 100
   disconnectInactiveConnections: 0
   disconnectInactiveTimeout: 60
   authenticator: {fileID: 0}
-  playerPrefab: {fileID: 0}
-  autoCreatePlayer: 1
+  playerPrefab: {fileID: 3664771775739345355, guid: 0a4f643c655b4604eaa8ae5aeac61bd6, type: 3}
+  autoCreatePlayer: 0
   playerSpawnMethod: 0
   spawnPrefabs: []
   exceptionsDisconnect: 1
@@ -80,16 +82,52 @@ MonoBehaviour:
   timeInterpolationGui: 0
   showRoomGUI: 1
   minPlayers: 1
-  roomPlayerPrefab: {fileID: 0}
+  roomPlayerPrefab: {fileID: 5998385113949316115, guid: 0a4f643c655b4604eaa8ae5aeac61bd6, type: 3}
   RoomScene: Assets/Scenes/RoomScene.unity
   GameplayScene: Assets/Scenes/NoProcGen.unity
   _allPlayersReady: 0
   roomSlots: []
   clientIndex: 0
-  Roles:
-  - Name: Driver
-    ID: 0
-    Limit: 1
-  - Name: Gunner
-    ID: 1
-    Limit: 1
+--- !u!114 &606322544417988642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7960848840884369540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b0fecffa3f624585964b0d0eb21b18e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  port: 7777
+  DualMode: 1
+  NoDelay: 1
+  Interval: 10
+  Timeout: 10000
+  RecvBufferSize: 7361536
+  SendBufferSize: 7361536
+  FastResend: 2
+  ReceiveWindowSize: 4096
+  SendWindowSize: 4096
+  MaxRetransmit: 40
+  MaximizeSocketBuffers: 1
+  ReliableMaxMessageSize: 297433
+  UnreliableMaxMessageSize: 1194
+  debugLog: 0
+  statisticsGUI: 0
+  statisticsLog: 0
+--- !u!114 &1491553044709321355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7960848840884369540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6442dc8070ceb41f094e44de0bf87274, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  offsetX: 0
+  offsetY: 0

@@ -580,18 +580,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: HornyTank
       objectReference: {fileID: 0}
-    - target: {fileID: 5797291073420949491, guid: cc463bf9a62b9234994922418126b6e2, type: 3}
-      propertyPath: m_CullingMask.m_Bits
-      value: 15543
-      objectReference: {fileID: 0}
-    - target: {fileID: 6430930366322368152, guid: cc463bf9a62b9234994922418126b6e2, type: 3}
-      propertyPath: m_CullingMask.m_Bits
-      value: 15543
-      objectReference: {fileID: 0}
-    - target: {fileID: 6517553101228452066, guid: cc463bf9a62b9234994922418126b6e2, type: 3}
-      propertyPath: m_CullingMask.m_Bits
-      value: 11447
-      objectReference: {fileID: 0}
     - target: {fileID: 6637771007257941104, guid: cc463bf9a62b9234994922418126b6e2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -631,10 +619,6 @@ PrefabInstance:
     - target: {fileID: 6637771007257941104, guid: cc463bf9a62b9234994922418126b6e2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8734713659294949896, guid: cc463bf9a62b9234994922418126b6e2, type: 3}
-      propertyPath: m_CullingMask.m_Bits
-      value: 15543
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
