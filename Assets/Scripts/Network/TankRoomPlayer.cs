@@ -14,7 +14,7 @@ public class TankRoomPlayer : NetworkRoomPlayer
     private void CmdPickRole(uint roleID)
     { //Should be it for now boss
         TankRoomManager tankRoom = NetworkManager.singleton as TankRoomManager; //Cast to TankRoom
-        tankRoom.PlayerPickedRole(CrewRoles.GetRoleByID(roleID));
+        tankRoom.PlayerPickedRole(CrewRoles.GetRoleByID(roleID), this.connectionToClient);
     }
 
 }

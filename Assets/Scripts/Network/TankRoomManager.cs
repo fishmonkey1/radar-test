@@ -10,14 +10,16 @@ public class TankRoomManager : NetworkRoomManager
     /// Don't let players ready up unless they have a role picked
     /// Figure out how I'm linking up roles with their associated scripts at some point :c
 
-    //Just so you can see these in the inspector. I've set to readonly so you can't change it, only view
-    [ReadOnly, SerializeField]
-    List<Role> Roles = CrewRoles.ImplementedRoles.ToList(); //TODO: Change to CrewRoles.AllRoles when all are implemented
+    readonly SyncDictionary<Role, NetworkConnection> pickedRoles = new();
 
-    Dictionary<Role, NetworkConnectionToClient> pickedRoles = new Dictionary<Role, NetworkConnectionToClient>();
-
-    public void PlayerPickedRole(Role role)
-    {
+    public void PlayerPickedRole(Role role, NetworkConnection conn)
+    { //Called on the server from TankRoomPlayer when a role is selected
+        if (pickedRoles.ContainsKey(role))
+        {
+            Debug.LogWarning("Tried to pick a role that is already picked by someone else!");
+            return;
+        }
+        pickedRoles.Add(role, conn); //Match the player's connection to the role
 
     }
     
