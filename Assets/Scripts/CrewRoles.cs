@@ -15,10 +15,10 @@ public static class CrewRoles
 public class Role
 {
     public string Name;
-    public int ID;
-    public int Limit;
+    public uint ID;
+    public uint Limit;
 
-    public Role(string name, int id, int limit)
+    public Role(string name, uint id, uint limit)
     {
         Name = name;
         ID = id;
