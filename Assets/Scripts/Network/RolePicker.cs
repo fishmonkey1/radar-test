@@ -25,11 +25,6 @@ public class RolePicker : NetworkBehaviour
             buttonScript.onClick.AddListener(() => SelectRole(role.Name));
             buttons.Add(newButton);
         }
-        if (isClient && isServer)
-        {
-            Debug.Log("Detected host and subscribed to callback");
-            pickedRoles.Callback += OnPickedRoleChanged;
-        }
     }
 
     void SelectRole(string roleName)
@@ -37,6 +32,8 @@ public class RolePicker : NetworkBehaviour
         //Fetch the local owner
         int ownerID = NetworkClient.connection.connectionId;
         Debug.Log($"Called select role with role name of {roleName} and an owner with value {ownerID}");
+        TankRoomPlayer localRoomPlayer = NetworkClient.connection.identity.GetComponent<TankRoomPlayer>();
+        localRoomPlayer.CmdPickRole(CrewRoles.GetRoleByName(roleName).ID);
         CmdSelectRole(roleName, ownerID); //Send this to the server
     }
 
@@ -45,7 +42,21 @@ public class RolePicker : NetworkBehaviour
     { //Called on the server to pick a role and add to the SyncDict
         Debug.Log("Server ran the select role and updated the sync dict");
         Role pickedRole = CrewRoles.GetRoleByName(roleName);
+        Role oldRole = OwnerHasRole(ownerID);
+        if (oldRole != null)
+            pickedRoles.Remove(oldRole);
+
         pickedRoles.Add(pickedRole, ownerID);
+    }
+
+    Role OwnerHasRole(int ownerID)
+    {
+        foreach (KeyValuePair<Role, int> pair in pickedRoles)
+        {
+            if (pair.Value == ownerID)
+                return pair.Key;
+        }
+        return null;
     }
 
     public override void OnStartClient()

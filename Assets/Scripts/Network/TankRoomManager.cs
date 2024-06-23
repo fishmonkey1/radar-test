@@ -10,26 +10,15 @@ public class TankRoomManager : NetworkRoomManager
     /// Don't let players ready up unless they have a role picked
     /// Figure out how I'm linking up roles with their associated scripts at some point :c
 
-    [SerializeField]
-    GameObject canvasPrefab; //Try spawning the prefab instead of leaving it in the scene?
+    [SerializeField] GameObject canvasPrefab; //Try spawning the prefab instead of leaving it in the scene?
+    [SerializeField] GameObject horniTankPrefab; //For spawning after the game scene is loaded
 
     public static new TankRoomManager singleton => NetworkManager.singleton as TankRoomManager;
-
-    public struct PlayerJoinMessage : NetworkMessage
-    {
-        public bool hasName;
-        public string name;
-    }
 
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
         base.OnServerAddPlayer(conn);
         Debug.Log("Server added a player");
-    }
-
-    public override void OnRoomStartServer()
-    {
-        
     }
 
     public override void OnRoomStopClient()
@@ -54,6 +43,14 @@ public class TankRoomManager : NetworkRoomManager
             Debug.Log("Server moved into room scene, spawning canvas");
             GameObject canvas = GameObject.Instantiate(canvasPrefab);
             NetworkServer.Spawn(canvas);
+        }
+        if (sceneName == GameplayScene)
+        {
+            //Time to spawn the tank in
+            //We'll worry about picking a proper spawn point later on
+            Debug.Log("Server moved into gameplay scene, spawning tank");
+            GameObject tank = GameObject.Instantiate(horniTankPrefab); //Double check this puts the tank at 0,0,0
+            NetworkServer.Spawn(tank);
         }
     }
 

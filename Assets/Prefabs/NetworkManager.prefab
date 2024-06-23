@@ -65,8 +65,8 @@ MonoBehaviour:
   autoCreatePlayer: 1
   playerSpawnMethod: 0
   spawnPrefabs:
+  - {fileID: 4283197213913971331, guid: cc463bf9a62b9234994922418126b6e2, type: 3}
   - {fileID: 2914714321878191827, guid: e7abf2eefe24d60489fabd76d7ce86c9, type: 3}
-  - {fileID: 3664771775739345355, guid: 0a4f643c655b4604eaa8ae5aeac61bd6, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
@@ -91,6 +91,7 @@ MonoBehaviour:
   roomSlots: []
   clientIndex: 0
   canvasPrefab: {fileID: 2914714321878191827, guid: e7abf2eefe24d60489fabd76d7ce86c9, type: 3}
+  horniTankPrefab: {fileID: 4283197213913971331, guid: cc463bf9a62b9234994922418126b6e2, type: 3}
 --- !u!114 &606322544417988642
 MonoBehaviour:
   m_ObjectHideFlags: 0

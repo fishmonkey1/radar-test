@@ -10,10 +10,29 @@ public class TankRoomPlayer : NetworkRoomPlayer
     /// Sends a message to the server when they've picked a role so everybody gets updated on which are left
     /// Can't ready up til you've picked a role
 
+    [SyncVar (hook=nameof(PickRole))] public uint RoleID = 999; //Init to an invalid role since 0 aligns with the first
+    [SyncVar] public string PlayerName = null;
+    Role role;
+
     [Command]
-    private void CmdPickRole(uint roleID)
+    public void CmdPickRole(uint roleID)
     { //Should be it for now boss
-        
+        role = CrewRoles.GetRoleByID(roleID);
+        RoleID = roleID;
+    }
+
+    private void PickRole(uint oldID, uint newID) 
+    {
+        Role newRole = CrewRoles.GetRoleByID(newID);
+        if (newRole != role)
+        {
+            role = newRole;
+        }
+    }
+
+    public void CmdSetName(string newName)
+    {
+        PlayerName = newName; //And that's pretty much it
     }
 
     public override void OnGUI()
