@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Mirror;
 
-public class tankSteer : MonoBehaviour, IRoleNeeded
+public class tankSteer : NetworkBehaviour, IRoleNeeded
 {
     [SerializeField] private CharacterController controller;
     [SerializeField] private Canvas radarCanvas;
@@ -114,7 +115,18 @@ public class tankSteer : MonoBehaviour, IRoleNeeded
     {
         if (!((IRoleNeeded)this).HaveRole(PlayerInfo.Instance.CurrentRole))
             return; //Don't allow driving inputs if you don't have the driver role selected
-        driverInput = value.Get<Vector2>();
+        if (isServer) //Only apply locally if you are the host
+            driverInput = value.Get<Vector2>();
+        else
+            SendInputs(value.Get<Vector2>()); //Otherwise send to the server
+    }
+
+    [Command(requiresAuthority = false)]
+    public void SendInputs(Vector2 input)
+    {
+        //Set the inputs on the server and then let it replicate the tank's position for everyone else
+        driverInput.x = input.x;
+        driverInput.y = input.y;
     }
 
     public void OnCameraToggle()
