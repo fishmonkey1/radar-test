@@ -37,7 +37,7 @@ public class Role
 {
     public string Name;
     public uint ID;
-    public uint Limit;
+    public uint PlayerLimit;
 
     public Role() { }
 
@@ -45,6 +45,6 @@ public class Role
     {
         Name = name;
         ID = id;
-        Limit = limit;
+        PlayerLimit = limit;
     }
 }
