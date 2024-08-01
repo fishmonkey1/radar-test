@@ -17,7 +17,7 @@ public class TankRoomManager : NetworkRoomManager
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
         base.OnServerAddPlayer(conn);
-        Debug.Log("Server added a player");
+        Debug.Log("Server added a player with a netId of " + conn.identity.netId);
     }
 
     public override void OnRoomStopClient()
@@ -32,7 +32,7 @@ public class TankRoomManager : NetworkRoomManager
 
     public override void OnRoomServerConnect(NetworkConnectionToClient conn)
     {
-        Debug.Log($"Client connected to the server with id of {conn.connectionId}");
+        Debug.Log($"Client connected to the server with server connection id of {conn.connectionId}");
     }
 
     public override void OnRoomServerSceneChanged(string sceneName)
