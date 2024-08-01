@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Mirror;
 
 
-public class Turret : MonoBehaviour, IRoleNeeded
+public class Turret : NetworkBehaviour, IRoleNeeded
 {
 
     [SerializeField]
@@ -25,7 +26,17 @@ public class Turret : MonoBehaviour, IRoleNeeded
     {
         if (!((IRoleNeeded)this).HaveRole(PlayerInfo.Instance.CurrentRole))
             return; //Don't allow turret inputs if you don't have the gunner role selected
-        turretInput = input.Get<Vector2>();
+        if (isServer) //Only move the turret locally and replicate if you're the host
+            turretInput = input.Get<Vector2>();
+        else //Otherwise we send our input commands to the server
+            CmdOnMove(input.Get<Vector2>());
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdOnMove(Vector2 input)
+    {  //The transforms are synced across the network so this replicates to all clients
+        turretInput.x = input.x;
+        turretInput.y = input.y;
     }
 
     public void OnFire()
