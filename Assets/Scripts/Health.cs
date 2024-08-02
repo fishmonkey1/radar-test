@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class Health : MonoBehaviour
+public class Health : NetworkBehaviour
 {
     [SerializeField] float MaxHealth;
+    [SyncVar]
     public float CurrentHealth;
     public delegate void OnTargetDestroyed(GameObject target, GameObject damager);
     public OnTargetDestroyed OnDestroyed;
@@ -29,6 +31,7 @@ public class Health : MonoBehaviour
         { //This object has been destroyed
             if (OnDestroyed != null) //Call any functions that were listening for this to be boomed
                 OnDestroyed(gameObject, damager);
+            NetworkServer.Destroy(gameObject);
             GameObject.Destroy(gameObject); //Remove the destroyed thingy
         }
     }
