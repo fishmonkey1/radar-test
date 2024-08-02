@@ -108,18 +108,4 @@ public class RolePicker : NetworkBehaviour
         }
     }
 
-    void ChangeRoleButton(Role role, bool enable)
-    { //If disable is true then we turn the button off, and the opposite for false
-        foreach(GameObject button in buttons)
-        {
-            TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
-            if (text.text == role.Name)
-            { //We found it
-                Button buttonComp = button.GetComponent<Button>();
-                buttonComp.interactable = enable;
-                break;
-            }
-        }
-    }
-
 }

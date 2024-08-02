@@ -32,7 +32,7 @@ public class Turret : NetworkBehaviour, IRoleNeeded
             CmdOnMove(input.Get<Vector2>());
     }
 
-    [Command(requiresAuthority = false)]
+    [Command(requiresAuthority=false)]
     public void CmdOnMove(Vector2 input)
     {  //The transforms are synced across the network so this replicates to all clients
         turretInput.x = input.x;
@@ -43,11 +43,17 @@ public class Turret : NetworkBehaviour, IRoleNeeded
     {
         if (!((IRoleNeeded)this).HaveRole(PlayerInfo.Instance.CurrentRole))
             return;
-        //TODO: Handle shooting logic here next time
+        CmdOnFire();
+    }
+
+    [Command(requiresAuthority=false)]
+    public void CmdOnFire()
+    {
         GameObject projectileObject = GameObject.Instantiate(projectilePrefab, projectileSpawn.position, Quaternion.identity);
         Projectile projectile = projectileObject.GetComponent<Projectile>();
         projectile.shooter = gameObject;
         projectileObject.transform.rotation = Quaternion.LookRotation(projectileSpawn.forward, projectileSpawn.up);
+        NetworkServer.Spawn(projectileObject);
     }
 
     public void OnRoleChange(Role oldRole, Role newRole)
