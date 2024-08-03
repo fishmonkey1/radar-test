@@ -10,7 +10,7 @@ public class RolePicker : NetworkBehaviour
     RectTransform RoleButtonPanel; // Set the button panel in the inspector
     [SerializeField]
     GameObject RoleButtonPrefab;
-    public readonly SyncDictionary<Role, uint> pickedRoles = new();
+    public readonly Dictionary<Role, uint> selectedRoles = new();
 
     List<GameObject> buttons = new List<GameObject>();
 
@@ -39,22 +39,54 @@ public class RolePicker : NetworkBehaviour
 
     [Command(requiresAuthority = false)]
     void CmdSelectRole(string roleName, uint ownerID)
-    { //Called on the server to pick a role and add to the SyncDict
+    { //Called on the server to pick a role and add to the Dict
         Debug.Log("Server ran the select role and updated the sync dict");
         Role pickedRole = CrewRoles.GetRoleByName(roleName);
         Role oldRole = OwnerHasRole(ownerID);
         if (oldRole != null)
         {
-            pickedRoles.Remove(oldRole);
+            selectedRoles.Remove(oldRole);
+            RpcRemoveRole(oldRole.Name);
             Debug.Log("Removed old role with name " + oldRole.Name);
         }
 
-        pickedRoles.Add(pickedRole, ownerID);
+        selectedRoles.Add(pickedRole, ownerID);
+        RpcSelectRole(roleName, ownerID);
+        UpdateButtons();
+    }
+
+    [ClientRpc]
+    void RpcRemoveRole(string roleName)
+    {
+        Debug.Log("Client is running remove command with role " + roleName);
+        if (isServer)
+        {
+            Debug.Log("Skipping remove call on host");
+            return;
+        }
+
+        Role oldRole = CrewRoles.GetRoleByName(roleName);
+        selectedRoles.Remove(oldRole);
+        UpdateButtons(); //Refresh the buttons after the change
+    }
+
+    [ClientRpc]
+    void RpcSelectRole(string roleName, uint ownerID)
+    {
+        if (isServer)
+        {
+            Debug.Log("Skipping add call for host.");
+            return;
+        }
+
+        Role selectedRole = CrewRoles.GetRoleByName(roleName);
+        selectedRoles.Add(selectedRole, ownerID);
+        UpdateButtons(); //Refresh the buttons after the change
     }
 
     Role OwnerHasRole(uint ownerID)
     {
-        foreach (KeyValuePair<Role, uint> pair in pickedRoles)
+        foreach (KeyValuePair<Role, uint> pair in selectedRoles)
         {
             if (pair.Value == ownerID)
                 return pair.Key;
@@ -62,31 +94,10 @@ public class RolePicker : NetworkBehaviour
         return null;
     }
 
-    public override void OnStartClient()
-    {
-        Debug.Log("Subscribed to sync dict callback");
-        pickedRoles.Callback += OnPickedRoleChanged;
-    }
-
-    void OnPickedRoleChanged(SyncDictionary<Role, uint>.Operation op, Role role, uint ownerID)
-    { //Called on observing clients when the dictionary has changed
-        Debug.Log($"SyncDict changed. Values are operation: {op.ToString()}, Role: {role.Name}, owner: {ownerID}");
-        /*switch (op) 
-        {
-            case SyncIDictionary<Role, uint>.Operation.OP_ADD:
-                ChangeRoleButton(role, false); //Disable the picked role
-                break;
-            case SyncIDictionary<Role, uint>.Operation.OP_REMOVE:
-                ChangeRoleButton(role, true); //Enable the picked role since its removed
-                break;
-        }*/
-        UpdateButtons();
-    }
-
     void UpdateButtons()
     {
         string syncDictKVPs = "";
-        foreach (KeyValuePair<Role, uint> pair in pickedRoles)
+        foreach (KeyValuePair<Role, uint> pair in selectedRoles)
         {
             syncDictKVPs += $"Key: {pair.Key.Name} Value: {pair.Value} ";
         }
@@ -96,15 +107,24 @@ public class RolePicker : NetworkBehaviour
             TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
             Role role = CrewRoles.GetRoleByName(text.text);
             bool usedRole = false;
-            foreach (KeyValuePair<Role, uint> pair in pickedRoles)
+            foreach (KeyValuePair<Role, uint> pair in selectedRoles)
             {
-                if (pair.Key.Name ==  role.Name)
-                    usedRole = true; break;
+                if (pair.Key.Name == role.Name)
+                {
+                    usedRole = true;
+                    break;
+                }
             }
             if (usedRole)
+            {
                 button.GetComponent<Button>().interactable = false;
+                Debug.Log("Found a used role with name " + role.Name);
+            }
             else
+            {
+                Debug.Log($"Role {role.Name} is unused.");
                 button.GetComponent<Button>().interactable = true;
+            }
         }
     }
 
