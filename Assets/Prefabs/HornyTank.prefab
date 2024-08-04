@@ -229,6 +229,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8031298364410392830}
   - component: {fileID: 4339066053549183298}
+  - component: {fileID: 3689799265424992483}
   m_Layer: 0
   m_Name: Overhead Cam
   m_TagString: MainCamera
@@ -302,6 +303,14 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!81 &3689799265424992483
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1983003687421340465}
+  m_Enabled: 1
 --- !u!1 &2114295516183381532
 GameObject:
   m_ObjectHideFlags: 0
@@ -724,6 +733,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3a250e49ee786d4ba651c88af9899ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   controller: {fileID: 4413024497142797380}
   radarCanvas: {fileID: 0}
   maxSpeed: 20
@@ -749,6 +761,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2317a94762a5c6542a0a72564b0dd449, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   turret: {fileID: 7049589460280495168}
   barrel: {fileID: 1783248617948569194}
   rotationSensitivity: 1
@@ -843,6 +858,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f63365037180304badca42fd6743395, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   MaxHealth: 150
   CurrentHealth: 0
 --- !u!114 &3106130578814861263
@@ -1111,7 +1129,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6632153931250665045}
   - component: {fileID: 4720236431368178803}
-  - component: {fileID: 1058121725099266356}
   m_Layer: 8
   m_Name: Radar Camera
   m_TagString: MainCamera
@@ -1185,14 +1202,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &1058121725099266356
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5481536787013894122}
-  m_Enabled: 0
 --- !u!1 &5964881135196394988
 GameObject:
   m_ObjectHideFlags: 0
@@ -1326,6 +1335,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5882476262191185284}
   - component: {fileID: 5794657405004911898}
+  - component: {fileID: 4567860616633758981}
   m_Layer: 0
   m_Name: 3rd Person Cam
   m_TagString: MainCamera
@@ -1399,6 +1409,14 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!81 &4567860616633758981
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8496116559467687038}
+  m_Enabled: 1
 --- !u!1 &8577808168214862212
 GameObject:
   m_ObjectHideFlags: 0

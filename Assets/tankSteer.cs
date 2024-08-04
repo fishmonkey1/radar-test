@@ -120,6 +120,8 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
 
     public void OnMove(InputValue value)
     {
+        if (playerInfo == null)
+            return; //This role is unused, so do nothing
         if (!((IRoleNeeded)this).HaveRole(playerInfo.CurrentRole))
             return; //Don't allow driving inputs if you don't have the driver role selected
         if (isServer) //Only apply locally if you are the host
@@ -138,6 +140,8 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
 
     public void OnCameraToggle()
     {
+        if (playerInfo == null)
+            return; //This role is unused, so do nothing
         if (!((IRoleNeeded)this).HaveRole(playerInfo.CurrentRole))
             return;
 

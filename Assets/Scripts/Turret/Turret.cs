@@ -25,6 +25,8 @@ public class Turret : NetworkBehaviour, IRoleNeeded
 
     public void OnMove(InputValue input)
     {
+        if (playerInfo == null)
+            return; //This role is unused, so do nothing
         if (!((IRoleNeeded)this).HaveRole(playerInfo.CurrentRole))
             return; //Don't allow turret inputs if you don't have the gunner role selected
         if (isServer) //Only move the turret locally and replicate if you're the host
@@ -42,6 +44,8 @@ public class Turret : NetworkBehaviour, IRoleNeeded
 
     public void OnFire()
     {
+        if (playerInfo == null)
+            return; //This role is unused, so do nothing
         if (!((IRoleNeeded)this).HaveRole(playerInfo.CurrentRole))
             return;
         CmdOnFire();
@@ -68,6 +72,8 @@ public class Turret : NetworkBehaviour, IRoleNeeded
 
     public void OnCameraToggle()
     {
+        if (playerInfo == null)
+            return; //This role is unused, so do nothing
         if (!((IRoleNeeded)this).HaveRole(playerInfo.CurrentRole))
             return;
 
@@ -80,12 +86,10 @@ public class Turret : NetworkBehaviour, IRoleNeeded
         if (playerInfo.OnRoleChange == null)
         {
             playerInfo.OnRoleChange = new PlayerInfo.RoleChangeDelegate(OnRoleChange);
-            Debug.Log("Assigned Turret RoleChange to new delegate");
         }
         else
         {
             playerInfo.OnRoleChange += OnRoleChange;
-            Debug.Log("Assigned Turret RoleChange to existing delegate");
         }
     }
 
