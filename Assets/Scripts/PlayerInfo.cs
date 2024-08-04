@@ -9,8 +9,6 @@ public class PlayerInfo : NetworkBehaviour
     /// </summary>
     public string PlayerName { get; private set; }
     public Role CurrentRole { get; private set; }
-    static PlayerInfo instance; //Hold the singleton during debug testing and remove this when multiplayer is added
-    public static PlayerInfo Instance => instance; //Return the singleton
     public delegate void RoleChangeDelegate(Role oldRole, Role newRole);
     public RoleChangeDelegate OnRoleChange;
 
@@ -34,16 +32,6 @@ public class PlayerInfo : NetworkBehaviour
 
     public void Awake()
     {
-        if (!isLocalPlayer)
-        {
-            //Remove playerInfo components from other player objects
-            GameObject.Destroy(this);
-        }
-        if (instance != null)
-        {
-            throw new System.Exception("You have more than one PlayerInfo component in the scene!");
-        }
-        instance = this; //Lazy singleton instantiation for now
         CurrentRole = CrewRoles.Driver; //For now we'll always start you as the driver during our testing
     }
 

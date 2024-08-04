@@ -11,8 +11,37 @@ public class TankRoomManager : NetworkRoomManager
 
     [SerializeField] GameObject canvasPrefab; //Try spawning the prefab instead of leaving it in the scene?
     [SerializeField] GameObject horniTankPrefab; //For spawning after the game scene is loaded
+    GameObject horniTank; //The spawned tank for grabbing components off of
 
     public static new TankRoomManager singleton => NetworkManager.singleton as TankRoomManager;
+
+    public override GameObject OnRoomServerCreateGamePlayer(NetworkConnectionToClient conn, GameObject roomPlayer)
+    {
+        // get start position from base class
+        Transform startPos = GetStartPosition();
+        GameObject gamePlayer = startPos != null
+            ? Instantiate(playerPrefab, startPos.position, startPos.rotation)
+            : Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+
+        PlayerInfo playerInfo = gamePlayer.GetComponent<PlayerInfo>();
+        TankRoomPlayer roomInfo = roomPlayer.GetComponent<TankRoomPlayer>();
+
+        playerInfo.PickRole(CrewRoles.GetRoleByID(roomInfo.RoleID)); //Set the role to what was in the room player
+        playerInfo.PickName(roomInfo.PlayerName);
+
+        if (playerInfo.CurrentRole == CrewRoles.Gunner)
+        {
+            Turret turret = horniTank.GetComponent<Turret>();
+            turret.SetPlayer(playerInfo); //Assign the turret to the player
+        }
+        if (playerInfo.CurrentRole == CrewRoles.Driver)
+        {
+            tankSteer steer = horniTank.GetComponent<tankSteer>();
+            steer.SetPlayer(playerInfo); //Assign tankSteer to the player
+        }
+
+        return gamePlayer; //Send the player prefab back
+    }
 
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
@@ -48,8 +77,8 @@ public class TankRoomManager : NetworkRoomManager
             //Time to spawn the tank in
             //We'll worry about picking a proper spawn point later on
             Debug.Log("Server moved into gameplay scene, spawning tank");
-            GameObject tank = GameObject.Instantiate(horniTankPrefab); //Double check this puts the tank at 0,0,0
-            NetworkServer.Spawn(tank);
+            horniTank = GameObject.Instantiate(horniTankPrefab); //Double check this puts the tank at 0,0,0
+            NetworkServer.Spawn(horniTank);
         }
     }
 

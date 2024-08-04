@@ -27,6 +27,7 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
     [SerializeField] float engineForce;
 
     public Role RoleNeeded => CrewRoles.Driver;
+    PlayerInfo playerInfo;
 
 
     //[SerializeField] private GameManager gm;
@@ -43,10 +44,16 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
     private void Start()
     {
         layerMask = LayerMask.GetMask("Terrain");
-        if (PlayerInfo.Instance.OnRoleChange == null)
-            PlayerInfo.Instance.OnRoleChange = new PlayerInfo.RoleChangeDelegate(OnRoleChange);
+        
+    }
+
+    public void SetPlayer(PlayerInfo info)
+    {
+        playerInfo = info;
+        if (playerInfo.OnRoleChange == null)
+            playerInfo.OnRoleChange = new PlayerInfo.RoleChangeDelegate(OnRoleChange);
         else
-            PlayerInfo.Instance.OnRoleChange += OnRoleChange;
+            playerInfo.OnRoleChange += OnRoleChange;
         //We have to fetch a camera in Start since the debug stuff assumes you start as the driver
         //PlayerInfo does the PickRole stuff for the driver before this class registers for the delegate
         //So we can't just handle it normally in OnRoleChange for now until there's UI for picking roles
@@ -113,16 +120,16 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
 
     public void OnMove(InputValue value)
     {
-        if (!((IRoleNeeded)this).HaveRole(PlayerInfo.Instance.CurrentRole))
+        if (!((IRoleNeeded)this).HaveRole(playerInfo.CurrentRole))
             return; //Don't allow driving inputs if you don't have the driver role selected
         if (isServer) //Only apply locally if you are the host
             driverInput = value.Get<Vector2>();
         else
-            SendInputs(value.Get<Vector2>()); //Otherwise send to the server
+            CmdSendInputs(value.Get<Vector2>()); //Otherwise send to the server
     }
 
     [Command(requiresAuthority = false)]
-    public void SendInputs(Vector2 input)
+    public void CmdSendInputs(Vector2 input)
     {
         //Set the inputs on the server and then let it replicate the tank's position for everyone else
         driverInput.x = input.x;
@@ -131,7 +138,7 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
 
     public void OnCameraToggle()
     {
-        if (!((IRoleNeeded)this).HaveRole(PlayerInfo.Instance.CurrentRole))
+        if (!((IRoleNeeded)this).HaveRole(playerInfo.CurrentRole))
             return;
 
         currentCam = CamCycle.Instance.GetNextCamera(RoleNeeded, currentCam);

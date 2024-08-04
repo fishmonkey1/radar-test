@@ -19,12 +19,13 @@ public class Turret : NetworkBehaviour, IRoleNeeded
 
     Vector2 turretInput = Vector2.zero;
     Camera currentCam;
+    PlayerInfo playerInfo; //The player that has the Gunner role goes here
 
     public Role RoleNeeded => CrewRoles.Gunner;
 
     public void OnMove(InputValue input)
     {
-        if (!((IRoleNeeded)this).HaveRole(PlayerInfo.Instance.CurrentRole))
+        if (!((IRoleNeeded)this).HaveRole(playerInfo.CurrentRole))
             return; //Don't allow turret inputs if you don't have the gunner role selected
         if (isServer) //Only move the turret locally and replicate if you're the host
             turretInput = input.Get<Vector2>();
@@ -41,7 +42,7 @@ public class Turret : NetworkBehaviour, IRoleNeeded
 
     public void OnFire()
     {
-        if (!((IRoleNeeded)this).HaveRole(PlayerInfo.Instance.CurrentRole))
+        if (!((IRoleNeeded)this).HaveRole(playerInfo.CurrentRole))
             return;
         CmdOnFire();
     }
@@ -67,22 +68,23 @@ public class Turret : NetworkBehaviour, IRoleNeeded
 
     public void OnCameraToggle()
     {
-        if (!((IRoleNeeded)this).HaveRole(PlayerInfo.Instance.CurrentRole))
+        if (!((IRoleNeeded)this).HaveRole(playerInfo.CurrentRole))
             return;
 
         currentCam = CamCycle.Instance.GetNextCamera(RoleNeeded, currentCam);
     }
 
-    void Start()
+    public void SetPlayer(PlayerInfo info)
     {
-        if (PlayerInfo.Instance.OnRoleChange == null)
+        playerInfo = info;
+        if (playerInfo.OnRoleChange == null)
         {
-            PlayerInfo.Instance.OnRoleChange = new PlayerInfo.RoleChangeDelegate(OnRoleChange);
+            playerInfo.OnRoleChange = new PlayerInfo.RoleChangeDelegate(OnRoleChange);
             Debug.Log("Assigned Turret RoleChange to new delegate");
         }
         else
         {
-            PlayerInfo.Instance.OnRoleChange += OnRoleChange;
+            playerInfo.OnRoleChange += OnRoleChange;
             Debug.Log("Assigned Turret RoleChange to existing delegate");
         }
     }
