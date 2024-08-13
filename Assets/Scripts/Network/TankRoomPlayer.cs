@@ -30,6 +30,13 @@ public class TankRoomPlayer : NetworkRoomPlayer
         }
     }
 
+    public bool HasAnyRole()
+    {
+        if (role != null)
+            return true;
+        return false;
+    }
+
     public void CmdSetName(string newName)
     {
         PlayerName = newName; //And that's pretty much it

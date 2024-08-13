@@ -254,7 +254,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1948978294276892278}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 657328333328737988}
+        m_TargetAssemblyTypeName: RolePicker, Assembly-CSharp
+        m_MethodName: ReadyButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &2914714321878191827
 GameObject:
   m_ObjectHideFlags: 0
@@ -313,6 +325,7 @@ MonoBehaviour:
   syncInterval: 0
   RoleButtonPanel: {fileID: 632911893198168544}
   RoleButtonPrefab: {fileID: 7151781250998158829, guid: e12ca72b859f034499ea6e00f3a221ba, type: 3}
+  ReadyButtonObject: {fileID: 3138113748611914890}
 --- !u!223 &4456731233276219804
 Canvas:
   m_ObjectHideFlags: 0
@@ -930,4 +943,16 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7922192305543275991}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 657328333328737988}
+        m_TargetAssemblyTypeName: RolePicker, Assembly-CSharp
+        m_MethodName: BackToMenuButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2

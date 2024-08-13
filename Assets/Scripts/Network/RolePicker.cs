@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using Mirror;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class RolePicker : NetworkBehaviour
 {
@@ -10,9 +11,13 @@ public class RolePicker : NetworkBehaviour
     RectTransform RoleButtonPanel; // Set the button panel in the inspector
     [SerializeField]
     GameObject RoleButtonPrefab;
+    [SerializeField]
+    Button ReadyButtonObject; //For enabling/disabling when you pick a role
+
     public readonly Dictionary<Role, uint> selectedRoles = new();
 
     List<GameObject> buttons = new List<GameObject>();
+    TankRoomPlayer localRoomPlayer;
 
     void Start()
     {
@@ -25,6 +30,29 @@ public class RolePicker : NetworkBehaviour
             buttonScript.onClick.AddListener(() => SelectRole(role.Name));
             buttons.Add(newButton);
         }
+        ReadyButtonObject.interactable = false; //Can't ready up until you pick a role
+    }
+
+    public void BackToMenuButton()
+    {
+        //Note to future me, we might want to change this to call the menu by name instead of build index
+        if (isServer)
+        { //You're hosting the game, so lets shut it down
+            TankRoomManager.singleton.StopHost();
+        }
+        else if (isClient && !isServer)
+        { //You've joined somebody else's game and need to leave
+            TankRoomManager.singleton.StopClient();
+        }
+        SceneManager.LoadScene(0); //Take us back to the main menu
+    }
+
+    public void ReadyButton()
+    {
+        TankRoomPlayer player = NetworkClient.localPlayer.GetComponent<TankRoomPlayer>();
+        player.CmdChangeReadyState(true);
+        if (NetworkClient.localPlayer == null)
+            NetworkClient.AddPlayer();
     }
 
     void SelectRole(string roleName)
@@ -32,7 +60,8 @@ public class RolePicker : NetworkBehaviour
         //Fetch the local owner
         uint ownerID = NetworkClient.localPlayer.netId;
         Debug.Log($"Called select role with role name of {roleName} and an owner with netId of {ownerID}");
-        TankRoomPlayer localRoomPlayer = NetworkClient.connection.identity.GetComponent<TankRoomPlayer>();
+        if (localRoomPlayer == null)
+            localRoomPlayer = NetworkClient.connection.identity.GetComponent<TankRoomPlayer>();
         localRoomPlayer.CmdPickRole(CrewRoles.GetRoleByName(roleName).ID);
         CmdSelectRole(roleName, ownerID); //Send this to the server
     }
@@ -126,6 +155,10 @@ public class RolePicker : NetworkBehaviour
                 button.GetComponent<Button>().interactable = true;
             }
         }
+        if (localRoomPlayer == null) //Grab the room player before checking roles
+            localRoomPlayer = NetworkClient.connection.identity.GetComponent<TankRoomPlayer>();
+        if (localRoomPlayer.HasAnyRole())
+            ReadyButtonObject.interactable = true; //You picked a role so you can now ready up
     }
 
 }

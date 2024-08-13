@@ -15,6 +15,12 @@ public class TankRoomManager : NetworkRoomManager
 
     public static new TankRoomManager singleton => NetworkManager.singleton as TankRoomManager;
 
+    public override void ReadyStatusChanged()
+    {
+        base.ReadyStatusChanged();
+        Debug.Log("Player is now ready");
+    }
+
     public override GameObject OnRoomServerCreateGamePlayer(NetworkConnectionToClient conn, GameObject roomPlayer)
     {
         // get start position from base class
