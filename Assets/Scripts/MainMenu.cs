@@ -77,7 +77,7 @@ public class MainMenu : MonoBehaviour
         if (Transport.active is PortTransport portTransport)
         {
             // use TryParse in case someone tries to enter non-numeric characters
-            if (ushort.TryParse(GUILayout.TextField(portTransport.Port.ToString()), out ushort port))
+            if (ushort.TryParse(PortInput.text, out ushort port))
                 portTransport.Port = port;
         }
         manager.StartClient(); //Actually join into the server
