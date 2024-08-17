@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5700891118520640933}
   - component: {fileID: 1038724502412647635}
+  - component: {fileID: 1389306650163751965}
   m_Layer: 11
   m_Name: BarrelCam
   m_TagString: Untagged
@@ -83,6 +84,14 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!81 &1389306650163751965
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1117173218082354742}
+  m_Enabled: 1
 --- !u!1 &1344660305879264419
 GameObject:
   m_ObjectHideFlags: 0
@@ -716,8 +725,8 @@ MonoBehaviour:
   - {fileID: 9205086570135376729}
   - {fileID: 1038724502412647635}
   gunnerCameras:
-  - {fileID: 5794657405004911898}
   - {fileID: 1038724502412647635}
+  - {fileID: 5794657405004911898}
   driverCameras:
   - {fileID: 9205086570135376729}
   - {fileID: 4339066053549183298}

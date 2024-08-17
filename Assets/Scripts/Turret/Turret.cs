@@ -82,7 +82,13 @@ public class Turret : NetworkBehaviour, IRoleNeeded
 
     public void SetPlayer(PlayerInfo info)
     {
+        Debug.Log("Assigning local player in Turret.");
         playerInfo = info;
+        if (RoleNeeded.Name == info.CurrentRole.Name)
+        {
+            Debug.Log("Local player's role matches for Turret");
+            currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded);
+        }
         if (playerInfo.OnRoleChange == null)
         {
             playerInfo.OnRoleChange = new PlayerInfo.RoleChangeDelegate(OnRoleChange);

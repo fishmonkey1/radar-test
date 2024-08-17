@@ -44,11 +44,16 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
     private void Start()
     {
         layerMask = LayerMask.GetMask("Terrain");
-        
     }
 
     public void SetPlayer(PlayerInfo info)
     {
+        Debug.Log("Assigning local player to tankSteer. info's role is " + info.CurrentRole);
+        if(RoleNeeded.Name == info.CurrentRole.Name)
+        {
+            Debug.Log("Player's role matches for tankSteer");
+            currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded);
+        }
         playerInfo = info;
         if (playerInfo.OnRoleChange == null)
             playerInfo.OnRoleChange = new PlayerInfo.RoleChangeDelegate(OnRoleChange);
@@ -57,7 +62,6 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
         //We have to fetch a camera in Start since the debug stuff assumes you start as the driver
         //PlayerInfo does the PickRole stuff for the driver before this class registers for the delegate
         //So we can't just handle it normally in OnRoleChange for now until there's UI for picking roles
-        currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded);
     }
 
     private void FixedUpdate()

@@ -1,5 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CamCycle : MonoBehaviour
@@ -50,17 +53,35 @@ public class CamCycle : MonoBehaviour
 
     }
 
+    public List<Camera> GetCamerasByRole(Role role)
+    {
+        foreach (var entry in roleCameras)
+        {
+            if (entry.Key.Name == role.Name) //We found a match
+                return entry.Value;
+        }
+        return null;
+    }
+
     public void ChangeRoles(Role lastRole, Role newRole)
     {
-        if (!roleCameras.ContainsKey(lastRole) || !roleCameras.ContainsKey(newRole))
-            throw new System.NotImplementedException();
-        foreach (Camera cam in roleCameras[lastRole])
+        List<Camera> lastCams = GetCamerasByRole(lastRole);
+        List<Camera> newCams = GetCamerasByRole(newRole);
+        if (newCams == null)
         {
-            cam.gameObject.SetActive(false);
+            Debug.Log($"newRole is not in roleCamera dictionary. newRole is {newRole.Name} and lastRole is {lastRole.Name}");
+            return;
         }
-        Debug.Log($"Disabled cameras for {lastRole.Name} role");
+        if (lastCams != null)
+        {
+            foreach (Camera cam in lastCams)
+            {
+                cam.gameObject.SetActive(false);
+            }
+            Debug.Log($"Disabled cameras for {lastRole.Name} role");
+        }
 
-        GetFirstCamera(newRole).gameObject.SetActive(true);
+        newCams[0].gameObject.SetActive(true); //Turn on the first cam for the role
     }
 
 }

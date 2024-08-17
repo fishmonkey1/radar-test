@@ -11,7 +11,7 @@ public class TankRoomManager : NetworkRoomManager
 
     [SerializeField] GameObject canvasPrefab; //Try spawning the prefab instead of leaving it in the scene?
     [SerializeField] GameObject horniTankPrefab; //For spawning after the game scene is loaded
-    GameObject horniTank; //The spawned tank for grabbing components off of
+    public GameObject horniTank; //The spawned tank for grabbing components off of
 
     public static new TankRoomManager singleton => NetworkManager.singleton as TankRoomManager;
 
@@ -29,22 +29,11 @@ public class TankRoomManager : NetworkRoomManager
             ? Instantiate(playerPrefab, startPos.position, startPos.rotation)
             : Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
 
-        PlayerInfo playerInfo = gamePlayer.GetComponent<PlayerInfo>();
+        PlayerInfo newInfo = gamePlayer.GetComponent<PlayerInfo>();
         TankRoomPlayer roomInfo = roomPlayer.GetComponent<TankRoomPlayer>();
 
-        playerInfo.PickRole(CrewRoles.GetRoleByID(roomInfo.RoleID)); //Set the role to what was in the room player
-        playerInfo.PickName(roomInfo.PlayerName);
-
-        if (playerInfo.CurrentRole == CrewRoles.Gunner)
-        {
-            Turret turret = horniTank.GetComponent<Turret>();
-            turret.SetPlayer(playerInfo); //Assign the turret to the player
-        }
-        if (playerInfo.CurrentRole == CrewRoles.Driver)
-        {
-            tankSteer steer = horniTank.GetComponent<tankSteer>();
-            steer.SetPlayer(playerInfo); //Assign tankSteer to the player
-        }
+        newInfo.PickRole(CrewRoles.GetRoleByID(roomInfo.RoleID)); //Set the role to what was in the room player
+        newInfo.PickName(roomInfo.PlayerName);
 
         return gamePlayer; //Send the player prefab back
     }
