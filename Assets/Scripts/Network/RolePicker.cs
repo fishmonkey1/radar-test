@@ -64,6 +64,11 @@ public class RolePicker : NetworkBehaviour
         Debug.Log($"Called select role with role name of {roleName} and an owner with netId of {ownerID}");
         if (localRoomPlayer == null)
             localRoomPlayer = NetworkClient.connection.identity.GetComponent<TankRoomPlayer>();
+        //Try picking the role right away for the button update
+        if (localRoomPlayer.role != null)
+            localRoomPlayer.PickRole(localRoomPlayer.role.ID, CrewRoles.GetRoleByName(roleName).ID);
+        else
+            localRoomPlayer.PickRole(999, CrewRoles.GetRoleByName(roleName).ID);
         localRoomPlayer.CmdPickRole(CrewRoles.GetRoleByName(roleName).ID);
         CmdSelectRole(roleName, ownerID); //Send this to the server
     }
@@ -217,7 +222,14 @@ public class RolePicker : NetworkBehaviour
         if (localRoomPlayer == null) //Grab the room player before checking roles
             localRoomPlayer = NetworkClient.connection.identity.GetComponent<TankRoomPlayer>();
         if (localRoomPlayer.HasAnyRole())
+        {
+            Debug.Log("Local player has a role, turning ready button on.");
             ReadyButtonObject.interactable = true; //You picked a role so you can now ready up
+        }
+        else
+        {
+            Debug.Log($"No role on local player. RoleID is {localRoomPlayer.RoleID} and Role name is {localRoomPlayer.role.Name}");
+        }
     }
 
 }

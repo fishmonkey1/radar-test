@@ -12,26 +12,29 @@ public class TankRoomPlayer : NetworkRoomPlayer
 
     [SyncVar (hook=nameof(PickRole))] public uint RoleID = 999; //Init to an invalid role since 0 aligns with the first
     [SyncVar] public string PlayerName = null;
-    Role role;
+    public Role role;
 
     [Command]
     public void CmdPickRole(uint roleID)
-    { //Should be it for now boss
+    {
         role = CrewRoles.GetRoleByID(roleID);
         RoleID = roleID;
     }
 
-    private void PickRole(uint oldID, uint newID) 
+    public void PickRole(uint oldID, uint newID) 
     {
         Role newRole = CrewRoles.GetRoleByID(newID);
         if (newRole != role)
         {
             role = newRole;
+            RoleID = newRole.ID;
         }
     }
 
     public bool HasAnyRole()
     {
+        if (RoleID == 999)
+            return false; //You're on the default role
         if (role != null)
             return true;
         return false;
