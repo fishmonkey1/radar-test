@@ -680,7 +680,7 @@ GameObject:
   - component: {fileID: 4167277447963746903}
   m_Layer: 11
   m_Name: HornyTank
-  m_TagString: Untagged
+  m_TagString: PlayerTank
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -778,6 +778,7 @@ MonoBehaviour:
   rotationSensitivity: 1
   projectilePrefab: {fileID: 3237541956323890682, guid: bb121984466ce824084205ec73e2212b, type: 3}
   projectileSpawn: {fileID: 5793015795270388151}
+  turretInput: {x: 0, y: 0}
 --- !u!65 &1284342536998342120
 BoxCollider:
   m_ObjectHideFlags: 0

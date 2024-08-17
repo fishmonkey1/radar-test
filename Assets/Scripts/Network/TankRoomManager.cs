@@ -11,7 +11,6 @@ public class TankRoomManager : NetworkRoomManager
 
     [SerializeField] GameObject canvasPrefab; //Try spawning the prefab instead of leaving it in the scene?
     [SerializeField] GameObject horniTankPrefab; //For spawning after the game scene is loaded
-    public GameObject horniTank; //The spawned tank for grabbing components off of
 
     public static new TankRoomManager singleton => NetworkManager.singleton as TankRoomManager;
 
@@ -72,7 +71,7 @@ public class TankRoomManager : NetworkRoomManager
             //Time to spawn the tank in
             //We'll worry about picking a proper spawn point later on
             Debug.Log("Server moved into gameplay scene, spawning tank");
-            horniTank = GameObject.Instantiate(horniTankPrefab); //Double check this puts the tank at 0,0,0
+            GameObject horniTank = GameObject.Instantiate(horniTankPrefab); //Double check this puts the tank at 0,0,0
             NetworkServer.Spawn(horniTank);
         }
     }

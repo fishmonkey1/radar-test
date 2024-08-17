@@ -17,7 +17,7 @@ public class Turret : NetworkBehaviour, IRoleNeeded
     [SerializeField] GameObject projectilePrefab; //This will need to be fetched later when there are different ammos
     [SerializeField] Transform projectileSpawn;
 
-    Vector2 turretInput = Vector2.zero;
+    [SerializeField, ReadOnly]Vector2 turretInput = Vector2.zero;
     Camera currentCam;
     PlayerInfo playerInfo; //The player that has the Gunner role goes here
 
@@ -45,15 +45,22 @@ public class Turret : NetworkBehaviour, IRoleNeeded
     public void OnFire()
     {
         if (playerInfo == null)
+        {
+            Debug.Log("No playerInfo on turret to call OnFire with.");
             return; //This role is unused, so do nothing
+        }
         if (!((IRoleNeeded)this).HaveRole(playerInfo.CurrentRole))
+        {
+            Debug.Log("Ignoring fire order from Non-Gunner player");
             return;
+        }
         CmdOnFire();
     }
 
     [Command(requiresAuthority=false)]
     public void CmdOnFire()
     {
+        Debug.Log("Server is spawning projectile");
         GameObject projectileObject = GameObject.Instantiate(projectilePrefab, projectileSpawn.position, Quaternion.identity);
         Projectile projectile = projectileObject.GetComponent<Projectile>();
         projectile.shooter = gameObject;
@@ -101,7 +108,6 @@ public class Turret : NetworkBehaviour, IRoleNeeded
 
     void Update()
     {
-        //TODO: Do turret translation in here next time I code
         if (!Mathf.Approximately(0, turretInput.x))
         { //Only turn the turret if we have input to use
             turret.Rotate(Vector3.forward, turretInput.x * rotationSensitivity * Time.deltaTime);

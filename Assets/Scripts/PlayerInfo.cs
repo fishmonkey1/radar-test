@@ -11,6 +11,7 @@ public class PlayerInfo : NetworkBehaviour
     [SyncVar(hook = nameof(NetworkChangeRole))] public Role CurrentRole;
     public delegate void RoleChangeDelegate(Role oldRole, Role newRole);
     public RoleChangeDelegate OnRoleChange;
+    public GameObject horniTank;
 
     public override void OnStartLocalPlayer()
     {
@@ -18,6 +19,7 @@ public class PlayerInfo : NetworkBehaviour
         if (isLocalPlayer && Utils.IsSceneActive(TankRoomManager.singleton.GameplayScene))
         {
             Debug.Log("This PlayerInfo is on a local player and we are in the gameplay screen");
+            horniTank = GameObject.FindGameObjectWithTag("PlayerTank"); //Find the tank and assign it
             PickRole(CurrentRole);
         }
 
@@ -47,13 +49,14 @@ public class PlayerInfo : NetworkBehaviour
             {
                 CamCycle.Instance.ChangeRoles(oldRole, role);
                 Debug.Log("Setting up local player camera");
-                if (TankRoomManager.singleton.horniTank != null)
+                if (horniTank != null)
                 {
                     Debug.Log("Assigning player to spawned tank");
-                    if (role == CrewRoles.Gunner)
-                        TankRoomManager.singleton.horniTank.GetComponent<Turret>().SetPlayer(this);
-                    if (role == CrewRoles.Driver)
-                        TankRoomManager.singleton.horniTank.GetComponent<tankSteer>().SetPlayer(this);
+                    Debug.Log("Role equals gunner: " + (role.Name == CrewRoles.Gunner.Name));
+                    if (role.Name == CrewRoles.Gunner.Name)
+                        horniTank.GetComponent<Turret>().SetPlayer(this);
+                    if (role.Name == CrewRoles.Driver.Name)
+                        horniTank.GetComponent<tankSteer>().SetPlayer(this);
                 }
             }
         }
