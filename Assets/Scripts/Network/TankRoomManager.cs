@@ -11,6 +11,7 @@ public class TankRoomManager : NetworkRoomManager
 
     [SerializeField] GameObject canvasPrefab; //Try spawning the prefab instead of leaving it in the scene?
     [SerializeField] GameObject horniTankPrefab; //For spawning after the game scene is loaded
+    [SerializeField, ReadOnly] RolePicker rolePicker; //Cached after the UI is made
 
     public static new TankRoomManager singleton => NetworkManager.singleton as TankRoomManager;
 
@@ -64,6 +65,7 @@ public class TankRoomManager : NetworkRoomManager
         {
             Debug.Log("Server moved into room scene, spawning canvas");
             GameObject canvas = GameObject.Instantiate(canvasPrefab);
+            rolePicker = canvas.GetComponent<RolePicker>();
             NetworkServer.Spawn(canvas);
         }
         if (sceneName == GameplayScene)
@@ -75,6 +77,16 @@ public class TankRoomManager : NetworkRoomManager
             NetworkServer.Spawn(horniTank);
         }
     }
+
+    //This no worky. I'll have to try some other way
+    /*public override void OnRoomClientExit()
+    { //If the client leaves during the room scene then we should free up their 
+        if (Utils.IsSceneActive(GameplayScene))
+            return; //Not handling clients leaving the game yet
+        if (rolePicker == null)
+            rolePicker = GameObject.Find("LobbyCanvas").GetComponent<RolePicker>(); //Fetch the component
+        rolePicker.CmdRemoveRoleByID(NetworkClient.localPlayer.netId);
+    }*/
 
     public override void OnGUI()
     {

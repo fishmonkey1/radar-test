@@ -31,6 +31,8 @@ public class RolePicker : NetworkBehaviour
             buttons.Add(newButton);
         }
         ReadyButtonObject.interactable = false; //Can't ready up until you pick a role
+        //When the client enters the room we should update to reflect any roles that were picked before they joined
+        CmdGetServerSelectedRoles(); //Ask for any roles that were picked so far
     }
 
     public void BackToMenuButton()
@@ -84,6 +86,27 @@ public class RolePicker : NetworkBehaviour
         UpdateButtons();
     }
 
+    [Command(requiresAuthority = false)]
+    public void CmdRemoveRoleByID(uint id)
+    {
+        Role role = null;
+        foreach (KeyValuePair<Role, uint> pair in selectedRoles)
+        {
+            if (pair.Value == id)
+            {
+                role = pair.Key;
+                break;
+            }
+        }
+        if (role == null)
+            return; //This player didn't have a role selected
+        if (selectedRoles.ContainsKey(role))
+        {
+            selectedRoles.Remove(role);
+            RpcRemoveRole(role.Name);
+        }
+    }
+
     [ClientRpc]
     void RpcRemoveRole(string roleName)
     {
@@ -111,6 +134,42 @@ public class RolePicker : NetworkBehaviour
         Role selectedRole = CrewRoles.GetRoleByName(roleName);
         selectedRoles.Add(selectedRole, ownerID);
         UpdateButtons(); //Refresh the buttons after the change
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdGetServerSelectedRoles()
+    { //This collects the entries from the dictionary and then send them to the client
+        if (selectedRoles.Count == 0)
+            return; //No need to do this if there's no selected roles
+        Role[] roles = new Role[selectedRoles.Count];
+        uint[] ids = new uint[selectedRoles.Count];
+        int index = 0;
+        foreach (KeyValuePair<Role, uint> pair in selectedRoles)
+        { //Build out the two arrays for sending
+            roles[index] = pair.Key;
+            ids[index] = pair.Value;
+            index++;
+        }
+        RpcUpdateSelectedRoles(roles, ids);
+    }
+
+    [ClientRpc]
+    public void RpcUpdateSelectedRoles(Role[] roles, uint[] ids)
+    { //Called from the server after someone joins an in-progress room
+        //TODO: Target this function to only players that have joined
+        bool changed = false; //If there is an updated element then we update the buttons
+        for (int i = 0; i < roles.Length; i++)
+        { //Roles and ids array are the same size, so lets check for them in the local dictionary
+            if (!selectedRoles.ContainsKey(roles[i]))
+            {
+                selectedRoles.Add(roles[i], ids[i]);
+                changed = true;
+            }
+        }
+        if (changed)
+        { //This gets sent to every client right now, so only update buttons if there is new info
+            UpdateButtons();
+        }
     }
 
     Role OwnerHasRole(uint ownerID)
