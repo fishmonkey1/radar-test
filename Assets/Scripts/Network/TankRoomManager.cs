@@ -21,6 +21,16 @@ public class TankRoomManager : NetworkRoomManager
         Debug.Log("Player is now ready");
     }
 
+    public TankRoomPlayer GetRoomPlayerByID(uint id)
+    {
+        foreach (TankRoomPlayer player in roomSlots)
+        {
+            if (player.netId == id)
+                return player;
+        }
+        Debug.LogError($"Tried to fetch player ID of {id} and it does not exist in the RoomManager!");
+        return null; //This could be baaaad.
+    }
     public override GameObject OnRoomServerCreateGamePlayer(NetworkConnectionToClient conn, GameObject roomPlayer)
     {
         // get start position from base class
