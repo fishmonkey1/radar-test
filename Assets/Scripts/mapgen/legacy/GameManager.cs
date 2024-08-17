@@ -32,8 +32,11 @@ public class GameManager: MonoBehaviour
 
     public void Awake()
     {
+        /*
+        AssetDatabase.FindAssets()
         AssetDatabase.DeleteAsset("Assets/Textures_and_Models/Resources/TerrainTextures/topo/layers/Topographic.terrainlayer");
         AssetDatabase.Refresh();
+        */
 
         loadNewData();
         //LoadEnemies();

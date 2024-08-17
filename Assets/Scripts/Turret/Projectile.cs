@@ -33,7 +33,6 @@ public class Projectile : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        //TODO: damage stuff here
 
         if (damage.AreaDamageType == DamageInfo.AreaDamage.SPHERE)
         {
