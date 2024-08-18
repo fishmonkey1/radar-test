@@ -7,7 +7,7 @@ using System;
 public class Chat : NetworkBehaviour
 {
     [SerializeField] GameObject chatPanel;
-    [SerializeField] InputField chatInput;
+    [SerializeField] TMP_InputField chatInput;
     [SerializeField] TMP_Text chatText;
 
     public delegate void OnMessageReceived(ChatMessage message);
@@ -17,13 +17,15 @@ public class Chat : NetworkBehaviour
     public struct ChatMessage
     {
         public string messageText;
-        public uint senderNetID;
+        public string PlayerName;
+        public int connectionID;
         public MessageTypes messageType;
 
-        public ChatMessage(string message, uint ID, MessageTypes type)
+        public ChatMessage(string message, string playerName, int ID, MessageTypes type)
         {
             messageText = message;
-            senderNetID = ID;
+            PlayerName = playerName;
+            connectionID = ID;
             messageType = type;
         }
     }
@@ -46,14 +48,14 @@ public class Chat : NetworkBehaviour
 
     void SendChatMessage(string text)
     { //This happens on the local machine, giving us a chance to collect info before sending to the server
-        CmdSendChatMessage(text, NetworkClient.localPlayer.netId);
+        chatInput.text = ""; //Clear the text out of the inputField
+        CmdSendChatMessage(text, NetworkClient.connection.connectionId, PlayerInfo.localPlayerName);
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdSendChatMessage(string text, uint netID)
+    public void CmdSendChatMessage(string text, int connectionID, string playerName)
     { //Server finds the player's name, appends the text to make the whole message, then sends the message to all clients
-        TankRoomPlayer player = TankRoomManager.singleton.GetRoomPlayerByID(netID);
-        ChatMessage message = new ChatMessage(text, netID, MessageTypes.ALL); //Just default to all for now
+        ChatMessage message = new ChatMessage(text, playerName, connectionID, MessageTypes.ALL); //Just default to all for now
         chatText.text += BuildMessage(message); //Stick this on the end of the server's chatText area
         //Now we need to send this message to all the clients for display on their end
         RpcReceiveMessage(message);
@@ -62,7 +64,6 @@ public class Chat : NetworkBehaviour
     [ClientRpc]
     public void RpcReceiveMessage(ChatMessage message)
     {
-        TankRoomPlayer player = TankRoomManager.singleton.GetRoomPlayerByID(message.senderNetID);
         if (!isServer)
         {
             chatText.text += BuildMessage(message);
@@ -75,7 +76,6 @@ public class Chat : NetworkBehaviour
 
     string BuildMessage(ChatMessage message)
     {
-        TankRoomPlayer player = TankRoomManager.singleton.GetRoomPlayerByID(message.senderNetID);
-        return player.PlayerName + ": " + message.messageText + "\n";
+        return message.PlayerName + ": " + message.messageText + "\n";
     }
 }

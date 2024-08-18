@@ -13,6 +13,8 @@ public class PlayerInfo : NetworkBehaviour
     public RoleChangeDelegate OnRoleChange;
     public GameObject horniTank;
 
+    public static string localPlayerName = "default"; //This lets the local player assign their name
+
     public override void OnStartLocalPlayer()
     {
         Debug.Log("Starting up a local PlayerInfo component");

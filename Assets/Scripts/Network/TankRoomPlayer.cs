@@ -14,6 +14,18 @@ public class TankRoomPlayer : NetworkRoomPlayer
     [SyncVar] public string PlayerName = null;
     public Role role;
 
+    public override void Start()
+    {
+        base.Start();
+        Debug.Log($"IsLocalPlayer equals {isLocalPlayer}");
+        if (isLocalPlayer)
+        {
+            PlayerName = PlayerInfo.localPlayerName;
+            GetComponent<PlayerInfo>().PickName(PlayerName);
+            CmdSetName(PlayerInfo.localPlayerName);
+        }
+    }
+
     [Command]
     public void CmdPickRole(uint roleID)
     {

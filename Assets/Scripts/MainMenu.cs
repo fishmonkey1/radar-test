@@ -11,6 +11,7 @@ public class MainMenu : MonoBehaviour
     public GameObject OptionsPopup; //Show the options screen
     public GameObject JoinPopup; //Show the join screen
     public GameObject CreditsPopup; //Need to link this to a credits file at some point
+    public GameObject NamePopup; //If you have no name assigned this appears instead of hosting or joining a game
     public TMP_InputField IPInput;
     public TMP_InputField PortInput;
     GameObject currentScreen; //Check which screen you're showing right now
@@ -22,12 +23,29 @@ public class MainMenu : MonoBehaviour
 
     public void HostGame()
     {
+        if (PlayerInfo.localPlayerName == "default")
+        { //Pick a name before hosting
+            ShowNamePopup();
+            return;
+        }
         TankRoomManager manager = NetworkManager.singleton as TankRoomManager;
         manager.StartHost();
     }
 
+    public void ShowNamePopup()
+    {
+        currentScreen.SetActive(false);
+        currentScreen = NamePopup;
+        currentScreen.SetActive(true);
+    }
+
     public void ShowJoinScreen()
     {
+        if (PlayerInfo.localPlayerName == "default")
+        { //Pick a name before joining
+            ShowNamePopup();
+            return;
+        }
         currentScreen.SetActive(false);
         currentScreen = JoinPopup;
         currentScreen.SetActive(true);

@@ -9,7 +9,8 @@ public class TankRoomManager : NetworkRoomManager
     /// Don't let players ready up unless they have a role picked
     /// Figure out how I'm linking up roles with their associated scripts at some point :c
 
-    [SerializeField] GameObject canvasPrefab; //Try spawning the prefab instead of leaving it in the scene?
+    [SerializeField] GameObject rolePickerPrefab; //Try spawning the prefab instead of leaving it in the scene?
+    [SerializeField] GameObject chatroomPrefab;
     [SerializeField] GameObject horniTankPrefab; //For spawning after the game scene is loaded
     [SerializeField, ReadOnly] RolePicker rolePicker; //Cached after the UI is made
 
@@ -21,16 +22,6 @@ public class TankRoomManager : NetworkRoomManager
         Debug.Log("Player is now ready");
     }
 
-    public TankRoomPlayer GetRoomPlayerByID(uint id)
-    {
-        foreach (TankRoomPlayer player in roomSlots)
-        {
-            if (player.netId == id)
-                return player;
-        }
-        Debug.LogError($"Tried to fetch player ID of {id} and it does not exist in the RoomManager!");
-        return null; //This could be baaaad.
-    }
     public override GameObject OnRoomServerCreateGamePlayer(NetworkConnectionToClient conn, GameObject roomPlayer)
     {
         // get start position from base class
@@ -74,9 +65,9 @@ public class TankRoomManager : NetworkRoomManager
         if (sceneName == RoomScene)
         {
             Debug.Log("Server moved into room scene, spawning canvas");
-            GameObject canvas = GameObject.Instantiate(canvasPrefab);
-            rolePicker = canvas.GetComponent<RolePicker>();
-            NetworkServer.Spawn(canvas);
+            GameObject RolePickerObject = GameObject.Instantiate(rolePickerPrefab);
+            rolePicker = RolePickerObject.GetComponent<RolePicker>();
+            NetworkServer.Spawn(RolePickerObject);
         }
         if (sceneName == GameplayScene)
         {
@@ -85,6 +76,9 @@ public class TankRoomManager : NetworkRoomManager
             Debug.Log("Server moved into gameplay scene, spawning tank");
             GameObject horniTank = GameObject.Instantiate(horniTankPrefab); //Double check this puts the tank at 0,0,0
             NetworkServer.Spawn(horniTank);
+            GameObject canvas = GameObject.Find("Canvas");
+            GameObject chatroom = GameObject.Instantiate(chatroomPrefab, canvas.transform);
+            NetworkServer.Spawn(chatroom);
         }
     }
 
