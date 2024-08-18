@@ -7,6 +7,7 @@ using System;
 public class Chat : NetworkBehaviour
 {
     [SerializeField] GameObject chatPanel;
+    [SerializeField] private Canvas chatCanvas;
     [SerializeField] TMP_InputField chatInput;
     [SerializeField] TMP_Text chatText;
 
@@ -77,5 +78,18 @@ public class Chat : NetworkBehaviour
     string BuildMessage(ChatMessage message)
     {
         return message.PlayerName + ": " + message.messageText + "\n";
+    }
+
+    [ClientRpc]
+    public void OnShowChat()
+    {
+        if (chatPanel.activeInHierarchy)
+        {
+            chatPanel.SetActive(false);
+        }
+        else
+        {
+            chatPanel.SetActive(true);
+        }
     }
 }

@@ -12,6 +12,7 @@ namespace Mirror.Examples.Chat
         [SerializeField] Scrollbar scrollbar;
         [SerializeField] InputField chatMessage;
         [SerializeField] Button sendButton;
+        
 
         // This is only set on client to the name of the local player
         internal static string localPlayerName;
@@ -96,5 +97,7 @@ namespace Mirror.Examples.Chat
                 chatMessage.ActivateInputField();
             }
         }
+
+       
     }
 }
