@@ -57,7 +57,6 @@ public class EnemyManager : MonoBehaviour
     public delegate GameObject OnEnemySpawn(Enemy enemy);
     public OnEnemySpawn OnEnemySpawned;
 
-    // Start is called before the first frame update
     void Awake()
     {
         if (singleton == null)
