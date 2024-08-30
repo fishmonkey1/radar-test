@@ -9,11 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2498517763114151090}
-  - component: {fileID: 1689861258904427099}
+  - component: {fileID: 2949775327165846078}
   - component: {fileID: 6808901897129409266}
   - component: {fileID: 4838846517954928888}
   m_Layer: 0
-  m_Name: Path Road Creator
+  m_Name: NodesToRoads
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34,7 +34,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1689861258904427099
+--- !u!114 &2949775327165846078
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -43,7 +43,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 643190499433171579}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6f4dcc1e589559469810f851e729a67, type: 3}
+  m_Script: {fileID: 11500000, guid: c1f7227f509fc7044b392fdab3b62133, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   nodes: []

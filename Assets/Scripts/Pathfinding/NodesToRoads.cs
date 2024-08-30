@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(RoadMeshCreator))]
-public class PathCreatorToGraph : MonoBehaviour
+public class NodesToRoads : MonoBehaviour
 {
     //The PathCreator can't handle branches, so we can only render one length of path at a time.
     //I'll be experimenting with this so you don't have to set it up manually for the graph
@@ -15,8 +15,7 @@ public class PathCreatorToGraph : MonoBehaviour
     [SerializeField]
     RoadMeshCreator RoadMeshCreator; //Edit the values here 
 
-    // Start is called before the first frame update
-    void Awake()
+    public void DrawRoadsFromNodes()
     {
         if (RoadMeshCreator == null)
             RoadMeshCreator = GetComponent<RoadMeshCreator>();
@@ -29,5 +28,11 @@ public class PathCreatorToGraph : MonoBehaviour
 
         BezierPath path = new BezierPath(nodeTransforms, false, space: PathSpace.xyz);
         RoadMeshCreator.pathCreator.bezierPath = path; //Assign the nodes from the scene to the road renderer
+        RoadMeshCreator.TriggerUpdate(); //Make the road mesh creator actually draw out the road
+    }
+
+    public void AddNode(Node node)
+    {
+        nodes.Add(node); //Das it, mane
     }
 }
