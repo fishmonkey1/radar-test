@@ -292,6 +292,8 @@ MonoBehaviour:
   Connections:
   - {fileID: 596991333}
   StartOfNewRoad: 0
+  NodeImportance: 0
+  NodeTraversal: 0
 --- !u!4 &414561002
 Transform:
   m_ObjectHideFlags: 0
@@ -575,7 +577,10 @@ MonoBehaviour:
   Connections:
   - {fileID: 414561001}
   - {fileID: 1257501656}
+  - {fileID: 1324522553}
   StartOfNewRoad: 0
+  NodeImportance: 0
+  NodeTraversal: 0
 --- !u!4 &596991334
 Transform:
   m_ObjectHideFlags: 0
@@ -930,6 +935,8 @@ MonoBehaviour:
   - {fileID: 596991333}
   - {fileID: 2126526489}
   StartOfNewRoad: 0
+  NodeImportance: 0
+  NodeTraversal: 0
 --- !u!4 &1257501657
 Transform:
   m_ObjectHideFlags: 0
@@ -945,6 +952,56 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1671106592}
   m_LocalEulerAnglesHint: {x: 0, y: 21.558, z: 0}
+--- !u!1 &1324522552
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1324522554}
+  - component: {fileID: 1324522553}
+  m_Layer: 0
+  m_Name: IntersectionBranch
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1324522553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324522552}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5af56c8f86834942a7edded9864aeb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Connections:
+  - {fileID: 596991333}
+  - {fileID: 2056615862}
+  StartOfNewRoad: 1
+  NodeImportance: 0
+  NodeTraversal: 0
+--- !u!4 &1324522554
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1324522552}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 20, y: 0, z: -19.8}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1671106592}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1420528382 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2490491515257590033, guid: 9e5a858ffca90f44fbc9b28b1bde15fc, type: 3}
@@ -1187,6 +1244,8 @@ Transform:
   m_Children:
   - {fileID: 414561002}
   - {fileID: 596991334}
+  - {fileID: 1324522554}
+  - {fileID: 2056615861}
   - {fileID: 1257501657}
   - {fileID: 2126526490}
   m_Father: {fileID: 0}
@@ -1327,6 +1386,55 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e5a858ffca90f44fbc9b28b1bde15fc, type: 3}
+--- !u!1 &2056615860
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2056615861}
+  - component: {fileID: 2056615862}
+  m_Layer: 0
+  m_Name: TerminusNode
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2056615861
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2056615860}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.6, y: 0, z: -47.6}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1671106592}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2056615862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2056615860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5af56c8f86834942a7edded9864aeb2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Connections:
+  - {fileID: 1324522553}
+  StartOfNewRoad: 0
+  NodeImportance: 0
+  NodeTraversal: 0
 --- !u!1 &2126526488
 GameObject:
   m_ObjectHideFlags: 0
@@ -1338,7 +1446,7 @@ GameObject:
   - component: {fileID: 2126526490}
   - component: {fileID: 2126526489}
   m_Layer: 0
-  m_Name: Node (3)
+  m_Name: TerminusNode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1359,6 +1467,8 @@ MonoBehaviour:
   Connections:
   - {fileID: 2126526489}
   StartOfNewRoad: 0
+  NodeImportance: 0
+  NodeTraversal: 0
 --- !u!4 &2126526490
 Transform:
   m_ObjectHideFlags: 0
