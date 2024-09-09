@@ -6,6 +6,7 @@ public class GraphToRoads : MonoBehaviour
 
     [SerializeField]
     GameObject NodesToRoadsPrefab; //This converts the assigned nodes into the drawn roads
+    GameObject RoadsParent; //For putting all the road renderers inside so they dont clutter the inspector
     List<Node> Visited = new();
     [SerializeField]
     List<NodesToRoads> RoadDraws = new(); //For viewing all of the Node draw components in the editor
@@ -48,7 +49,7 @@ public class GraphToRoads : MonoBehaviour
         Queue<NodePair> newRoadPairs = new();
         NodePair rootNode = new NodePair(null, firstNode); //The first argument is the node that serves as the intersection, which doesn't exist in the root node.
         newRoadPairs.Enqueue(rootNode);
-
+        RoadsParent = new GameObject("Roads");
         while (newRoadPairs.Count > 0)
         { 
             //While there are still roads to make, follow the nodes until we run out of ones not flagged as new roads
@@ -58,7 +59,7 @@ public class GraphToRoads : MonoBehaviour
             NodePair roadStartPair = newRoadPairs.Dequeue();
             Node roadStartNode = roadStartPair.RoadStartNode;
 
-            GameObject road = GameObject.Instantiate(NodesToRoadsPrefab);
+            GameObject road = GameObject.Instantiate(NodesToRoadsPrefab, RoadsParent.transform);
             NodesToRoads roadDraw = road.GetComponent<NodesToRoads>();
             RoadDraws.Add(roadDraw); //Put the newly spawned component in the list for viewing in the editor
 

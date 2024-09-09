@@ -120,8 +120,11 @@ namespace PathCreation.Examples {
         // Add MeshRenderer and MeshFilter components to this gameobject if not already attached
         void AssignMeshComponents () {
 
-            if (meshHolder == null) {
+            if (meshHolder == null) 
+            {
                 meshHolder = new GameObject ("Road Mesh Holder");
+                if (transform.parent != null)
+                    meshHolder.transform.parent = transform.parent;
             }
 
             meshHolder.transform.rotation = Quaternion.identity;
