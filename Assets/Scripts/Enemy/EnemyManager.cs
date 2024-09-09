@@ -51,7 +51,7 @@ public class EnemyManager : MonoBehaviour
         public Vector3 vector;
     }
     //Stores where the player was seen and how much time the search has left
-    public List<Vector3FloatPair> Spottings {  get; private set; }
+    public List<Vector3FloatPair> PlayerSpottings {  get; private set; }
 
     public List<Enemy> AllEnemies = new();
     public delegate GameObject OnEnemySpawn(Enemy enemy);
