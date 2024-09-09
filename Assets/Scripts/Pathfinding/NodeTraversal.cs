@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public enum NodeTraversal
 {
     NOT_SET, //Used as error handling, meaning you didn't assign anything to the node
