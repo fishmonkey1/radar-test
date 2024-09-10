@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public abstract class OrderContext
 {
     public Orders Order { get; protected set; } //The order this context class goes to
+    public Node Node; //The node the order targets, used for everything but patrol
 
     public virtual void FinishOrder() { } //For use in children classes
     public virtual bool CheckOrderFinished() { return false; }
@@ -61,7 +62,6 @@ public class PatrolOrder : OrderContext
 
 public class InvestigateOrder : OrderContext
 {
-    public Node Node;
     //I'll need stuff about the search pattern somewhere in here, so I'll leave this one as a stub until I figure out what I'm doing... :c
 
     public InvestigateOrder()
@@ -73,10 +73,41 @@ public class InvestigateOrder : OrderContext
 public class RepositionOrder : OrderContext
 {
     //This one is also going to remain a stub for now until I decide if I'm going to have messages in the orders or in the containing class. I'm personally leaning towards having the manager sort it out, but we'll see
-    public Node Node; //The node the unit is going to
 
     public RepositionOrder()
     {
         Order = Orders.REPOSITION;
+    }
+}
+
+public class GuardOrder : OrderContext
+{
+    public GuardOrder()
+    {
+        Order = Orders.GUARD;
+    }
+}
+
+public class AssaultOrder : OrderContext
+{
+    public AssaultOrder()
+    {
+        Order = Orders.ASSAULT;
+    }
+}
+
+public class RetreatOrder : OrderContext
+{
+    public RetreatOrder()
+    {
+        Order = Orders.RETREAT;
+    }
+}
+
+public class FallbackOrder : OrderContext
+{
+    public FallbackOrder()
+    {
+        Order = Orders.FALLBACK;
     }
 }
