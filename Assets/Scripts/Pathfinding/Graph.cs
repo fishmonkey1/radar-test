@@ -3,7 +3,17 @@ using UnityEngine;
 
 public class Graph : MonoBehaviour
 {
-    public static Graph Instance;
+    static Graph instance;
+    public static Graph Instance
+    { get
+        {
+            if (instance == null)
+            {
+                instance = FindObjectOfType<Graph>();
+            }
+            return instance;
+        }
+    }
     public List<Node> nodes;
 
     private void Awake()
@@ -12,6 +22,5 @@ public class Graph : MonoBehaviour
         {
             Debug.LogWarning("You have multiple graph components in the scene. Delete graph named " + gameObject.name);
         }
-        Instance = this;
     }
 }

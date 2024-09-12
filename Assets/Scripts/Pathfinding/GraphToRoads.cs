@@ -29,8 +29,17 @@ public class GraphToRoads : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        TraverseGraph(); //Called from start for now, but needs to be done after the map is created
-        foreach (NodesToRoads draw in RoadDraws)
+        DrawRoads();
+    }
+
+    public void DrawRoads()
+    {
+        if (RoadsParent != null)
+        {
+            GameObject.Destroy(RoadsParent); //Remove the old renderers and prep to make new ones
+        }
+        TraverseGraph();
+        foreach(NodesToRoads draw in RoadDraws)
         {
             draw.DrawRoadsFromNodes(); //After assigning all the nodes, tell the components to actually render their paths
         }
