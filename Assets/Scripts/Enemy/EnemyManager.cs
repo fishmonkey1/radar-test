@@ -4,7 +4,7 @@ using UnityEngine;
 public class EnemyManager : MonoBehaviour
 {
 
-    static EnemyManager singleton; //Lazy singleton pattern because lazy rn
+    static EnemyManager singleton; //Lazy awake singleton pattern because lazy rn
     public static EnemyManager Singleton => singleton;
 
     public AlertSuspicionLevel AlertLevel = new AlertSuspicionLevel();

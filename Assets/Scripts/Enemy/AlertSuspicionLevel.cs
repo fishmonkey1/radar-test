@@ -30,7 +30,7 @@ public class AlertSuspicionLevel
     public AlertSuspicionLevel()
     {
         OnAlertLevelChanged = new AlertLevelDelegate(LogAlertChanged);
-        OnSuspicionLevelChanged = new SuspicionLevelDelegate(LogSupsicionLevel);
+        OnSuspicionLevelChanged = new SuspicionLevelDelegate(LogSuspicionLevel);
     }
 
     void LogAlertChanged(AlertLevel level)
@@ -38,7 +38,7 @@ public class AlertSuspicionLevel
         Debug.Log("Alert level changed. New alert level is: " + level.ToString());
     }
 
-    void LogSupsicionLevel(SuspicionLevel level)
+    void LogSuspicionLevel(SuspicionLevel level)
     {
         Debug.Log("Suspicion level changed. New suspicion level is " + level.ToString());
     }

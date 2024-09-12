@@ -12,4 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffcd2025fcb1f164a8f95f682e1c4fee, type: 3}
   m_Name: TestSquad
   m_EditorClassIdentifier: 
-  EnemyTypes: []
+  EnemyTypes:
+  - EnemyPrefab: {fileID: 0}
+    MinNumber: 0
+    MaxNumber: 0
