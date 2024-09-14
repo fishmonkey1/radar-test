@@ -99,6 +99,10 @@ public class GraphToRoads : MonoBehaviour
                 Visited.Add(node); //And mark the node as visited so we never add it again
                 foreach (Node connectedNode in node.Connections)
                 { //Check if any connected nodes are flagged as new roads (intersections)
+                    if (Visited.Contains(connectedNode) && !roadDraw.ContainsNode(connectedNode))
+                    { //We've added a loop, so only add the end node to render, but do not enqueue visited nodes
+                        roadDraw.AddNode(connectedNode);
+                    }
                     if (connectedNode.StartOfNewRoad && !Visited.Contains(connectedNode))
                     { //There's an intersection here, so get the intersection node and start of road node
                         NodePair intersectionPair = new NodePair(node, connectedNode);

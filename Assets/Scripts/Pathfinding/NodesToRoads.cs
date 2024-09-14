@@ -35,4 +35,9 @@ public class NodesToRoads : MonoBehaviour
     {
         nodes.Add(node); //Das it, mane
     }
+
+    public bool ContainsNode(Node node)
+    {
+        return nodes.Contains(node);
+    }
 }
