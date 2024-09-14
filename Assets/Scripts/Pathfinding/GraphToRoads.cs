@@ -34,6 +34,10 @@ public class GraphToRoads : MonoBehaviour
 
     public void DrawRoads()
     {
+#if UNITY_EDITOR
+        if (RoadsParent != null)
+            GameObject.DestroyImmediate(RoadsParent);
+        #endif
         if (RoadsParent != null)
         {
             GameObject.Destroy(RoadsParent); //Remove the old renderers and prep to make new ones
@@ -53,6 +57,7 @@ public class GraphToRoads : MonoBehaviour
     {
         graph = Graph.Instance; //Get a reference to the one and only graph in the scene
         Visited.Clear(); //I highly doubt we'll be calling this more than once, but it never hurts
+        RoadDraws.Clear();
 
         Node firstNode = graph.nodes[0]; //Get the first one in the list which we'll assume is a root road
         Queue<NodePair> newRoadPairs = new();
