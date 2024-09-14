@@ -148,10 +148,22 @@ namespace PathCreation.Examples {
         }
 
         void AssignMaterials () {
-            if (roadMaterial != null && undersideMaterial != null) {
-                meshRenderer.sharedMaterials = new Material[] { roadMaterial, undersideMaterial, undersideMaterial };
-                meshRenderer.sharedMaterials[0].mainTextureScale = new Vector3 (1, textureTiling);
+            if (Application.isPlaying)
+            {
+                meshRenderer.materials = new Material[] { roadMaterial, undersideMaterial, undersideMaterial };
+                meshRenderer.materials[0].mainTextureScale = new Vector3(1, textureTiling * path.length);
             }
+            else
+            {
+                #if UNITY_EDITOR
+                if (roadMaterial != null && undersideMaterial != null)
+                {
+                    meshRenderer.sharedMaterials = new Material[] { roadMaterial, undersideMaterial, undersideMaterial };
+                    meshRenderer.sharedMaterials[0].mainTextureScale = new Vector3(1, textureTiling);
+                }
+                #endif
+            }
+
         }
 
     }

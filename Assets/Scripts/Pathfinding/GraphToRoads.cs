@@ -34,10 +34,11 @@ public class GraphToRoads : MonoBehaviour
 
     public void DrawRoads()
     {
+        RoadsParent = GameObject.Find("Roads");
 #if UNITY_EDITOR
         if (RoadsParent != null)
             GameObject.DestroyImmediate(RoadsParent);
-        #endif
+#endif
         if (RoadsParent != null)
         {
             GameObject.Destroy(RoadsParent); //Remove the old renderers and prep to make new ones

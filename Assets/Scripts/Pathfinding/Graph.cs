@@ -15,12 +15,4 @@ public class Graph : MonoBehaviour
         }
     }
     public List<Node> nodes;
-
-    private void Awake()
-    {
-        if (Instance != null)
-        {
-            Debug.LogWarning("You have multiple graph components in the scene. Delete graph named " + gameObject.name);
-        }
-    }
 }

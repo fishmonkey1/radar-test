@@ -13,7 +13,7 @@ public class NodesToRoads : MonoBehaviour
     [SerializeField]
     List<Node> nodes = new List<Node>();
     [SerializeField]
-    RoadMeshCreator RoadMeshCreator; //Edit the values here 
+    RoadMeshCreator RoadMeshCreator; //Edit the values here
 
     public void DrawRoadsFromNodes()
     {
@@ -28,6 +28,7 @@ public class NodesToRoads : MonoBehaviour
 
         BezierPath path = new BezierPath(nodeTransforms, false, space: PathSpace.xyz);
         RoadMeshCreator.pathCreator.bezierPath = path; //Assign the nodes from the scene to the road renderer
+        RoadMeshCreator.textureTiling = 1; //Attempt at hard coding this value before drawing
         RoadMeshCreator.TriggerUpdate(); //Make the road mesh creator actually draw out the road
     }
 
