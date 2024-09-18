@@ -9,6 +9,7 @@ public class Node : MonoBehaviour
     public uint NodeImportance; //The level of importance paid by the enemy AI to this node
     public NodeTraversal NodeTraversal = NodeTraversal.NOT_SET;
     public NodeBuilding NodeBuilding = NodeBuilding.NONE; //Change the node to indicate that an important structure is nearby
+    public VillageInfo village;
 
     public void Start()
     {

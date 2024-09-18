@@ -6,5 +6,6 @@ public enum NodeBuilding
     CHECKPOINT,
     RADAR,
     RAIL_DEPOT,
-    VILLAGE
+    VILLAGE,
+    VILLAGE_CENTER
 }
