@@ -16,4 +16,9 @@ public class Node : MonoBehaviour
         if (!Graph.Instance.nodes.Contains(this))
             Graph.Instance.nodes.Add(this);
     }
+
+    public void CreateVillageInfo()
+    {
+
+    }
 }
