@@ -4195,6 +4195,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1671106592}
   - component: {fileID: 1671106593}
+  - component: {fileID: 1671106594}
   - component: {fileID: 1671106591}
   m_Layer: 0
   m_Name: Graph
@@ -4272,6 +4273,19 @@ MonoBehaviour:
   - {fileID: 1688345038}
   - {fileID: 1378493456}
   - {fileID: 1791892159}
+--- !u!114 &1671106594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1671106590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d97c2d4f4bf7e449ad9fa6c044d675d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BuildingNodes: []
 --- !u!4 &1673106618 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2490491515257590033, guid: 9e5a858ffca90f44fbc9b28b1bde15fc, type: 3}

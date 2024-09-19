@@ -1,0 +1,28 @@
+{
+  "List": [
+    {
+      "Building": 1,
+      "Value": 2
+    },
+    {
+      "Building": 2,
+      "Value": 2
+    },
+    {
+      "Building": 3,
+      "Value": 3
+    },
+    {
+      "Building": 4,
+      "Value": 3
+    },
+    {
+      "Building": 5,
+      "Value": 4
+    },
+    {
+      "Building": 7,
+      "Value": 3
+    }
+  ]
+}
