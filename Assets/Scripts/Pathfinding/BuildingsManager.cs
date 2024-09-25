@@ -7,11 +7,6 @@ public class BuildingsManager : MonoBehaviour
     public List<Node> BuildingNodes = new(); //If a node has a building, it ends up in here
     public Dictionary<Node, BuildingIntPair> NodesToWeights = new(); //Track the values of the nodes here
 
-    private void Start()
-    {
-        FindBuildingsInGraph();
-    }
-
     public void FindBuildingsInGraph()
     {
         Graph graph = Graph.Instance;

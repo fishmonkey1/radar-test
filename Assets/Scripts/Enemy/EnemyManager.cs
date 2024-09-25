@@ -49,13 +49,18 @@ public class EnemyManager : MonoBehaviour
         }
         InvestigateChanged = new OnInvestigateChanged(LogInvestigateState);
         OnEnemySpawned = new OnEnemySpawn(LogEnemySpawn);
+        BuildingsManager.FindBuildingsInGraph(); //Collect all of the graph's buildings together
         Spawner.CreateSquads(); //Create all of the enemies
         //Now we need to give orders to all of our squads
+        StartingOrders(); //Assign initial orders
     }
 
     public void StartingOrders()
-    { //We assign all of the orders we need in here and spawn in enemy squads.
+    { //We assign all of the orders we need in here and place the enemies at their assigned node
+        foreach (EnemySquad squad in AllSquads)
+        {
 
+        }
     }
 
     void LogInvestigateState(bool investigating)

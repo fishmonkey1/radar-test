@@ -14,7 +14,7 @@ public class EnemySpawner
             SquadScriptableObject SquadSO = pair.SquadSO;
             EnemySquad squad = new EnemySquad();
 
-            foreach (SquadScriptableObject.EnemyAmount enemy in SquadSO.EnemyTypes)
+            foreach (EnemyAmount enemy in SquadSO.EnemyTypes)
             {
                 int num = enemy.RollNumber(); //Determine the number of enemies in this squad type
                 for (int i = 0; i < num; i++)
