@@ -7,6 +7,9 @@ public class EnemyManager : MonoBehaviour
     static EnemyManager singleton; //Lazy awake singleton pattern because lazy rn
     public static EnemyManager Singleton => singleton;
 
+    public BuildingsManager BuildingsManager; //For grabbing map buildings and checking weights
+    public EnemySpawner Spawner; //For fetching enemy squads out of
+
     public AlertSuspicionLevel AlertLevel = new AlertSuspicionLevel();
 
     /// <summary>

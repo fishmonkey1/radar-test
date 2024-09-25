@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: TestSquad
   m_EditorClassIdentifier: 
   EnemyTypes:
-  - EnemyPrefab: {fileID: 0}
-    MinNumber: 0
-    MaxNumber: 0
+  - EnemyPrefab: {fileID: 6181564224677165571, guid: bb9b1c2b1946df84ead1c59852497d86, type: 3}
+    MinNumber: 1
+    MaxNumber: 2
