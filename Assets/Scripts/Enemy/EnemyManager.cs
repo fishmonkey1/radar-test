@@ -36,6 +36,8 @@ public class EnemyManager : MonoBehaviour
     public delegate GameObject OnEnemySpawn(Enemy enemy);
     public OnEnemySpawn OnEnemySpawned;
 
+    public List<EnemySquad> AllSquads = new(); //Holds all of the squads that have been made
+
     void Awake()
     {
         if (singleton == null)
@@ -47,9 +49,14 @@ public class EnemyManager : MonoBehaviour
         }
         InvestigateChanged = new OnInvestigateChanged(LogInvestigateState);
         OnEnemySpawned = new OnEnemySpawn(LogEnemySpawn);
+        Spawner.CreateSquads(); //Create all of the enemies
+        //Now we need to give orders to all of our squads
     }
 
+    public void StartingOrders()
+    { //We assign all of the orders we need in here and spawn in enemy squads.
 
+    }
 
     void LogInvestigateState(bool investigating)
     {

@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 public enum Orders
 {
     IDLE, //No orders are assigned, use to indicate a unit needs new orders
