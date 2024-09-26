@@ -22,6 +22,7 @@ public class EnemySpawner
                     GameObject newEnemy = GameObject.Instantiate(enemy.EnemyPrefab); //We won't do anything about its position until orders are assigned
                     EnemyManager.Singleton.AllEnemies.Add(newEnemy.GetComponent<Enemy>());
                     squad.AddEnemy(newEnemy); //Track all instantiated enemies in the manager
+                    squad.OrderWeight = SquadSO.PreferredOrders; //Copy the preferred order array over to the new squad
                 }
             }
             EnemyManager.Singleton.AllSquads.Add(squad); //Put the new squad in the list

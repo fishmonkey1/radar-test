@@ -7,8 +7,9 @@ public class EnemySquad
 
     Node TargetNode; //The node the squad is meant to go to
     Node NearestNode; //The node the squad members are closest to
-    
+
     //I need some way of giving squads orders here... enum for now
+    public OrderWeight[] OrderWeight;
     Orders CurrentOrder = Orders.IDLE; //Order the squad is currently doing
     public OrderContext OrderContext { get; protected set; } //This holds the extra data that the order has been assigned, currently NULL for the idle order
     public delegate void OrderChangedDelegate(OrderContext order); //Enemy listens to this delegate
@@ -29,14 +30,17 @@ public class EnemySquad
         }
     }
 
-    public void AddEnemy(GameObject enemy)
+    public void AddEnemy(GameObject Enemy)
     {
-        SquadMembers.Add(enemy.GetComponent<Enemy>()); //I'll handle error checking for this later
+        Enemy enemy = Enemy.GetComponent<Enemy>();
+        enemy.Squad = this;
+        SquadMembers.Add(enemy); //I'll handle error checking for this later
     }
 
-    public void AddEnemy(Enemy enemy)
+    public void AddEnemy(Enemy Enemy)
     { //Override for above, using the enemy script instead
-        SquadMembers.Add(enemy);
+        Enemy.Squad = this;
+        SquadMembers.Add(Enemy);
     }
 
     void LogOrderChanged(OrderContext order)

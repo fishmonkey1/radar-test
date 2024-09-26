@@ -26,4 +26,13 @@ public class OrderWeight
 {
     public Orders Order;
     public int Weight;
+
+    public OrderWeight() { }
+
+    public OrderWeight(Orders order, int weight)
+    {
+        Order = order;
+        Weight = weight;
+    }
+
 }

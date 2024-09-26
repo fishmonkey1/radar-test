@@ -16,3 +16,6 @@ MonoBehaviour:
   - EnemyPrefab: {fileID: 6181564224677165571, guid: bb9b1c2b1946df84ead1c59852497d86, type: 3}
     MinNumber: 1
     MaxNumber: 2
+  PreferredOrders:
+  - Order: 0
+    Weight: 0

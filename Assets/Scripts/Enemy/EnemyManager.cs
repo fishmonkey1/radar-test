@@ -9,6 +9,7 @@ public class EnemyManager : MonoBehaviour
 
     public BuildingsManager BuildingsManager; //For grabbing map buildings and checking weights
     public EnemySpawner Spawner; //For fetching enemy squads out of
+    public OrdersManager OrdersManager;
 
     public AlertSuspicionLevel AlertLevel = new AlertSuspicionLevel();
 
@@ -52,16 +53,10 @@ public class EnemyManager : MonoBehaviour
         BuildingsManager.FindBuildingsInGraph(); //Collect all of the graph's buildings together
         Spawner.CreateSquads(); //Create all of the enemies
         //Now we need to give orders to all of our squads
-        StartingOrders(); //Assign initial orders
+        OrdersManager.StartingOrders(); //Assign initial orders
     }
 
-    public void StartingOrders()
-    { //We assign all of the orders we need in here and place the enemies at their assigned node
-        foreach (EnemySquad squad in AllSquads)
-        {
-
-        }
-    }
+    
 
     void LogInvestigateState(bool investigating)
     {
