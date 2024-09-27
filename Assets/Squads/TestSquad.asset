@@ -17,5 +17,5 @@ MonoBehaviour:
     MinNumber: 1
     MaxNumber: 2
   PreferredOrders:
-  - Order: 0
-    Weight: 0
+  - Order: 1
+    Weight: 1

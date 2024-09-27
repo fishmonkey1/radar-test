@@ -16,6 +16,11 @@ public abstract class OrderContext
             Orders.PATROL => new PatrolOrder(),
             Orders.INVESTIGATE => new InvestigateOrder(),
             Orders.REPOSITION => new RepositionOrder(),
+            Orders.GUARD => new GuardOrder(),
+            Orders.ASSAULT_STANDBY => new AssaultStandbyOrder(),
+            Orders.ASSAULT => new AssaultOrder(),
+            Orders.RETREAT => new RetreatOrder(),
+            Orders.FALLBACK => new FallbackOrder(),
             _ => throw new System.ArgumentException($"Order type {nameof(order)} has not be implemented or does not exist")
         };
     }
@@ -85,6 +90,14 @@ public class GuardOrder : OrderContext
     public GuardOrder()
     {
         Order = Orders.GUARD;
+    }
+}
+
+public class AssaultStandbyOrder : OrderContext
+{
+    public AssaultStandbyOrder()
+    {
+        Order = Orders.ASSAULT;
     }
 }
 

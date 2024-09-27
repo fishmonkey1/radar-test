@@ -9,7 +9,7 @@ public class EnemySquad
     Node NearestNode; //The node the squad members are closest to
 
     //I need some way of giving squads orders here... enum for now
-    public OrderWeight[] OrderWeight;
+    public OrderWeight[] OrderWeights;
     Orders CurrentOrder = Orders.IDLE; //Order the squad is currently doing
     public OrderContext OrderContext { get; protected set; } //This holds the extra data that the order has been assigned, currently NULL for the idle order
     public delegate void OrderChangedDelegate(OrderContext order); //Enemy listens to this delegate
