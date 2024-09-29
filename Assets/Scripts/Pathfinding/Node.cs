@@ -4,6 +4,7 @@ using UnityEngine;
 public class Node : MonoBehaviour
 {
     public List<Node> Connections = new(); //Other nodes reachable from this one
+    public Dictionary<Node, float> ConnectionDistances = new();
     public bool StartOfNewRoad; //If this needs to have another road renderer used
     //The AI uses this to determine if this node should be weighted higher for pathfinding, for use with highways for example
     public uint NodeImportance; //The level of importance paid by the enemy AI to this node
@@ -17,8 +18,19 @@ public class Node : MonoBehaviour
             Graph.Instance.nodes.Add(this);
     }
 
-    public void CreateVillageInfo()
+    public void CalculateConnectionDistances()
     {
-
+        foreach (var node in Connections)
+        {
+            //Get the nodes' locations in the world
+            Transform here = this.transform;
+            Transform there = node.transform;
+            float distance = Vector3.Distance(here.position, there.position);
+            if (!ConnectionDistances.ContainsKey(node))
+            {
+                ConnectionDistances.Add(node, distance);
+            }
+        }
     }
+
 }

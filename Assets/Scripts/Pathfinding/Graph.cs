@@ -15,4 +15,17 @@ public class Graph : MonoBehaviour
         }
     }
     public List<Node> nodes;
+
+    void Awake()
+    {
+        CalculateNodeDistances();
+    }
+
+    public void CalculateNodeDistances()
+    {
+        foreach (var node in nodes)
+        {
+            node.CalculateConnectionDistances(); //Just do this for all of the nodes
+        }
+    }
 }
