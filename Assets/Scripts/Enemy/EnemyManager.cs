@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class EnemyManager : MonoBehaviour
+public class EnemyManager : NetworkBehaviour
 {
 
     static EnemyManager instance; //Lazy awake singleton pattern because lazy rn
@@ -9,7 +10,7 @@ public class EnemyManager : MonoBehaviour
 
     public BuildingsManager BuildingsManager; //For grabbing map buildings and checking weights
     public EnemySpawner Spawner; //For fetching enemy squads out of
-    public OrdersManager OrdersManager;
+    public OrdersManager OrdersManager = new();
 
     public AlertSuspicionLevel AlertLevel = new AlertSuspicionLevel();
 
@@ -57,6 +58,14 @@ public class EnemyManager : MonoBehaviour
         foreach (EnemySquad squad in AllSquads)
         { //Now lets move all of the enemies to their assigned nodes
             squad.TeleportAll(squad.OrderContext.Node);
+        }
+        //It makes more sense to spawn the enemies over the network here, now that they're positioned properly
+        if (isServer)
+        { //If we're on the server then we spawn all the enemies over the network
+            foreach (Enemy enemy in AllEnemies)
+            {
+                NetworkServer.Spawn(enemy.gameObject); //Spawn baby, spawn!
+            }
         }
     }
 
