@@ -4,8 +4,8 @@ using UnityEngine;
 public class EnemyManager : MonoBehaviour
 {
 
-    static EnemyManager singleton; //Lazy awake singleton pattern because lazy rn
-    public static EnemyManager Singleton => singleton;
+    static EnemyManager instance; //Lazy awake singleton pattern because lazy rn
+    public static EnemyManager Instance => instance;
 
     public BuildingsManager BuildingsManager; //For grabbing map buildings and checking weights
     public EnemySpawner Spawner; //For fetching enemy squads out of
@@ -41,8 +41,8 @@ public class EnemyManager : MonoBehaviour
 
     void Awake()
     {
-        if (singleton == null)
-            singleton = this;
+        if (instance == null)
+            instance = this;
         else
         {
             Debug.Log("You have two EnemyManagers in the scene, disabling this one.");
