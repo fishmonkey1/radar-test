@@ -24,6 +24,7 @@ public class EnemySquad
     { //Assigning the new order to the squad.
         OrderContext = orderContext;
         CurrentOrder = orderContext.Order;
+        TargetNode = orderContext.Node;
         if (OnOrderChanged != null)
         {
             OnOrderChanged.Invoke(orderContext);
@@ -41,6 +42,15 @@ public class EnemySquad
     { //Override for above, using the enemy script instead
         Enemy.Squad = this;
         SquadMembers.Add(Enemy);
+    }
+
+    public void TeleportAll(Node location)
+    {
+        foreach (Enemy enemy in SquadMembers)
+        {
+            enemy.transform.position = location.transform.position; //Set the enemy to be positioned at the starting node
+        }
+        NearestNode = location;
     }
 
     void LogOrderChanged(OrderContext order)

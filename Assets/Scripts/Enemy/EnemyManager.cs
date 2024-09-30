@@ -54,6 +54,10 @@ public class EnemyManager : MonoBehaviour
         Spawner.CreateSquads(); //Create all of the enemies
         //Now we need to give orders to all of our squads
         OrdersManager.StartingOrders(); //Assign initial orders
+        foreach (EnemySquad squad in AllSquads)
+        { //Now lets move all of the enemies to their assigned nodes
+            squad.TeleportAll(squad.OrderContext.Node);
+        }
     }
 
     
