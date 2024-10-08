@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class EnemySquad
 {
     List<Enemy> SquadMembers = new(); //All the enemies that compose this squad
@@ -55,6 +56,6 @@ public class EnemySquad
 
     void LogOrderChanged(OrderContext order)
     {
-        Debug.Log("Enemy Squad had it's orders changed to " + nameof(order.Order));
+        Debug.Log("Enemy Squad had it's orders changed to " + order.Order);
     }
 }

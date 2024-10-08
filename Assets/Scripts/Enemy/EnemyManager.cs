@@ -83,10 +83,10 @@ public class EnemyManager : NetworkBehaviour
         foreach (SquadSO_Pair pair in SquadTemplates)
         {
             SquadScriptableObject SquadSO = pair.SquadSO;
-            EnemySquad squad = new EnemySquad();
 
             for (int x = 0; x < pair.Amount; x++)
             {
+                EnemySquad squad = new EnemySquad(); //Set up the new squad object
                 foreach (EnemyAmount enemy in SquadSO.EnemyTypes)
                 {
                     int num = enemy.RollNumber(); //Determine the number of enemies in this squad type
@@ -107,8 +107,9 @@ public class EnemyManager : NetworkBehaviour
                         }
                     }
                 }
+                //Doing this in the for loop so the extra squads actually get added
+                EnemyManager.Instance.AllSquads.Add(squad); //Put the new squad in the list
             }
-            EnemyManager.Instance.AllSquads.Add(squad); //Put the new squad in the list
         }
     }
 
