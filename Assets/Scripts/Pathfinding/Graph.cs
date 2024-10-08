@@ -28,4 +28,5 @@ public class Graph : MonoBehaviour
             node.CalculateConnectionDistances(); //Just do this for all of the nodes
         }
     }
+
 }
