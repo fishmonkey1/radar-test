@@ -11,6 +11,7 @@ public class TankRoomManager : NetworkRoomManager
 
     [SerializeField] GameObject rolePickerPrefab; //Try spawning the prefab instead of leaving it in the scene?
     [SerializeField] GameObject chatroomPrefab;
+    [SerializeField] GameObject enemyManagerPrefab; //I'm going to attempt to spawn the enemy stuff in here from the tank manager
     [SerializeField] GameObject horniTankPrefab; //For spawning after the game scene is loaded
     [SerializeField, ReadOnly] RolePicker rolePicker; //Cached after the UI is made
 
@@ -79,6 +80,8 @@ public class TankRoomManager : NetworkRoomManager
             GameObject canvas = GameObject.Find("Canvas");
             GameObject chatroom = GameObject.Instantiate(chatroomPrefab, canvas.transform);
             NetworkServer.Spawn(chatroom);
+            GameObject enemyManager = GameObject.Instantiate(enemyManagerPrefab); //Now spawn across the network
+            NetworkServer.Spawn(enemyManager);
         }
     }
 
