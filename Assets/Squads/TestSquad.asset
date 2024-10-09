@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffcd2025fcb1f164a8f95f682e1c4fee, type: 3}
+  m_Name: TestSquad
+  m_EditorClassIdentifier: 
+  EnemyTypes:
+  - EnemyPrefab: {fileID: 6181564224677165571, guid: bb9b1c2b1946df84ead1c59852497d86, type: 3}
+    MinNumber: 1
+    MaxNumber: 2
+  PreferredOrders:
+  - Order: 1
+    Weight: 1

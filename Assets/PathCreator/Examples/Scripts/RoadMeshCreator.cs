@@ -120,8 +120,11 @@ namespace PathCreation.Examples {
         // Add MeshRenderer and MeshFilter components to this gameobject if not already attached
         void AssignMeshComponents () {
 
-            if (meshHolder == null) {
+            if (meshHolder == null) 
+            {
                 meshHolder = new GameObject ("Road Mesh Holder");
+                if (transform.parent != null)
+                    meshHolder.transform.parent = transform.parent;
             }
 
             meshHolder.transform.rotation = Quaternion.identity;
@@ -145,10 +148,22 @@ namespace PathCreation.Examples {
         }
 
         void AssignMaterials () {
-            if (roadMaterial != null && undersideMaterial != null) {
-                meshRenderer.sharedMaterials = new Material[] { roadMaterial, undersideMaterial, undersideMaterial };
-                meshRenderer.sharedMaterials[0].mainTextureScale = new Vector3 (1, textureTiling);
+            if (Application.isPlaying)
+            {
+                meshRenderer.materials = new Material[] { roadMaterial, undersideMaterial, undersideMaterial };
+                meshRenderer.materials[0].mainTextureScale = new Vector3(1, textureTiling * path.length);
             }
+            else
+            {
+                #if UNITY_EDITOR
+                if (roadMaterial != null && undersideMaterial != null)
+                {
+                    meshRenderer.sharedMaterials = new Material[] { roadMaterial, undersideMaterial, undersideMaterial };
+                    meshRenderer.sharedMaterials[0].mainTextureScale = new Vector3(1, textureTiling);
+                }
+                #endif
+            }
+
         }
 
     }
