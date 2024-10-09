@@ -41,4 +41,9 @@ public class NodesToRoads : MonoBehaviour
     {
         return nodes.Contains(node);
     }
+
+    public PathCreator GetPathCreator()
+    {
+        return RoadMeshCreator.pathCreator;
+    }
 }

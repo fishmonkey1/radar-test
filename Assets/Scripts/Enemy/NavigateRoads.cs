@@ -17,7 +17,7 @@ public class NavigateRoads : Navigation
 
     float distanceTravelled = 0f;
 
-    void Awake()
+    public void Initialize()
     {
         owner = GetComponent<Enemy>(); //Cache the enemy so we can pull their speeds and such
         squad = owner.Squad; //Nab the squad so we can follow our orders
@@ -46,7 +46,9 @@ public class NavigateRoads : Navigation
         {
             distanceTravelled += MoveSpeed * Time.deltaTime;
             transform.position = roadPath.path.GetPointAtDistance(distanceTravelled, endOfPathInstruction);
-            transform.rotation = roadPath.path.GetRotationAtDistance(distanceTravelled, endOfPathInstruction);
+            Quaternion q = roadPath.path.GetRotationAtDistance(distanceTravelled, endOfPathInstruction);
+            Vector3 rotation = new Vector3(q.x, q.y, 0); //Cancel out the z rotation of the path and only take x,y
+            transform.rotation = Quaternion.Euler(rotation);
         }
     }
 
