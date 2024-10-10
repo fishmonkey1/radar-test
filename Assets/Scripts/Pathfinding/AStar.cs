@@ -75,4 +75,15 @@ public static class AStar
         }
         return totalDistance;
     }
+
+    public static string PrintPath(List<Node> path)
+    {
+        string pathString = "Path: ";
+        foreach (Node node in path)
+        {
+            pathString += node.gameObject.name + " -> ";
+        }
+        pathString += "End of path";
+        return pathString;
+    }
 }

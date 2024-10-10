@@ -107,8 +107,10 @@ public class OrdersManager
         List<Node> path = AStar.GetPath(patrol.Node, buildings[1]);
         patrol.Nodes = path; //Assign the path we found to the patrol
         patrol.Looping = true; //I'm just gonna set them all to looping for right now
+        Debug.Log($"Created a patrol path. Contents of path are " + AStar.PrintPath(path));
         return patrol;
     }
+
 }
 
 public class OrdersSquadPair
