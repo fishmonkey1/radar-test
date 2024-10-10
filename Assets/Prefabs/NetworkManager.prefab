@@ -67,6 +67,7 @@ MonoBehaviour:
   - {fileID: 4283197213913971331, guid: cc463bf9a62b9234994922418126b6e2, type: 3}
   - {fileID: 2914714321878191827, guid: e7abf2eefe24d60489fabd76d7ce86c9, type: 3}
   - {fileID: 3237541956323890682, guid: bb121984466ce824084205ec73e2212b, type: 3}
+  - {fileID: 6181564224677165571, guid: bb9b1c2b1946df84ead1c59852497d86, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
@@ -92,6 +93,7 @@ MonoBehaviour:
   clientIndex: 0
   rolePickerPrefab: {fileID: 2914714321878191827, guid: e7abf2eefe24d60489fabd76d7ce86c9, type: 3}
   chatroomPrefab: {fileID: 8764900838701480349, guid: 385a122923061ec49947541c307248f8, type: 3}
+  enemyManagerPrefab: {fileID: 5274330537421434379, guid: dd08b167fd0f39542977c9ffa6b36b98, type: 3}
   horniTankPrefab: {fileID: 4283197213913971331, guid: cc463bf9a62b9234994922418126b6e2, type: 3}
   rolePicker: {fileID: 0}
 --- !u!114 &606322544417988642

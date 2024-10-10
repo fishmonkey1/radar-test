@@ -97,6 +97,7 @@ public class GraphToRoads : MonoBehaviour
                     break; //Get out of the while loop and just grab the next remaining road node
                 }
                 roadDraw.AddNode(node); //Assign the node to the draw component
+                node.SetRenderer(roadDraw); //Assign the renderer to the node too
                 Visited.Add(node); //And mark the node as visited so we never add it again
                 foreach (Node connectedNode in node.Connections)
                 { //Check if any connected nodes are flagged as new roads (intersections)

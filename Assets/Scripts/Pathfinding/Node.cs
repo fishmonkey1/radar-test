@@ -11,11 +11,17 @@ public class Node : MonoBehaviour
     public NodeTraversal NodeTraversal = NodeTraversal.NOT_SET;
     public NodeBuilding NodeBuilding = NodeBuilding.NONE; //Change the node to indicate that an important structure is nearby
     public VillageInfo village;
+    public NodesToRoads NodeRenderer;
 
     public void Start()
     {
         if (!Graph.Instance.nodes.Contains(this))
             Graph.Instance.nodes.Add(this);
+    }
+
+    public void SetRenderer(NodesToRoads renderer)
+    {
+        NodeRenderer = renderer; //Once the graph has had the roads built, the renderer gets assigned to it
     }
 
     public void CalculateConnectionDistances()

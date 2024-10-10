@@ -9,7 +9,6 @@ public class EnemyManager : NetworkBehaviour
     public static EnemyManager Instance => instance;
 
     public BuildingsManager BuildingsManager; //For grabbing map buildings and checking weights
-    public EnemySpawner Spawner; //For fetching enemy squads out of
     public OrdersManager OrdersManager = new();
 
     public AlertSuspicionLevel AlertLevel = new AlertSuspicionLevel();
@@ -39,6 +38,7 @@ public class EnemyManager : NetworkBehaviour
     public OnEnemySpawn OnEnemySpawned;
 
     public List<EnemySquad> AllSquads = new(); //Holds all of the squads that have been made
+    public List<SquadSO_Pair> SquadTemplates = new();
 
     void Awake()
     {
@@ -51,21 +51,17 @@ public class EnemyManager : NetworkBehaviour
         }
         InvestigateChanged = new OnInvestigateChanged(LogInvestigateState);
         OnEnemySpawned = new OnEnemySpawn(LogEnemySpawn);
+        if (BuildingsManager == null)
+        {
+            BuildingsManager = GameObject.FindObjectOfType<BuildingsManager>(); //Fetch the buildings script
+        }
         BuildingsManager.FindBuildingsInGraph(); //Collect all of the graph's buildings together
-        Spawner.CreateSquads(); //Create all of the enemies
+        CreateSquads(); //Create all of the enemies
         //Now we need to give orders to all of our squads
         OrdersManager.StartingOrders(); //Assign initial orders
         foreach (EnemySquad squad in AllSquads)
         { //Now lets move all of the enemies to their assigned nodes
             squad.TeleportAll(squad.OrderContext.Node);
-        }
-        //It makes more sense to spawn the enemies over the network here, now that they're positioned properly
-        if (isServer)
-        { //If we're on the server then we spawn all the enemies over the network
-            foreach (Enemy enemy in AllEnemies)
-            {
-                NetworkServer.Spawn(enemy.gameObject); //Spawn baby, spawn!
-            }
         }
     }
 
@@ -82,4 +78,46 @@ public class EnemyManager : NetworkBehaviour
         return enemy.gameObject; //I don't entirely remember why I was doing it this way...
     }
 
+    public void CreateSquads()
+    {
+        foreach (SquadSO_Pair pair in SquadTemplates)
+        {
+            SquadScriptableObject SquadSO = pair.SquadSO;
+
+            for (int x = 0; x < pair.Amount; x++)
+            {
+                EnemySquad squad = new EnemySquad(); //Set up the new squad object
+                foreach (EnemyAmount enemy in SquadSO.EnemyTypes)
+                {
+                    int num = enemy.RollNumber(); //Determine the number of enemies in this squad type
+                    for (int i = 0; i < num; i++)
+                    { //Now spawn one of these enemies, assign it to its squad, and put it in the EnemyManager's list
+                        GameObject newEnemy = GameObject.Instantiate(enemy.EnemyPrefab); //We won't do anything about its position until orders are assigned
+                        EnemyManager.Instance.AllEnemies.Add(newEnemy.GetComponent<Enemy>());
+                        squad.AddEnemy(newEnemy); //Track all instantiated enemies in the manager
+                        squad.OrderWeights = SquadSO.PreferredOrders; //Copy the preferred order array over to the new squad
+                        if (isServer)
+                        {
+                            Debug.Log("Spawning enemy across network");
+                            NetworkServer.Spawn(newEnemy);
+                        }
+                        else
+                        {
+                            Debug.Log("EnemySpawner is not the host, can't spawn an enemy");
+                        }
+                    }
+                }
+                //Doing this in the for loop so the extra squads actually get added
+                EnemyManager.Instance.AllSquads.Add(squad); //Put the new squad in the list
+            }
+        }
+    }
+
+}
+
+[System.Serializable]
+public class SquadSO_Pair
+{
+    public SquadScriptableObject SquadSO;
+    public int Amount;
 }

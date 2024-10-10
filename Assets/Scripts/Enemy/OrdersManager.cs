@@ -1,3 +1,4 @@
+using IO.Swagger.Model;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -102,7 +103,9 @@ public class OrdersManager
         //Now we need to set up our OrderContext with some of the data
 
         patrol.Node = buildings[0]; //Enemies spawn on this node, so we assign it to the start of the patrol
-        patrol.Nodes = buildings; //For now we'll ignore looking for closer buildings and just do high value
+        //Now we need to get a path from the first node to the second node and assign that to patrol.Nodes
+        List<Node> path = AStar.GetPath(patrol.Node, buildings[1]);
+        patrol.Nodes = path; //Assign the path we found to the patrol
         patrol.Looping = true; //I'm just gonna set them all to looping for right now
         return patrol;
     }

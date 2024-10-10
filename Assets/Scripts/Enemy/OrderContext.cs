@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 
+[Serializable]
 public abstract class OrderContext
 {
     public Orders Order { get; protected set; } //The order this context class goes to

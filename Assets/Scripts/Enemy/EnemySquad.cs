@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class EnemySquad
 {
     List<Enemy> SquadMembers = new(); //All the enemies that compose this squad
@@ -49,12 +50,17 @@ public class EnemySquad
         foreach (Enemy enemy in SquadMembers)
         {
             enemy.transform.position = location.transform.position; //Set the enemy to be positioned at the starting node
+            enemy.NearNode = location;
+            //And lets set up the enemy's navigation while we're here too
+            NavigateRoads navigate = enemy.GetComponent<NavigateRoads>();
+            navigate.Initialize(); //Kick things off
         }
         NearestNode = location;
+        
     }
 
     void LogOrderChanged(OrderContext order)
     {
-        Debug.Log("Enemy Squad had it's orders changed to " + nameof(order.Order));
+        Debug.Log("Enemy Squad had it's orders changed to " + order.Order);
     }
 }
