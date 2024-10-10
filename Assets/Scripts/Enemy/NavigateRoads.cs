@@ -29,9 +29,9 @@ public class NavigateRoads : Navigation
         if (squad.OrderContext.Order == Orders.PATROL)
         { //We should grab the path since we're doing a patrol
             //Future Vicky, I'm pretty sure the path is already populated from the OrdersManager
-            //path = AStar.GetPath(owner.NearNode, owner.TargetNode); //Have the pathfinder return a road path
-            nextNode = path[0]; //Assign the first node as our target and let the update function mark it as reached
             PatrolOrder patrol = squad.OrderContext as PatrolOrder;
+            path = patrol.Nodes;
+            nextNode = patrol.Node; //Assign the first node as our target and let the update function mark it as reached
             if (patrol.Looping) //If we loop then actually set the instruction to reverse
                 endOfPathInstruction = EndOfPathInstruction.Reverse;
             else
@@ -63,6 +63,10 @@ public class NavigateRoads : Navigation
             {
                 PatrolOrder patrol = squad.OrderContext as PatrolOrder;
                 nextNode = patrol.GetNextNode(nextNode);
+                if (nextNode.NodeRenderer != roadNodes)
+                { //This means we're at an intersection and need to continue down a new road
+                    roadNodes = nextNode.NodeRenderer;
+                }
             }
 
             yield return new WaitForSeconds(rangeInterval);
