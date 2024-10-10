@@ -33,7 +33,7 @@ public class Deform : MonoBehaviour
     GameObject nm_builder_object;
 
     // for some reason, this is throwing a null reference when trying to access it in the Deform func
-    LocalNavMeshBuilder navmesh;
+    //LocalNavMeshBuilder navmesh;
 
     
 
@@ -104,7 +104,7 @@ public class Deform : MonoBehaviour
         // this is fucking terrible but works.... figure out why???
         // TODO: only run this if the deform causes new water layer.
         // Don't need to update navmesh if the side of a mountain is hit.
-        nm_builder_object.GetComponent<LocalNavMeshBuilder>().UpdateNavMesh(false);
+        //nm_builder_object.GetComponent<LocalNavMeshBuilder>().UpdateNavMesh(false);
         //navmesh.UpdateNavMesh(false);
         // This errors Null reference for some reason, but shouldn't... 
         //navmesh.UpdateNavMesh(false);

@@ -18,7 +18,6 @@ public class Radar : MonoBehaviour
     [Header("Radar Settings")]
     [Range(1f, 45f)] [SerializeField] float rotationsPerMinute = 10.0f;
     [Range(.02f, 5f)] [SerializeField] public float disappearTimerMax = 3f;
-    [Range(-50, -1)] [SerializeField] private int sweepLineUnderCameraOffset = -5;
     [Range(.01f, 1f)] [SerializeField] public float sweepLineWidth = .5f;
     [SerializeField] private Color sweepLineColor;
     [Range(.1f, 1f)] [SerializeField] private float sweepLineOpacity = 1f;
