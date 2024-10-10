@@ -273,7 +273,6 @@ namespace ProcGenTiles
         /// <returns>List<(int x, int y)></returns>
         public List<Tile> GetNeighbors((int x, int y) coords, Func<Tile, float, bool> checkFunction, bool eightNeighbors, List<Tile> optionalAddList = null, float checkFloat = 0)
         {
-            bool debug = false;
             List<Tile> foundNeighbors = null;
             if (optionalAddList == null)
                 foundNeighbors = new List<Tile>();
@@ -312,8 +311,6 @@ namespace ProcGenTiles
                     {
                         foundNeighbors.Add(direction);
                     }
-                    else
-                        debug = true;
                 }
             }
   
