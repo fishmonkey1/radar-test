@@ -11,8 +11,8 @@ public class NavigateRoads : Navigation
     PathCreator roadPath;
     List<Node> path; //Contains all the road nodes we want to travel through to get to Enemy.targetNode
     Node nextNode; //The next node we're trying to reach
-    float rangeCheck = 0.5f; //How far the transform can be before we count it as reached
-    float rangeInterval = 0.5f; //How often we check to see if we're near the node
+    [SerializeField] float rangeCheck = 0.5f; //How far the transform can be before we count it as reached
+    [SerializeField] float rangeInterval = 0.5f; //How often we check to see if we're near the node
     EndOfPathInstruction endOfPathInstruction;
 
     float distanceTravelled = 0f;
@@ -59,13 +59,18 @@ public class NavigateRoads : Navigation
         {
             float distance = Vector3.Distance(transform.position, nextNode.transform.position);
 
+            Debug.Log("Checking distance to nodes");
             if (distance <= rangeCheck)
             {
                 PatrolOrder patrol = squad.OrderContext as PatrolOrder;
                 nextNode = patrol.GetNextNode(nextNode);
+                Debug.Log("Getting next node in path. Next node is " + nextNode.name);
                 if (nextNode.NodeRenderer != roadNodes)
                 { //This means we're at an intersection and need to continue down a new road
                     roadNodes = nextNode.NodeRenderer;
+                    roadPath = roadNodes.GetPathCreator();
+                    distanceTravelled = 0;
+                    Debug.Log("Next node has a different renderer, reassigning...");
                 }
             }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 [Serializable]
 public abstract class OrderContext
@@ -40,6 +41,7 @@ public class PatrolOrder : OrderContext
         if (Looping)
         { //If we're supposed to loop this patrol then reverse the list for the next use
             Nodes.Reverse();
+            Debug.Log("Unit has reached end of looping patrol, reversing nodes.");
         }
     }
 

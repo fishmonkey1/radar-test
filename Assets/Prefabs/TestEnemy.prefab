@@ -185,6 +185,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 0
   MoveSpeed: 5
+  rangeCheck: 1.5
+  rangeInterval: 0.5
 --- !u!1001 &6113082026898636314
 PrefabInstance:
   m_ObjectHideFlags: 0
