@@ -63,6 +63,8 @@ public class PatrolOrder : OrderContext
                 return null; // Returning null as a signal that the patrol is finished
         }
 
+        Debug.Log($"Fetching next node in patrol. Index of current node is {index} out of path count of {Nodes.Count}");
+
         return Nodes[index + 1];
     }
 

@@ -46,8 +46,6 @@ public static class AStar
                 Frontier.Enqueue(backtrack); //I don't think anything else should be here in the frontier, so this should be next? Need to test
             }
         }
-        //We've found a path that reaches the end node, but we haven't added the node to the path so lets fix that
-        Path.Add(end);
 
         return Path; //And send back our located path
     }

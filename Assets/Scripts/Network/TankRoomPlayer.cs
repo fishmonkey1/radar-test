@@ -17,7 +17,7 @@ public class TankRoomPlayer : NetworkRoomPlayer
     public override void Start()
     {
         base.Start();
-        Debug.Log($"IsLocalPlayer equals {isLocalPlayer}");
+        //Debug.Log($"IsLocalPlayer equals {isLocalPlayer}");
         if (isLocalPlayer)
         {
             PlayerName = PlayerInfo.localPlayerName;

@@ -47,9 +47,7 @@ public class NavigateRoads : Navigation
         {
             distanceTravelled += MoveSpeed * Time.deltaTime;
             transform.position = roadPath.path.GetPointAtDistance(distanceTravelled, endOfPathInstruction);
-            Quaternion q = roadPath.path.GetRotationAtDistance(distanceTravelled, endOfPathInstruction);
-            Vector3 rotation = new Vector3(q.x, q.y, 0); //Cancel out the z rotation of the path and only take x,y
-            transform.rotation = Quaternion.Euler(rotation);
+            transform.rotation = roadPath.path.GetRotationAtDistance(distanceTravelled, endOfPathInstruction);
         }
     }
 
@@ -59,7 +57,7 @@ public class NavigateRoads : Navigation
         {
             float distance = Vector3.Distance(transform.position, nextNode.transform.position);
 
-            Debug.Log("Checking distance to nodes");
+            //Debug.Log("Checking distance to nodes");
             if (distance <= rangeCheck)
             {
                 PatrolOrder patrol = squad.OrderContext as PatrolOrder;
