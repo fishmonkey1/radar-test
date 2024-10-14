@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6700207559908763054}
   - component: {fileID: 1431006972072941027}
   - component: {fileID: -3414936438872187309}
-  - component: {fileID: -3381004853487413142}
+  - component: {fileID: 2859206517796170545}
   m_Layer: 0
   m_Name: TestEnemy
   m_TagString: Untagged
@@ -94,7 +94,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CurrentSpeed: 0
-  MaxSpeed: 0
+  MaxSpeed: 5
   target: {x: 0, y: 0, z: 0}
   type: 2
   radarInfo: {fileID: 1684246022570810483}
@@ -171,7 +171,7 @@ MonoBehaviour:
   positionSensitivity: 0.01
   rotationSensitivity: 0.01
   scaleSensitivity: 0.01
---- !u!114 &-3381004853487413142
+--- !u!114 &2859206517796170545
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -180,11 +180,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 6181564224677165571}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abbf270eb26c9a94d854386ee6a55dc4, type: 3}
+  m_Script: {fileID: 11500000, guid: ea07d9f6f79589a428c2f516937d6bfb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   active: 0
-  MoveSpeed: 5
   rangeCheck: 1.5
   rangeInterval: 0.5
 --- !u!1001 &6113082026898636314
