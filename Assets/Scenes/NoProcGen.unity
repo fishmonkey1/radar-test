@@ -181,6 +181,7 @@ MonoBehaviour:
     - {fileID: 1798024200}
     - {fileID: 1894137816}
     VillageCenter: {fileID: 1894137816}
+  NodeRenderer: {fileID: 0}
 --- !u!1 &36009021
 GameObject:
   m_ObjectHideFlags: 0
@@ -1361,6 +1362,7 @@ MonoBehaviour:
     VillageNodes:
     - {fileID: 414561001}
     VillageCenter: {fileID: 414561001}
+  NodeRenderer: {fileID: 0}
 --- !u!4 &414561002
 Transform:
   m_ObjectHideFlags: 0
@@ -1415,6 +1417,7 @@ MonoBehaviour:
   village:
     VillageNodes: []
     VillageCenter: {fileID: 0}
+  NodeRenderer: {fileID: 0}
 --- !u!4 &444011327
 Transform:
   m_ObjectHideFlags: 0
@@ -1799,6 +1802,7 @@ MonoBehaviour:
   village:
     VillageNodes: []
     VillageCenter: {fileID: 0}
+  NodeRenderer: {fileID: 0}
 --- !u!4 &596991334
 Transform:
   m_ObjectHideFlags: 0
@@ -2685,6 +2689,7 @@ MonoBehaviour:
     - {fileID: 1798024200}
     - {fileID: 1894137816}
     VillageCenter: {fileID: 1894137816}
+  NodeRenderer: {fileID: 0}
 --- !u!1 &926833993
 GameObject:
   m_ObjectHideFlags: 0
@@ -2739,6 +2744,7 @@ MonoBehaviour:
   village:
     VillageNodes: []
     VillageCenter: {fileID: 0}
+  NodeRenderer: {fileID: 0}
 --- !u!1 &938297622
 GameObject:
   m_ObjectHideFlags: 0
@@ -2793,6 +2799,7 @@ MonoBehaviour:
   village:
     VillageNodes: []
     VillageCenter: {fileID: 0}
+  NodeRenderer: {fileID: 0}
 --- !u!4 &958533980 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7080642204257920288, guid: 962e47bec5a660d47b5e07c7f3c6fb28, type: 3}
@@ -2842,6 +2849,7 @@ MonoBehaviour:
   village:
     VillageNodes: []
     VillageCenter: {fileID: 0}
+  NodeRenderer: {fileID: 0}
 --- !u!4 &999273622
 Transform:
   m_ObjectHideFlags: 0
@@ -3083,6 +3091,7 @@ MonoBehaviour:
   village:
     VillageNodes: []
     VillageCenter: {fileID: 0}
+  NodeRenderer: {fileID: 0}
 --- !u!1001 &1212621383
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3432,6 +3441,7 @@ MonoBehaviour:
   village:
     VillageNodes: []
     VillageCenter: {fileID: 0}
+  NodeRenderer: {fileID: 0}
 --- !u!4 &1257501657
 Transform:
   m_ObjectHideFlags: 0
@@ -3589,6 +3599,7 @@ MonoBehaviour:
   village:
     VillageNodes: []
     VillageCenter: {fileID: 0}
+  NodeRenderer: {fileID: 0}
 --- !u!4 &1324522554
 Transform:
   m_ObjectHideFlags: 0
@@ -4013,6 +4024,7 @@ MonoBehaviour:
   village:
     VillageNodes: []
     VillageCenter: {fileID: 0}
+  NodeRenderer: {fileID: 0}
 --- !u!1001 &1550329105
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4635,6 +4647,7 @@ MonoBehaviour:
   village:
     VillageNodes: []
     VillageCenter: {fileID: 0}
+  NodeRenderer: {fileID: 0}
 --- !u!1 &1798024199
 GameObject:
   m_ObjectHideFlags: 0
@@ -4677,6 +4690,7 @@ MonoBehaviour:
     - {fileID: 1798024200}
     - {fileID: 1894137816}
     VillageCenter: {fileID: 1894137816}
+  NodeRenderer: {fileID: 0}
 --- !u!4 &1798024201
 Transform:
   m_ObjectHideFlags: 0
@@ -4811,6 +4825,7 @@ MonoBehaviour:
     - {fileID: 1798024200}
     - {fileID: 1894137816}
     VillageCenter: {fileID: 1894137816}
+  NodeRenderer: {fileID: 0}
 --- !u!1001 &1935584984
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5007,6 +5022,7 @@ MonoBehaviour:
   village:
     VillageNodes: []
     VillageCenter: {fileID: 0}
+  NodeRenderer: {fileID: 0}
 --- !u!1 &2056615860
 GameObject:
   m_ObjectHideFlags: 0
@@ -5060,6 +5076,7 @@ MonoBehaviour:
   village:
     VillageNodes: []
     VillageCenter: {fileID: 0}
+  NodeRenderer: {fileID: 0}
 --- !u!43 &2100815572
 Mesh:
   m_ObjectHideFlags: 0
@@ -5283,6 +5300,7 @@ MonoBehaviour:
   village:
     VillageNodes: []
     VillageCenter: {fileID: 0}
+  NodeRenderer: {fileID: 0}
 --- !u!4 &2126526490
 Transform:
   m_ObjectHideFlags: 0

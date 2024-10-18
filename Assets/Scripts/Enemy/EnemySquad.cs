@@ -52,7 +52,7 @@ public class EnemySquad
             enemy.transform.position = location.transform.position; //Set the enemy to be positioned at the starting node
             enemy.NearNode = location;
             //And lets set up the enemy's navigation while we're here too
-            DriveRoads navigate = enemy.GetComponent<DriveRoads>();
+            NavigateRoads navigate = enemy.GetComponent<NavigateRoads>();
             navigate.Initialize(); //Kick things off
         }
         NearestNode = location;
