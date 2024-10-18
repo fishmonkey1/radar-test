@@ -98,7 +98,8 @@ public class OrdersManager
     OrderContext PopulatePatrol(PatrolOrder patrol)
     {
         //We need to get our highest rated pair of buildings to try to build a patrol out of
-        List<Node> buildings = EnemyManager.Instance.BuildingsManager.GetHighestValuedBuildings(PatrolLength); //No need for excluding buildings now
+        BuildingsManager buildingManager = EnemyManager.Instance.BuildingsManager;
+        List<Node> buildings = buildingManager.GetHighestValuedBuildings(PatrolLength); //No need for excluding buildings now
 
         //Now we need to set up our OrderContext with some of the data
 
@@ -108,6 +109,10 @@ public class OrdersManager
         patrol.Nodes = path; //Assign the path we found to the patrol
         patrol.Looping = true; //I'm just gonna set them all to looping for right now
         Debug.Log($"Created a patrol path. Contents of path are " + AStar.PrintPath(path));
+        //Since we assigned an order to these nodes, we should reduce their weights
+        //I only have two buildings for now, so I've commented out the second building getting decremented
+        buildingManager.ChangeBuildingValue(patrol.Node, -1); //Reduce the weight since a squad is assigned
+        //buildingManager.ChangeBuildingValue(buildings[1], -1);
         return patrol;
     }
 

@@ -20,7 +20,7 @@ public class BuildingsManager : MonoBehaviour
 
         List<Node> topBuildings = WeightedNodeBuildings //Linq statement
         .Where(pair => !exclude.Contains(pair.Value.Building)) //Filter out any buildings that were excluded
-        .OrderByDescending(pair => pair.Value.Value) //Sort from highest at the start to lowest
+        .OrderByDescending(pair => pair.Value) //Sort from highest at the start to lowest
         .Take(numResults) //Only grab however many results they asked for
         .Select(pair => pair.Key) //Swap the value to Node instead of BuildingIntPair
         .ToList(); //And finally make it a list
