@@ -24,10 +24,10 @@ public class Steering : MonoBehaviour
     }
 
     // Method to determine the required speed for turning towards a target Transform
-    public float CalculateRequiredSpeed(Transform target)
+    public float CalculateRequiredSpeed(Vector3 target)
     {
         // Vector from the entity to the target
-        Vector3 toTarget = target.position - transform.position;
+        Vector3 toTarget = target - transform.position;
 
         // Angle between forward direction and the direction to the target
         float angleToTarget = Vector3.Angle(transform.forward, toTarget);
@@ -46,7 +46,7 @@ public class Steering : MonoBehaviour
     }
 
     // Example function to update the steering logic
-    public void UpdateSteering(Transform target)
+    public void UpdateSteering(Vector3 target)
     {
         // Calculate the turn radius based on the current speed
         float turnRadius = CalculateTurnRadius(currentSpeed);

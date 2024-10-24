@@ -11,21 +11,33 @@ public class BuildingsManager : MonoBehaviour
     public void ChangeBuildingValue(Node node, int change)
     { //Doing this so I can hook debug stuff up later if we need
         BuildingIntPair pair = WeightedNodeBuildings[node];
-        pair.Value += change; 
+        pair.Value += change;
+        PrintWeightedNodes();
     }
 
     public List<Node> GetHighestValuedBuildings(int numResults, List<NodeBuilding> exclude = null)
     {
-        exclude = exclude ?? new List<NodeBuilding>(); //Initialize the list if it doesnt get passed
+        exclude ??= new List<NodeBuilding>(); //Initialize the list if it doesnt get passed
 
         List<Node> topBuildings = WeightedNodeBuildings //Linq statement
         .Where(pair => !exclude.Contains(pair.Value.Building)) //Filter out any buildings that were excluded
-        .OrderByDescending(pair => pair.Value) //Sort from highest at the start to lowest
+        .OrderByDescending(pair => pair.Value.Value) //Sort from highest at the start to lowest
         .Take(numResults) //Only grab however many results they asked for
         .Select(pair => pair.Key) //Swap the value to Node instead of BuildingIntPair
         .ToList(); //And finally make it a list
 
         return topBuildings;
+    }
+
+    public void PrintWeightedNodes()
+    {
+        string nodePairs = "Weighted nodes list: ";
+        foreach (KeyValuePair<Node, BuildingIntPair> pair in WeightedNodeBuildings)
+        {
+            nodePairs += pair.Key.gameObject.name + ": ";
+            nodePairs += pair.Value.Value + " ";
+        }
+        Debug.Log(nodePairs);
     }
 
     public void FindBuildingsInGraph()
@@ -44,7 +56,7 @@ public class BuildingsManager : MonoBehaviour
                 { //This has a proper building to track on it, so into the list it goes
                     BuildingNodes.Add(node);
                     BuildingIntPair pair = BuildingImportance.GetBuildingValue(node.NodeBuilding);
-                    WeightedNodeBuildings.Add(node, pair);
+                    WeightedNodeBuildings.Add(node, new BuildingIntPair(pair.Building, pair.Value));
                 }
             }
             visited.Add(node);

@@ -11,6 +11,7 @@ public class NavigateRoads : Navigation
     [SerializeField] float rangeCheck = 0.5f; //How far the transform can be before we count it as reached
     [SerializeField] float rangeInterval = 0.5f; //How often we check to see if we're near the node
     PatrolOrder patrolOrder; //Store a reference to this since I expect most usage of this script to be from patrols
+    Steering steer;
 
     public void Initialize()
     {
@@ -29,6 +30,7 @@ public class NavigateRoads : Navigation
         }
         //Now we need to rotate our unit to face the node it's going to
         transform.LookAt(nextNode.transform.position); //Point towards the node
+        steer = GetComponent<Steering>();
         StartCoroutine(CheckDistanceToNextNode()); //Start the distance check
     }
 
@@ -41,6 +43,7 @@ public class NavigateRoads : Navigation
         Vector3 pathPoint = roadPath.path.GetClosestPointOnPath(aheadPoint);
         transform.LookAt(pathPoint); //Orientate to face the point on the path, then move towards it
         transform.position += transform.forward * owner.MaxSpeed * Time.deltaTime;
+        //steer.UpdateSteering(pathPoint);
     }
 
     public IEnumerator CheckDistanceToNextNode()

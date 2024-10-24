@@ -1,5 +1,6 @@
 using IO.Swagger.Model;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -100,6 +101,16 @@ public class OrdersManager
         //We need to get our highest rated pair of buildings to try to build a patrol out of
         BuildingsManager buildingManager = EnemyManager.Instance.BuildingsManager;
         List<Node> buildings = buildingManager.GetHighestValuedBuildings(PatrolLength); //No need for excluding buildings now
+        Debug.Log("Testing WeightedBuildingNodes list after getting HighestValuedBuildings");
+        buildingManager.PrintWeightedNodes();
+        string listbuildings = ""; //For quick debugging of the node names
+        foreach(Node building in buildings)
+        {
+            listbuildings += building.gameObject.name + " ";
+        }
+
+        Debug.Log($"Contents of HighestValuedBuildings is: {listbuildings}");
+        
 
         //Now we need to set up our OrderContext with some of the data
 
