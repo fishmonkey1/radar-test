@@ -12,6 +12,7 @@ public class NavigateRoads : Navigation
     [SerializeField] float rangeInterval = 0.5f; //How often we check to see if we're near the node
     [SerializeField] float maxTurnAngle = 35f;
     [SerializeField] float turnSpeed = 2f;
+    [SerializeField] float currentSpeed;
     PatrolOrder patrolOrder; //Store a reference to this since I expect most usage of this script to be from patrols
 
     public void Initialize()
@@ -31,28 +32,43 @@ public class NavigateRoads : Navigation
         }
         //Now we need to rotate our unit to face the node it's going to
         transform.LookAt(nextNode.transform.position); //Point towards the node
+        currentSpeed = owner.MaxSpeed;
         StartCoroutine(CheckDistanceToNextNode()); //Start the distance check
     }
 
     void Update()
     {
         //Get the point the truck is going to move to
-        Vector3 aheadPoint = transform.position + transform.forward * owner.MaxSpeed * Time.deltaTime;
+        Vector3 directionToNode = nextNode.transform.position - transform.position;
+        directionToNode.Normalize();
+        Vector3 aheadPoint = transform.position + directionToNode * owner.MaxSpeed * rangeCheck * Time.deltaTime;
         //Now we find the closest point on the path to our aheadPoint
         //If we changed road renderers, the unit should be facing the next node, which should prevent wrong turns
-        Vector3 pathPoint = roadPath.path.GetClosestPointOnPath(aheadPoint);
-        Vector3 directionToPoint = pathPoint - transform.position;
-        float angleToPoint = Vector3.Angle(transform.forward, directionToPoint);
-        if (angleToPoint > maxTurnAngle)
+        Vector3 targetPoint = roadPath.path.GetClosestPointOnPath(aheadPoint);
+        Vector3 directionToTarget = new Vector3(
+            targetPoint.x - transform.position.x,
+            0,
+            targetPoint.z - transform.position.z
+        );
+        // Normalize direction to avoid issues with scale
+        directionToTarget.Normalize();
+        float angleToTarget = Vector3.SignedAngle(transform.forward, directionToTarget, Vector3.up);
+        float angleFactor = Mathf.Abs(angleToTarget) / 90f;  // Normalize angle to [0, 1]
+        currentSpeed = Mathf.Lerp(owner.MaxSpeed, owner.MinSpeed, angleFactor);  // Interpolate speed based on angle
+
+        if (Mathf.Abs(angleToTarget) > maxTurnAngle)
         { //If the next found point is outside of our turning range, start turning to face it
-            Quaternion targetRotation = Quaternion.LookRotation(directionToPoint);
+            float targetYRotation = transform.eulerAngles.y + angleToTarget;
+            Quaternion targetRotation = Quaternion.Euler(0, targetYRotation, 0);
+
+            // Smoothly rotate towards the target using the shortest path
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
         }
         else
-            transform.LookAt(pathPoint); //Orientate to face the point on the path, then move towards it
+            transform.LookAt(new Vector3(targetPoint.x, transform.position.y, targetPoint.z)); //Orientate to face the point on the path, then move towards it
 
         //Now move the vehicle forwards
-        transform.position += transform.forward * owner.MaxSpeed * Time.deltaTime;
+        transform.position += transform.forward * currentSpeed * Time.deltaTime;
         
     }
 
@@ -74,7 +90,7 @@ public class NavigateRoads : Navigation
                     Debug.Log("Next node has a different renderer, reassigning...");
                 }
                 //Lets try rotating the model to face the node, so the next update cycle starts with LookAt(nextNode)
-                transform.LookAt(nextNode.transform.position);
+                //transform.LookAt(nextNode.transform.position);
             }
 
             yield return new WaitForSeconds(rangeInterval);
