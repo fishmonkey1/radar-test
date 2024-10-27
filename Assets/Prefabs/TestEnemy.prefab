@@ -185,8 +185,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   active: 0
-  rangeCheck: 1.5
-  rangeInterval: 0.5
+  rangeCheck: 3
+  rangeInterval: 0.25
 --- !u!114 &4530219370630674380
 MonoBehaviour:
   m_ObjectHideFlags: 0
