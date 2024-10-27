@@ -14,13 +14,14 @@ public class TankRoomManager : NetworkRoomManager
     [SerializeField] GameObject enemyManagerPrefab; //I'm going to attempt to spawn the enemy stuff in here from the tank manager
     [SerializeField] GameObject horniTankPrefab; //For spawning after the game scene is loaded
     [SerializeField, ReadOnly] RolePicker rolePicker; //Cached after the UI is made
+    [SerializeField] bool startInDebugMode = true;
 
     public static new TankRoomManager singleton => NetworkManager.singleton as TankRoomManager;
 
     public override void ReadyStatusChanged()
     {
         base.ReadyStatusChanged();
-        Debug.Log("Player is now ready");
+        //Debug.Log("Player is now ready");
     }
 
     public override GameObject OnRoomServerCreateGamePlayer(NetworkConnectionToClient conn, GameObject roomPlayer)
@@ -43,7 +44,7 @@ public class TankRoomManager : NetworkRoomManager
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
         base.OnServerAddPlayer(conn);
-        Debug.Log("Server added a player with a netId of " + conn.identity.netId);
+        //Debug.Log("Server added a player with a netId of " + conn.identity.netId);
     }
 
     public override void OnRoomStopClient()
@@ -58,14 +59,14 @@ public class TankRoomManager : NetworkRoomManager
 
     public override void OnRoomServerConnect(NetworkConnectionToClient conn)
     {
-        Debug.Log($"Client connected to the server with server connection id of {conn.connectionId}");
+        //Debug.Log($"Client connected to the server with server connection id of {conn.connectionId}");
     }
 
     public override void OnRoomServerSceneChanged(string sceneName)
     {
         if (sceneName == RoomScene)
         {
-            Debug.Log("Server moved into room scene, spawning canvas");
+            //Debug.Log("Server moved into room scene, spawning canvas");
             GameObject RolePickerObject = GameObject.Instantiate(rolePickerPrefab);
             rolePicker = RolePickerObject.GetComponent<RolePicker>();
             NetworkServer.Spawn(RolePickerObject);
@@ -74,12 +75,14 @@ public class TankRoomManager : NetworkRoomManager
         {
             //Time to spawn the tank in
             //We'll worry about picking a proper spawn point later on
-            Debug.Log("Server moved into gameplay scene, spawning tank");
+            //Debug.Log("Server moved into gameplay scene, spawning tank");
             GameObject horniTank = GameObject.Instantiate(horniTankPrefab); //Double check this puts the tank at 0,0,0
             NetworkServer.Spawn(horniTank);
             GameObject canvas = GameObject.Find("Canvas");
             GameObject chatroom = GameObject.Instantiate(chatroomPrefab, canvas.transform);
             NetworkServer.Spawn(chatroom);
+            if (startInDebugMode)
+                canvas.SetActive(false); //Turn the UI off when we're in debug mode
             GameObject enemyManager = GameObject.Instantiate(enemyManagerPrefab); //Now spawn across the network
             NetworkServer.Spawn(enemyManager);
         }
