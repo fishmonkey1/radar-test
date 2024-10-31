@@ -10,6 +10,8 @@ public class LayerTerrain : MonoBehaviour
     public DrawType drawType;
     public TerrainSize terrainSize;
 
+    [SerializeField] public bool use_terrain_obj;
+
     [SerializeField] public int X;
     [SerializeField] public int Y;
     [SerializeField] public int depth; //Maybe rename to height instead? depth is kinda lame
@@ -117,7 +119,9 @@ public class LayerTerrain : MonoBehaviour
 
         NormalizeFinalMap(LayersEnum.Elevation, elevationLayers.NoisePairs[0].NoiseParams.minValue, elevationLayers.NoisePairs[0].NoiseParams.raisedPower); //Make the final map only span from 0 to 1
 
-        CreateTerrainFromHeightmap();
+        if (use_terrain_obj) { 
+            CreateTerrainFromHeightmap(); 
+        } else { CreateMeshFromHeightmap(); }
     }
 
 
@@ -131,6 +135,50 @@ public class LayerTerrain : MonoBehaviour
         // SetHeights takes in an array indexed as [y,x] so it needs a reversed version of our float values array.
         terrainData.SetHeights(0, 0, finalMap.FetchFloatValues_ReversedYXarray(LayersEnum.Elevation)); //SetHeights, I hate you SO SO SO SO SO SO much >_<
     }
+
+
+    public void CreateMeshFromHeightmap()
+    {
+        // Create a new mesh
+        Mesh mesh = new Mesh();
+        GetComponent<MeshFilter>().mesh = mesh;
+
+        // Define vertices
+        Vector3[] vertices = new Vector3[(X + 1) * (Y + 1)];
+        for (int x = 0; x <= X; x++)
+        {
+            for (int z = 0; z <= depth; z++)
+            {
+                float y = finalMap.FetchFloatValues(LayersEnum.Elevation)[x, z] * depth; // Scale height
+                vertices[x + z * (X + 1)] = new Vector3(x, y, z);
+            }
+        }
+
+        // Define triangles
+        int[] triangles = new int[X * depth * 6];
+        for (int x = 0; x < X; x++)
+        {
+            for (int z = 0; z < depth; z++)
+            {
+                int vertexIndex = x + z * (X + 1);
+                triangles[(x + z * X) * 6] = vertexIndex;
+                triangles[(x + z * X) * 6 + 1] = vertexIndex + X + 1;
+                triangles[(x + z * X) * 6 + 2] = vertexIndex + 1;
+                triangles[(x + z * X) * 6 + 3] = vertexIndex + 1;
+                triangles[(x + z * X) * 6 + 4] = vertexIndex + X + 1;
+                triangles[(x + z * X) * 6 + 5] = vertexIndex + X + 2;
+            }
+        }
+
+        // Assign vertices and triangles to the mesh
+        mesh.vertices = vertices;
+        mesh.triangles = triangles;
+
+        // Recalculate normals for proper lighting
+        mesh.RecalculateNormals();
+    }
+
+
 
 
     public void ReadNoiseParams(NoiseParams noiseParams) //STAYS
