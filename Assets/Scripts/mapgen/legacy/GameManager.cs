@@ -9,8 +9,8 @@ using UnityEditor;
 
 public class GameManager: MonoBehaviour
 {
-    [SerializeField] private MapGenerator mapGenerator;
-    [SerializeField] private RoadGen roadGen;
+    //[SerializeField] private MapGenerator mapGenerator;
+    //[SerializeField] private RoadGen roadGen;
 
     [SerializeField] private LayerTerrain layerTerrain;
     //[SerializeField] private Biomes biomes;
@@ -51,10 +51,10 @@ public class GameManager: MonoBehaviour
 
         layerTerrain.genTopo.createTopoTextures(0, 0, layerTerrain.X, layerTerrain.Y, false, noiseMap);
 
-        if (layerTerrain.drawMode == LayerTerrain.DrawMode.ColorMap)
+        /*if (layerTerrain.drawMode == LayerTerrain.DrawMode.ColorMap)
         {   
             colorMap = mapGenerator.GenerateColorMap(noiseMap); 
-        }
+        }*/
 
         RefreshObject();
     }
@@ -63,8 +63,8 @@ public class GameManager: MonoBehaviour
     {
         if (layerTerrain.drawType == LayerTerrain.DrawType.Terrain)
         {
-            colorMap = mapGenerator.GenerateColorMap(noiseMap);
-            colorMap = roadGen.GetArterialPaths(noiseMap, colorMap);
+            /*colorMap = mapGenerator.GenerateColorMap(noiseMap);
+            colorMap = roadGen.GetArterialPaths(noiseMap, colorMap);*/
 
             Texture2D texture = TextureGenerator.TextureFromColorMap(colorMap, layerTerrain.X, layerTerrain.Y);
             SetTextureOnTerrain(texture);
@@ -79,7 +79,7 @@ public class GameManager: MonoBehaviour
         
         TerrainLayer[] newlayerlist = new TerrainLayer[1];
         newlayerlist[0] = newlayer;
-        layerTerrain.terrain.terrainData.terrainLayers = newlayerlist;
+        //layerTerrain.terrain.terrainData.terrainLayers = newlayerlist;
     }
 
     public void LoadTerrainTextures()
@@ -132,8 +132,8 @@ public class GameManager: MonoBehaviour
                 }
             }
 
-            layerTerrain.terrain.terrainData.terrainLayers = layers.ToArray(); //set new layers
-            layerTerrain.terrain.terrainData.RefreshPrototypes();
+            /*layerTerrain.terrain.terrainData.terrainLayers = layers.ToArray(); //set new layers
+            layerTerrain.terrain.terrainData.RefreshPrototypes();*/
         }
     }
 

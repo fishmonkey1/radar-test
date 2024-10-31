@@ -12,8 +12,11 @@ public class LayerTerrain : MonoBehaviour
 
     [SerializeField] public bool use_terrain_obj;
 
-    [SerializeField] public int X;
-    [SerializeField] public int Y;
+    [SerializeField] public MeshRenderer MeshRenderer;
+    [SerializeField] public MeshFilter MeshFilter;
+
+    public int X;
+    public int Y;
     [SerializeField] public int depth; //Maybe rename to height instead? depth is kinda lame
 
     private float noiseScale; //For transforming the int coords into smaller float values to sample the noise better. Functions as zoom in effect
@@ -24,10 +27,10 @@ public class LayerTerrain : MonoBehaviour
 
     [SerializeField] private FastNoiseLite noise;
 
-    [SerializeField] public Terrain terrain; //This may become a custom mesh in the future, gotta dig up some code on it
-    public TerrainData terrainData;
+    //[SerializeField] public Terrain terrain; //This may become a custom mesh in the future, gotta dig up some code on it
+    //public TerrainData terrainData;
 
-    [SerializeField] public GameManager gameManager;
+    //[SerializeField] public GameManager gameManager;
 
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
     public Pathfinding pathfinding;
@@ -86,22 +89,22 @@ public class LayerTerrain : MonoBehaviour
     }
     public void Start()
     {
-        if (terrain == null) Debug.Log("layerTerrain has no terrain obj");//Should already be assigned, but nab it otherwise
+        //if (terrain == null) Debug.Log("layerTerrain has no terrain obj");//Should already be assigned, but nab it otherwise
     }
 
 
     public void SetTerrainSize()
     {
-        if (terrainSize == TerrainSize._1024) { X = 1024; Y = 1024; }
-        if (terrainSize == TerrainSize._512) { X = 512; Y = 512; }
-        if (terrainSize == TerrainSize._256) { X = 256; Y = 256; }
-        if (terrainSize == TerrainSize._128) { X = 128; Y = 128; }
-        if (terrainSize == TerrainSize._64) { X = 64; Y = 64; }
+        if (terrainSize == TerrainSize._1024) { X = 1024; Y = 1024; };
+        if (terrainSize == TerrainSize._512) { X = 512; Y = 512; };
+        if (terrainSize == TerrainSize._256) { X = 256; Y = 256; };
+        if (terrainSize == TerrainSize._128) { X = 128; Y = 128; };
+        if (terrainSize == TerrainSize._64) { X = 64; Y = 64; };
     }
 
     public void GenerateTerrain() //main entry
     {
-        if (drawType == DrawType.Terrain) SetTerrainSize();
+        SetTerrainSize();
 
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason
         pathfinding = new Pathfinding(finalMap); //Init the pathfinding for adjusting regions after they're created
@@ -127,29 +130,34 @@ public class LayerTerrain : MonoBehaviour
 
     public void CreateTerrainFromHeightmap()
     {
-        terrainData = terrain.terrainData;
+        /*terrainData = terrain.terrainData;
         terrainData.alphamapResolution = X + 1;
         terrainData.heightmapResolution = X - 1;
         terrainData.size = new Vector3(X, depth, Y);
 
         // SetHeights takes in an array indexed as [y,x] so it needs a reversed version of our float values array.
-        terrainData.SetHeights(0, 0, finalMap.FetchFloatValues_ReversedYXarray(LayersEnum.Elevation)); //SetHeights, I hate you SO SO SO SO SO SO much >_<
+        terrainData.SetHeights(0, 0, finalMap.FetchFloatValues_ReversedYXarray(LayersEnum.Elevation)); //SetHeights, I hate you SO SO SO SO SO SO much >_<*/
     }
 
 
     public void CreateMeshFromHeightmap()
-    {
+    {   
+        //resize mesh to proper size
+
         // Create a new mesh
         Mesh mesh = new Mesh();
-        GetComponent<MeshFilter>().mesh = mesh;
+        MeshFilter.mesh = mesh;
+
+        Debug.Log("made it to meshgen func");
 
         // Define vertices
         Vector3[] vertices = new Vector3[(X + 1) * (Y + 1)];
-        for (int x = 0; x <= X; x++)
+        for (int x = 0; x < X; x++)
         {
-            for (int z = 0; z <= depth; z++)
+            for (int z = 0; z < Y; z++)
             {
-                float y = finalMap.FetchFloatValues(LayersEnum.Elevation)[x, z] * depth; // Scale height
+                float y = finalMap.FetchFloatValues(LayersEnum.Elevation)[x, z] * depth;
+                if (x <2) Debug.Log(x + "    " + z + "    " + y);
                 vertices[x + z * (X + 1)] = new Vector3(x, y, z);
             }
         }
@@ -286,7 +294,7 @@ public class LayerTerrain : MonoBehaviour
 
     public void UpdateTerrainHeightmap(int xBase, int yBase, float[,] heightmap) //MOVE?
     { // TODO: This might need work to instead mark the terrain as dirty until all deform operations are done, and THEN we set the heights
-        terrain.terrainData.SetHeights(xBase, yBase, heightmap); //Fuck you SetHeights, why do you pretend like I can update regions with the xBase and yBase when you actually suck?
+       // terrain.terrainData.SetHeights(xBase, yBase, heightmap); //Fuck you SetHeights, why do you pretend like I can update regions with the xBase and yBase when you actually suck?
 
         //Because fuck you, that's why! >:)
     }
@@ -350,7 +358,7 @@ public class LayerTerrain : MonoBehaviour
 
     public void runResearchMapGen()
     {
-        gameManager.loadNewData();
+        GenerateTerrain();
     }
 
 }
