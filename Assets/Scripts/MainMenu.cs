@@ -15,6 +15,7 @@ public class MainMenu : MonoBehaviour
     public TMP_InputField IPInput;
     public TMP_InputField PortInput;
     GameObject currentScreen; //Check which screen you're showing right now
+    bool NamePopupFromConnect = false; //If you host or join and get a name popup, this is true and makes the popup join the game
 
     private void Start()
     {
