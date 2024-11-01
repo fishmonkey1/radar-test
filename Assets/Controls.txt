@@ -1,0 +1,9 @@
+Turret control and driving is done with WASD
+Cycling through cameras is C
+Changing the zoom of the radar is Z
+F1 toggles the radar display on and off
+Left click fires turret weapons and eventually the machine gun for the driver
+R reloads your currently selected ammo
+Q and E cycle through options on the screen, or you can use the mouse wheel
+T will cycle you through the implemented roles, which is currently a debug feature
+Tab will toggle the chat window on and off
