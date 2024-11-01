@@ -6,18 +6,16 @@ using System.Collections.Generic;
 
 public class LayerTerrain : MonoBehaviour
 {
-    public DrawMode drawMode;
-    public DrawType drawType;
-    public TerrainSize terrainSize;
-
-    [SerializeField] public bool use_terrain_obj;
+    public TerrainSize terrainSize = TerrainSize._256;
 
     [SerializeField] public MeshRenderer MeshRenderer;
     [SerializeField] public MeshFilter MeshFilter;
 
-    public int X;
-    public int Y;
-    [SerializeField] public int depth; //Maybe rename to height instead? depth is kinda lame
+    [HideInInspector] public int X;
+    [HideInInspector] public int Y;
+    private bool mesh_32bit_buffer = false;
+
+    [SerializeField] [Range(5, 100)] public int depth; //Maybe rename to height instead? depth is kinda lame
 
     private float noiseScale; //For transforming the int coords into smaller float values to sample the noise better. Functions as zoom in effect
 
@@ -27,23 +25,16 @@ public class LayerTerrain : MonoBehaviour
 
     [SerializeField] private FastNoiseLite noise;
 
-    //[SerializeField] public Terrain terrain; //This may become a custom mesh in the future, gotta dig up some code on it
-    //public TerrainData terrainData;
-
-    //[SerializeField] public GameManager gameManager;
 
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
     public Pathfinding pathfinding;
 
     public Dictionary<string, MapLayers> layersDict = new Dictionary<string, MapLayers>();
 
-    public float highest_e = -100;
-    private float lowest_e = 100;
+    [HideInInspector] public float highest_e = -100;
+    [HideInInspector] private float lowest_e = 100;
 
-    public float waterheight_int;
-
-    [Header("Editor research")]
-    [SerializeField] MapGenerator rmg;
+    [Header("Editor ")]
     public bool DrawInEditor;
     public bool autoUpdate;
 
@@ -57,27 +48,19 @@ public class LayerTerrain : MonoBehaviour
     // ----------------- DEBUG STUFF
     bool print_debug = false;
 
-    public enum DrawMode
-    {
-        NoiseMap,
-        ColorMap,
-        TopoMap,
-    }
-    public enum DrawType
-    {
-        Terrain,
-        Plane,
-        Mesh
-    }
 
     public enum TerrainSize
-    {   // if you add more, remember to add in SetTerrainSize() too :3
+    {   
+        // if you add more, remember to add in SetTerrainSize() too :3
+        _8192,
+        _4096,
+        _2048,
         _1024,
         _512,
         _256,
         _128,
         _64,
-
+        _32,
     }
 
 
@@ -94,12 +77,17 @@ public class LayerTerrain : MonoBehaviour
 
 
     public void SetTerrainSize()
-    {
-        if (terrainSize == TerrainSize._1024) { X = 1024; Y = 1024; };
-        if (terrainSize == TerrainSize._512) { X = 512; Y = 512; };
-        if (terrainSize == TerrainSize._256) { X = 256; Y = 256; };
-        if (terrainSize == TerrainSize._128) { X = 128; Y = 128; };
-        if (terrainSize == TerrainSize._64) { X = 64; Y = 64; };
+    {   
+        
+        if (terrainSize == TerrainSize._8192) { X = 8192; Y = 8192; mesh_32bit_buffer = true; };
+        if (terrainSize == TerrainSize._4096) { X = 4096; Y = 4096; mesh_32bit_buffer = true; };
+        if (terrainSize == TerrainSize._2048) { X = 2048; Y = 2048; mesh_32bit_buffer = true; };
+        if (terrainSize == TerrainSize._1024) { X = 1024; Y = 1024; mesh_32bit_buffer = true; };
+        if (terrainSize == TerrainSize._512)  { X = 512;  Y = 512;  mesh_32bit_buffer = true; };
+        if (terrainSize == TerrainSize._256)  { X = 256;  Y = 256; };
+        if (terrainSize == TerrainSize._128)  { X = 128;  Y = 128; };
+        if (terrainSize == TerrainSize._64)   { X = 64;   Y = 64; };
+        if (terrainSize == TerrainSize._32)   { X = 32;   Y = 32; };
     }
 
     public void GenerateTerrain() //main entry
@@ -122,52 +110,37 @@ public class LayerTerrain : MonoBehaviour
 
         NormalizeFinalMap(LayersEnum.Elevation, elevationLayers.NoisePairs[0].NoiseParams.minValue, elevationLayers.NoisePairs[0].NoiseParams.raisedPower); //Make the final map only span from 0 to 1
 
-        if (use_terrain_obj) { 
-            CreateTerrainFromHeightmap(); 
-        } else { CreateMeshFromHeightmap(); }
+        CreateMeshFromHeightmap(); 
     }
 
-
-    public void CreateTerrainFromHeightmap()
-    {
-        /*terrainData = terrain.terrainData;
-        terrainData.alphamapResolution = X + 1;
-        terrainData.heightmapResolution = X - 1;
-        terrainData.size = new Vector3(X, depth, Y);
-
-        // SetHeights takes in an array indexed as [y,x] so it needs a reversed version of our float values array.
-        terrainData.SetHeights(0, 0, finalMap.FetchFloatValues_ReversedYXarray(LayersEnum.Elevation)); //SetHeights, I hate you SO SO SO SO SO SO much >_<*/
-    }
 
 
     public void CreateMeshFromHeightmap()
-    {   
-        //resize mesh to proper size
-
-        // Create a new mesh
+    {
         Mesh mesh = new Mesh();
-        MeshFilter.mesh = mesh;
+        MeshFilter.sharedMesh = mesh;
 
-        Debug.Log("made it to meshgen func");
+        // maximum number of vertices in a mesh depends on the format of the mesh index buffer:
+        // 16 bit index buffer: Supports up to 65,535 vertices
+        // 32 bit index buffer: Supports up to 4 billion vertices
+        // The default index format is 16 bit because it uses less memory and bandwidth.
+        // if map larger than 256x256 it will use larger buffer.
+        if (mesh_32bit_buffer) { mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32; }
+        
 
-        // Define vertices
+        // Define vertices and triangles
         Vector3[] vertices = new Vector3[(X + 1) * (Y + 1)];
+        int[] triangles = new int[X * Y * 6];
+
+        float[,] fmap = finalMap.FetchFloatValues(LayersEnum.Elevation);
+
         for (int x = 0; x < X; x++)
         {
             for (int z = 0; z < Y; z++)
             {
-                float y = finalMap.FetchFloatValues(LayersEnum.Elevation)[x, z] * depth;
-                if (x <2) Debug.Log(x + "    " + z + "    " + y);
+                float y = fmap[x, z] * depth;
                 vertices[x + z * (X + 1)] = new Vector3(x, y, z);
-            }
-        }
 
-        // Define triangles
-        int[] triangles = new int[X * depth * 6];
-        for (int x = 0; x < X; x++)
-        {
-            for (int z = 0; z < depth; z++)
-            {
                 int vertexIndex = x + z * (X + 1);
                 triangles[(x + z * X) * 6] = vertexIndex;
                 triangles[(x + z * X) * 6 + 1] = vertexIndex + X + 1;
@@ -181,6 +154,8 @@ public class LayerTerrain : MonoBehaviour
         // Assign vertices and triangles to the mesh
         mesh.vertices = vertices;
         mesh.triangles = triangles;
+
+        // add mesh.uvs
 
         // Recalculate normals for proper lighting
         mesh.RecalculateNormals();
@@ -356,7 +331,7 @@ public class LayerTerrain : MonoBehaviour
         }
     }
 
-    public void runResearchMapGen()
+    public void runMapGen()
     {
         GenerateTerrain();
     }

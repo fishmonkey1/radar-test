@@ -12,13 +12,9 @@ public class LayerTerrainEditor : Editor
             LayerTerrain script = (LayerTerrain)target;
             if (script.autoUpdate)
             {
-                Debug.Log("Editor script sees change in Layer Terrain");
-                script.runResearchMapGen();
+                script.runMapGen();
             }
         }
-
-
-        
 
         if (GUILayout.Button("Serialize Params to JSON"))
         {
@@ -34,8 +30,7 @@ public class LayerTerrainEditor : Editor
         if (GUILayout.Button("Generate"))
         {
             LayerTerrain script = (LayerTerrain)target;
-            //ResearchMapGenerator script1 = (ResearchMapGenerator)target;
-            script.runResearchMapGen();
+            script.runMapGen();
         }
     }
 }
