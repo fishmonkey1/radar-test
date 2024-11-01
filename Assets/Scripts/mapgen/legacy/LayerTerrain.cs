@@ -8,7 +8,6 @@ public class LayerTerrain : MonoBehaviour
 {
     public TerrainSize terrainSize = TerrainSize._256;
 
-    [SerializeField] public MeshRenderer MeshRenderer;
     [SerializeField] public MeshFilter MeshFilter;
 
     [HideInInspector] public int X;
@@ -123,13 +122,7 @@ public class LayerTerrain : MonoBehaviour
         Mesh mesh = meshData.CreateMesh(mesh_32bit_buffer);
         
         MeshFilter.sharedMesh = mesh;
-    } 
-
-
-    
-
-
-
+    }
 
     public void ReadNoiseParams(NoiseParams noiseParams) //STAYS
     {
@@ -150,7 +143,7 @@ public class LayerTerrain : MonoBehaviour
     }
 
 
-    public void GenerateHeightmap(MapNoisePair noisePair, string layer) //STAYS
+    public void GenerateHeightmap(MapNoisePair noisePair, string layer)
     {
         highest_e = -100;
         lowest_e = 100;
