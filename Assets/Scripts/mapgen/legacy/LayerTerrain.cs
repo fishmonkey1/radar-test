@@ -51,16 +51,7 @@ public class LayerTerrain : MonoBehaviour
     public enum TerrainSize
     {   
         // if you add more, remember to add in SetTerrainSize() too :3
-        _8192,
-        _4096,
-        _2048,
-        _1024,
-        _512,
-        _256,
-        _128,
-        _64,
-        _32,
-    }
+        _8192, _4096, _2048, _1024, _512, _256, _128, _64, _32, _16    }
 
 
 
@@ -87,6 +78,7 @@ public class LayerTerrain : MonoBehaviour
         if (terrainSize == TerrainSize._128)  { X = 128;  Y = 128; };
         if (terrainSize == TerrainSize._64)   { X = 64;   Y = 64; };
         if (terrainSize == TerrainSize._32)   { X = 32;   Y = 32; };
+        if (terrainSize == TerrainSize._16)   { X = 16; Y = 16; }
     }
 
     public void GenerateTerrain() //main entry
