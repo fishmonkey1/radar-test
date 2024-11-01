@@ -58,10 +58,6 @@ public class NoiseParams
     [Range(1f, 100f)]
     public float raisedPower = 1f;
 
-    //
-    [Tooltip("Minimum height value so that we can set into ground to get flat ocean.\n Don't think being used anymore")]
-    public float minValue = .5f;
-
     public string SerializeParamsToJson()
     {
         return JsonUtility.ToJson(this, true); //Always export with prettyprint

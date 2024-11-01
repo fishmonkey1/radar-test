@@ -1,47 +1,32 @@
 {
-    "drawMode": 1,
-    "drawType": 0,
-    "terrainSize": 2,
+    "terrainSize": 5,
+    "MeshRenderer": {
+        "instanceID": 26592
+    },
+    "MeshFilter": {
+        "instanceID": 26594
+    },
     "X": 256,
     "Y": 256,
-    "depth": 10,
+    "depth": 32,
     "elevationLayers": {
         "NoisePairs": [
             {
                 "NoiseParams": {
                     "noiseType": 3,
                     "seed": 10,
-                    "noiseScale": 8.0,
+                    "noiseScale": 6.0,
                     "frequency": 0.00139999995008111,
                     "fractalType": 3,
                     "fractalOctaves": 5,
                     "fractalGain": 0.4320000112056732,
                     "fractalLacunarity": 2.6500000953674318,
                     "weightedStrength": 0.0,
-                    "raisedPower": 8.0,
+                    "raisedPower": 10.0,
                     "minValue": 0.18000000715255738
                 },
                 "JSON": {
-                    "instanceID": 23926
-                },
-                "UseJsonFile": false
-            },
-            {
-                "NoiseParams": {
-                    "noiseType": 3,
-                    "seed": 10,
-                    "noiseScale": 8.0,
-                    "frequency": 0.00139999995008111,
-                    "fractalType": 3,
-                    "fractalOctaves": 5,
-                    "fractalGain": 0.4320000112056732,
-                    "fractalLacunarity": 2.6500000953674318,
-                    "weightedStrength": 0.0,
-                    "raisedPower": 8.0,
-                    "minValue": 0.18000000715255738
-                },
-                "JSON": {
-                    "instanceID": 23926
+                    "instanceID": 25642
                 },
                 "UseJsonFile": false
             }
@@ -51,59 +36,46 @@
         "NoisePairs": [
             {
                 "NoiseParams": {
-                    "noiseType": 3,
-                    "seed": 10,
-                    "noiseScale": 0.0,
-                    "frequency": 0.019999999552965165,
-                    "fractalType": 3,
-                    "fractalOctaves": 4,
-                    "fractalGain": 0.5,
-                    "fractalLacunarity": 2.0,
-                    "weightedStrength": 1.0,
-                    "raisedPower": 15.0,
+                    "noiseType": 0,
+                    "seed": 0,
+                    "noiseScale": 3.0,
+                    "frequency": 0.009739999659359455,
+                    "fractalType": 2,
+                    "fractalOctaves": 1,
+                    "fractalGain": 0.04899999871850014,
+                    "fractalLacunarity": 1.25,
+                    "weightedStrength": 0.0,
+                    "raisedPower": 4.900000095367432,
                     "minValue": 0.0
                 },
                 "JSON": {
-                    "instanceID": 23928
+                    "instanceID": 25644
                 },
                 "UseJsonFile": true
             }
         ]
     },
-    "terrain": {
-        "instanceID": 23860
-    },
-    "terrainData": {
-        "instanceID": 23802
-    },
-    "gameManager": {
-        "instanceID": 23818
-    },
-    "highest_e": 1.9306213855743409,
-    "waterheight_int": 1.0,
-    "rmg": {
+    "highest_e": 0.9668549299240112,
+    "DrawInEditor": true,
+    "autoUpdate": true,
+    "genTopo": {
         "instanceID": 0
     },
-    "DrawInEditor": true,
-    "autoUpdate": false,
-    "genTopo": {
-        "instanceID": 23888
-    },
     "topoObject": {
-        "instanceID": 23878
+        "instanceID": 0
     },
-    "numberOfTopoLevels": 5,
+    "numberOfTopoLevels": 0,
     "topoColor1": {
-        "r": 0.8773584961891174,
-        "g": 0.8516751527786255,
-        "b": 0.5586952567100525,
-        "a": 1.0
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
     },
     "topoColor2": {
-        "r": 0.1921568661928177,
-        "g": 0.6392157077789307,
-        "b": 0.3294117748737335,
-        "a": 1.0
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
     },
     "makeTerrainTextureTopo": false
 }
