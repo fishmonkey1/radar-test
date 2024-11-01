@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class NamePicker : MonoBehaviour
 {
@@ -10,6 +7,8 @@ public class NamePicker : MonoBehaviour
     [SerializeField] TMP_InputField inputField;
     [SerializeField] MainMenu menu;
     [SerializeField] bool isPopup;
+    [HideInInspector] public bool PopupFromJoin; //If this is true, then once the name is updated we can proceed to either join or host afterwards
+    [HideInInspector] public bool PopupFromHost; //Same idea, but for the host button
 
     // Start is called before the first frame update
     void Awake()
@@ -22,6 +21,16 @@ public class NamePicker : MonoBehaviour
     void UpdatePlayerName()
     {
         PlayerInfo.localPlayerName = inputField.text;
+        if (PopupFromHost)
+        {
+            menu.HostGame();
+            return;
+        }
+        if (PopupFromJoin)
+        {
+            menu.ShowJoinScreen();
+            return;
+        }
         if (isPopup)
             menu.ShowMenu();
     }
