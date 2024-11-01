@@ -114,52 +114,18 @@ public class LayerTerrain : MonoBehaviour
     }
 
 
-
     public void CreateMeshFromHeightmap()
     {
-        Mesh mesh = new Mesh();
-        MeshFilter.sharedMesh = mesh;
-
-        // maximum number of vertices in a mesh depends on the format of the mesh index buffer:
-        // 16 bit index buffer: Supports up to 65,535 vertices
-        // 32 bit index buffer: Supports up to 4 billion vertices
-        // The default index format is 16 bit because it uses less memory and bandwidth.
-        // if map larger than 256x256 it will use larger buffer.
-        if (mesh_32bit_buffer) { mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32; }
-        
-
-        // Define vertices and triangles
-        Vector3[] vertices = new Vector3[(X + 1) * (Y + 1)];
-        int[] triangles = new int[X * Y * 6];
-
         float[,] fmap = finalMap.FetchFloatValues(LayersEnum.Elevation);
 
-        for (int x = 0; x < X; x++)
-        {
-            for (int z = 0; z < Y; z++)
-            {
-                float y = fmap[x, z] * depth;
-                vertices[x + z * (X + 1)] = new Vector3(x, y, z);
+        MeshData meshData = MeshGenerator.GenerateTerrainMesh(fmap, depth);
+        Mesh mesh = meshData.CreateMesh(mesh_32bit_buffer);
+        
+        MeshFilter.sharedMesh = mesh;
+    } 
 
-                int vertexIndex = x + z * (X + 1);
-                triangles[(x + z * X) * 6] = vertexIndex;
-                triangles[(x + z * X) * 6 + 1] = vertexIndex + X + 1;
-                triangles[(x + z * X) * 6 + 2] = vertexIndex + 1;
-                triangles[(x + z * X) * 6 + 3] = vertexIndex + 1;
-                triangles[(x + z * X) * 6 + 4] = vertexIndex + X + 1;
-                triangles[(x + z * X) * 6 + 5] = vertexIndex + X + 2;
-            }
-        }
 
-        // Assign vertices and triangles to the mesh
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
-
-        // add mesh.uvs
-
-        // Recalculate normals for proper lighting
-        mesh.RecalculateNormals();
-    }
+    
 
 
 
