@@ -20,7 +20,6 @@ public class Deform : MonoBehaviour
 
     [SerializeField] LayerTerrain terrain; //Does not support using TerrainFromTilemap, so don't try it Lexi
 
-    GameManager gameManager;
 
     Map map; //Fetched out of the terrain, but it would be wise to have a delegate this can listen for when the LayerTerrain has finished making the map (or move assignment to DeformTerrain)
 
@@ -96,8 +95,9 @@ public class Deform : MonoBehaviour
         //If there is a chance that multiple deforms can happen this needs to instead mark the LayerTerrain as dirty and wait until all operations are complete before updating the Terrain
         float[,] heights = map.FetchFloatValuesSlice(layer, 0, map.Width, 0, map.Height);
         terrain.UpdateTerrainHeightmap(0,0,heights);
-        gameManager.loadNewData();
-
+        
+        //gameManager.loadNewData();
+        //instead run refresh hook
 
 
 

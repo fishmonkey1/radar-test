@@ -986,7 +986,7 @@ public class RoadGen : MonoBehaviour
 
     public void runMapGen() //this is so the Editor script can auto update on changes
     {
-        lt.gameManager.loadNewData();
+        lt.GenerateTerrain();
     }
 
 
