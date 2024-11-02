@@ -47,7 +47,6 @@ public class Graph : MonoBehaviour
             if (!nodes.Contains(node))
             {
                 nodes.Add(node);
-                Debug.Log("Added node to graph");
             }
             visited.Add(node);
             foreach (var connection in node.Connections)

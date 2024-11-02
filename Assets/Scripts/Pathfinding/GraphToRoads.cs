@@ -53,6 +53,12 @@ public class GraphToRoads : MonoBehaviour
 
     public void DrawRoads()
     {
+        graph = Graph.Instance;
+        if (graph.nodes.Count <= 1)
+        { //You need at least two nodes in order to render a road
+            Debug.Log("Not enough nodes to render roads! Add more nodes or check GraphToRoads for issues.");
+            return;
+        }
         RoadsParent = GameObject.Find("Roads");
 #if UNITY_EDITOR
         if (RoadsParent != null) //This statement is only for use in the editor so we don't get errors
@@ -76,14 +82,9 @@ public class GraphToRoads : MonoBehaviour
     public void TraverseGraph()
     {
         graph = Graph.Instance; //Get a reference to the one and only graph in the scene
-        if (graph.nodes.Count <= 1)
-        { //You need at least two nodes in order to render a road
-            Debug.Log("Not enough nodes to render roads! Add more nodes or check GraphToRoads for issues.");
-            return;
-        }
 
-        Visited.Clear(); //I highly doubt we'll be calling this more than once, but it never hurts
-        RoadDraws.Clear();
+        Visited.Clear(); //Clear out the results from the last time we did this
+        RoadDraws.Clear(); //And remove all of the road renderers as well since we'll be making new ones
 
         Node firstNode = graph.nodes[0]; //Get the first one in the list which we'll assume is a root road
         Queue<NodePair> newRoadPairs = new();
@@ -91,7 +92,7 @@ public class GraphToRoads : MonoBehaviour
         newRoadPairs.Enqueue(rootNode);
         if (RoadsParent == null)
         {
-            RoadsParent = new GameObject("Roads");
+            RoadsParent = new GameObject("Roads"); //Create an empty to group the roads under
         }
         while (newRoadPairs.Count > 0)
         { 
@@ -111,7 +112,7 @@ public class GraphToRoads : MonoBehaviour
                 roadDraw.AddNode(roadStartPair.IntersectionNode);
             }
 
-            Queue<Node> remainingRoadNodes = new();
+            Queue<Node> remainingRoadNodes = new(); //The other adjacent nodes that have are waiting to be processed
             remainingRoadNodes.Enqueue(roadStartNode);
 
             //Now we go down the node connections to looking for unvisited nodes and more intersections
@@ -121,8 +122,7 @@ public class GraphToRoads : MonoBehaviour
                 Node node = remainingRoadNodes.Dequeue();
                 if (Visited.Contains(node))
                 { //We've already done stuff for this node, so lets skip it
-                    //To be honest, I don't think we'll ever actually have this problem though
-                    break; //Get out of the while loop and just grab the next remaining road node
+                    break; //Get out of the while loop and just grab the next unprocessed road node
                 }
                 roadDraw.AddNode(node); //Assign the node to the draw component
                 node.SetRenderer(roadDraw); //Assign the renderer to the node too
