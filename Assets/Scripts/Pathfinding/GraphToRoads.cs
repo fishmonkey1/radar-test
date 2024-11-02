@@ -36,11 +36,11 @@ public class GraphToRoads : MonoBehaviour
     {
         RoadsParent = GameObject.Find("Roads");
 #if UNITY_EDITOR
-        if (RoadsParent != null)
+        if (RoadsParent != null) //This statement is only for use in the editor so we don't get errors
             GameObject.DestroyImmediate(RoadsParent);
 #endif
         if (RoadsParent != null)
-        {
+        { //And this one runs in play mode, also to avoid errors
             GameObject.Destroy(RoadsParent); //Remove the old renderers and prep to make new ones
         }
         TraverseGraph();
@@ -56,13 +56,13 @@ public class GraphToRoads : MonoBehaviour
 
     public void TraverseGraph()
     {
+        graph = Graph.Instance; //Get a reference to the one and only graph in the scene
         if (graph.nodes.Count <= 1)
-        {
+        { //You need at least two nodes in order to render a road
             Debug.Log("Not enough nodes to render roads! Add more nodes or check GraphToRoads for issues.");
             return;
         }
 
-        graph = Graph.Instance; //Get a reference to the one and only graph in the scene
         Visited.Clear(); //I highly doubt we'll be calling this more than once, but it never hurts
         RoadDraws.Clear();
 
@@ -70,7 +70,10 @@ public class GraphToRoads : MonoBehaviour
         Queue<NodePair> newRoadPairs = new();
         NodePair rootNode = new NodePair(null, firstNode); //The first argument is the node that serves as the intersection, which doesn't exist in the root node.
         newRoadPairs.Enqueue(rootNode);
-        RoadsParent = new GameObject("Roads");
+        if (RoadsParent == null)
+        {
+            RoadsParent = new GameObject("Roads");
+        }
         while (newRoadPairs.Count > 0)
         { 
             //While there are still roads to make, follow the nodes until we run out of ones not flagged as new roads
