@@ -6,31 +6,41 @@ public class LayerTerrainEditor : Editor
 {
     public override void OnInspectorGUI()
     {
-        //base.OnInspectorGUI();
+        
+        LayerTerrain script = (LayerTerrain)target;
+        
         if (DrawDefaultInspector())
         {
-            LayerTerrain script = (LayerTerrain)target;
             if (script.autoUpdate)
             {
                 script.runMapGen();
             }
         }
 
+
+        if (GUILayout.Button("Generate"))
+        {
+            script.runMapGen();
+        }
+
         if (GUILayout.Button("Serialize Params to JSON"))
         {
-            LayerTerrain script = (LayerTerrain)target;
             script.SerializeNoiseParamsToJson();
         }
         if (GUILayout.Button("Load Params From JSON"))
         {
-            LayerTerrain script = (LayerTerrain)target;
             script.LoadNoiseParamsFromJson();
         }
 
-        if (GUILayout.Button("Generate"))
+        if (GUILayout.Button("Serialize Map to JSON"))
         {
-            LayerTerrain script = (LayerTerrain)target;
-            script.runMapGen();
+            script.SerializeMapToJson();
         }
+
+        if (GUILayout.Button("Load Map From JSON"))
+        {
+            script.LoadMapFromJson();
+        }
+
     }
 }

@@ -1,0 +1,40 @@
+{
+    "NoisePairs": [
+        {
+            "NoiseParams": {
+                "noiseType": 3,
+                "seed": 10,
+                "noiseScale": 3.0,
+                "frequency": 0.00139999995008111,
+                "fractalType": 3,
+                "fractalOctaves": 5,
+                "fractalGain": 0.4320000112056732,
+                "fractalLacunarity": 4.070000171661377,
+                "weightedStrength": 1.0,
+                "raisedPower": 5.0
+            },
+            "JSON": {
+                "instanceID": 25804
+            },
+            "UseJsonFile": false
+        },
+        {
+            "NoiseParams": {
+                "noiseType": 3,
+                "seed": 10,
+                "noiseScale": 1.0,
+                "frequency": 0.00892999954521656,
+                "fractalType": 2,
+                "fractalOctaves": 4,
+                "fractalGain": 0.06700000166893006,
+                "fractalLacunarity": 4.070000171661377,
+                "weightedStrength": 0.5,
+                "raisedPower": 20.0
+            },
+            "JSON": {
+                "instanceID": 25804
+            },
+            "UseJsonFile": false
+        }
+    ]
+}

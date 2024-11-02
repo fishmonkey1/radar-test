@@ -6,8 +6,10 @@ public class MapNoisePair
 {
     public Map Map;
     public NoiseParams NoiseParams;
+
     public TextAsset JSON;
     public bool UseJsonFile;
+    public bool LoadFromJSON;
 
     public MapNoisePair(Map map, NoiseParams noiseParams)
     {
