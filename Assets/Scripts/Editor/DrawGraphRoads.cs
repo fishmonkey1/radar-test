@@ -13,6 +13,15 @@ public class DrawGraphRoads : Editor
             GraphToRoads graphToRoads = (GraphToRoads)target;
             graphToRoads.DrawRoads();
         }
+        if (GUILayout.Button("Set Nodes To Terrain Height"))
+        {
+            GraphToRoads graphToRoads = (GraphToRoads)target;
+            graphToRoads.NodesToTerrainHeight();
+        }
+        if (GUILayout.Button("Add All Nodes To Graph"))
+        {
+            Graph.Instance.AddNodesToGraph();
+        }
     }
 
 }

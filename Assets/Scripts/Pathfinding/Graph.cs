@@ -29,4 +29,37 @@ public class Graph : MonoBehaviour
         }
     }
 
+    public void AddNodesToGraph()
+    {
+        if (nodes.Count == 0)
+        {
+            Debug.Log("You haven't assigned a node to the graph");
+            return;
+        }
+
+        Queue<Node> frontier = new();
+        List<Node> visited = new();
+        frontier.Enqueue(nodes[0]);
+
+        while (frontier.Count > 0)
+        {
+            Node node = frontier.Dequeue();
+            if (!nodes.Contains(node))
+            {
+                nodes.Add(node);
+                Debug.Log("Added node to graph");
+            }
+            visited.Add(node);
+            foreach (var connection in node.Connections)
+            {
+                if (!visited.Contains(connection))
+                {
+                    frontier.Enqueue(connection);
+                }
+            }
+
+        }
+        Debug.Log("Graph.nodes count is: " + nodes.Count);
+    }
+
 }

@@ -32,6 +32,25 @@ public class GraphToRoads : MonoBehaviour
         DrawRoads();
     }
 
+    public void NodesToTerrainHeight()
+    { //Called by DrawGraphRoads editor script to drop all of the nodes down 
+        if (graph == null)
+            graph = Graph.Instance;
+        foreach (Node node in graph.nodes)
+        {
+            // Start the raycast from above the nodes's position to ensure it points downward
+            Ray ray = new Ray(node.transform.position, Vector3.down);
+            RaycastHit hit;
+
+            // Perform the raycast
+            if (Physics.Raycast(ray, out hit, 100f))
+            {
+                // Set the node's position to the hit point on the terrain
+                node.transform.position = hit.point;
+            }
+        }
+    }
+
     public void DrawRoads()
     {
         RoadsParent = GameObject.Find("Roads");
