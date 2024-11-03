@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 using ProcGenTiles;
 using System.IO;
@@ -15,15 +16,12 @@ public class LayerTerrain : MonoBehaviour
     private bool mesh_32bit_buffer = false;
 
     [SerializeField] [Range(5, 100)] public int depth; //Maybe rename to height instead? depth is kinda lame
-
     private float noiseScale; //For transforming the int coords into smaller float values to sample the noise better. Functions as zoom in effect
 
     //Assign layers from the inspector. In the future I either want ScriptableObjects that can be dragged in or JSON serialization so these don't get lost on a reset
     [SerializeField] public MapLayers elevationLayers;
     [SerializeField] public MapLayers moistureLayers;
-
     [SerializeField] private FastNoiseLite noise;
-
 
     public Map finalMap { get; private set; } //This is where all of the layers get combined into.
     public Pathfinding pathfinding;
@@ -46,6 +44,11 @@ public class LayerTerrain : MonoBehaviour
     [SerializeField] public bool makeTerrainTextureTopo = true;
     // ----------------- DEBUG STUFF
     bool print_debug = false;
+
+
+    [HideInInspector] public bool mapLoadedFromJSON = false;
+    [HideInInspector] public string mapName = "";
+
 
 
     public enum TerrainSize
@@ -210,8 +213,6 @@ public class LayerTerrain : MonoBehaviour
             }
         }
 
-
-
         if (print_debug)
         {
             Debug.Log($"Lowest value before normalizing was {lowest} and highest was {highest} on {layer} layer ");
@@ -219,46 +220,42 @@ public class LayerTerrain : MonoBehaviour
         }
     }
 
-    public void UpdateTerrainHeightmap(int xBase, int yBase, float[,] heightmap) //MOVE?
-    { // TODO: This might need work to instead mark the terrain as dirty until all deform operations are done, and THEN we set the heights
-       // terrain.terrainData.SetHeights(xBase, yBase, heightmap); //Fuck you SetHeights, why do you pretend like I can update regions with the xBase and yBase when you actually suck?
 
-        //Because fuck you, that's why! >:)
+    public void LoadNoiseParamsFromJson(MapNoisePair pair) 
+    {
+        string folderPath = Path.Combine(Application.dataPath, "JSON/NoiseParams");
+        string filePath = EditorUtility.OpenFilePanel("Load NoiseParams From Json", folderPath, "json");
+        string json = File.ReadAllText(filePath);
+        pair.NoiseParams = JsonUtility.FromJson<NoiseParams>(json);
     }
 
-    public void SerializeNoiseParamsToJson() //MOVE
-    { //For each NoiseParam in our layers we serialize them with the naming convention of layer + index in list
-        for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
+
+    public void SerializeNoiseParamsToJson(MapNoisePair pair)
+    {
+        string folderPath = Path.Combine(Application.dataPath, "JSON/NoiseParams");
+        string filePath = EditorUtility.SaveFilePanel("Save new", folderPath, "", "json");
+
+        if (!Directory.Exists(folderPath))
         {
-            MapNoisePair pair = elevationLayers.NoisePairs[i];
-            string json = pair.NoiseParams.SerializeParamsToJson(); // Get the JSON string
+            Directory.CreateDirectory(folderPath);
+        }
 
-            // Define the path for the JSON file in the JSON folder inside the Assets folder
-            string folderPath = Path.Combine(Application.dataPath, "JSON");
-            string filePath = Path.Combine(folderPath, $"layer{i}.json");
-
-            // Create the JSON folder if it doesn't exist
-            if (!Directory.Exists(folderPath))
+        if (filePath.Length > 5)
+        {
+            string json = pair.NoiseParams.SerializeParamsToJson();
+            if (json != null)
             {
-                Directory.CreateDirectory(folderPath);
+                // Write the JSON string to the file
+                File.WriteAllText(filePath, json);
+                Debug.Log($"single NoiseParams JSON file saved to: {filePath}");
             }
-
-            // Write the JSON string to the file
-            File.WriteAllText(filePath, json);
-
-            Debug.Log($"JSON file saved to: {filePath}");
-            SerializeMapToJson();
         }
     }
 
     public void SerializeMapToJson()
     {
-        //LayerTerrain lt = GetComponent<LayerTerrain>();
-        string json = JsonUtility.ToJson(this, true);
-        Debug.Log(json);
-
         string folderPath = Path.Combine(Application.dataPath, "JSON");
-        string filePath = Path.Combine(folderPath, $"wholemap.json");
+        string filePath;
 
         // Create the JSON folder if it doesn't exist
         if (!Directory.Exists(folderPath))
@@ -266,21 +263,45 @@ public class LayerTerrain : MonoBehaviour
             Directory.CreateDirectory(folderPath);
         }
 
-        // Write the JSON string to the file
-        File.WriteAllText(filePath, json);
-        Debug.Log($"wholemap JSON file saved to: {filePath}");
-    }
+        if (mapLoadedFromJSON)
+        {    
+            
+            // if overwrite:
+            if (EditorUtility.DisplayDialog("Serialize Map to Json...", $"Would you like to save a new file, or overwrite '{mapName}'?", "Save New...", "Overwrite"))
+            {
+                filePath = EditorUtility.SaveFilePanel("Save new", folderPath, mapName, "json");
+            }
+            else
+            { 
+                filePath = Path.Combine(folderPath, $"{mapName}.json"); 
+            }
 
-    public void LoadNoiseParamsFromJson() //MOVE
-    {
-        for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
+        } 
+        else
         {
-            MapNoisePair pair = elevationLayers.NoisePairs[i];
-            if (pair.UseJsonFile && pair.JSON.text != string.Empty)
-            { //Only load if the bool is on and the json asset is assigned
-                pair.NoiseParams = JsonUtility.FromJson<NoiseParams>(pair.JSON.text);
+            filePath = EditorUtility.SaveFilePanel("Save new", folderPath, "", "json");
+        }
+
+        if (filePath.Length > 5)
+        {
+            string json = JsonUtility.ToJson(elevationLayers, true);
+            if (json != null)
+            {
+                // Write the JSON string to the file
+                File.WriteAllText(filePath, json);
+                Debug.Log($"wholemap JSON file saved to: {filePath}");
             }
         }
+    }
+
+    public void LoadMapFromJson()
+    {
+        string folderPath = Path.Combine(Application.dataPath, "JSON");
+        string filePath = EditorUtility.OpenFilePanel("Load Map From Json",folderPath,"json");
+        string json = File.ReadAllText(filePath);
+
+        elevationLayers = JsonUtility.FromJson<MapLayers>(json);
+        GenerateTerrain();
     }
 
     public void runMapGen()

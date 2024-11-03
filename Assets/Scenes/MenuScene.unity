@@ -1624,6 +1624,8 @@ MonoBehaviour:
   inputField: {fileID: 986814324}
   menu: {fileID: 1931138228}
   isPopup: 0
+  PopupFromJoin: 0
+  PopupFromHost: 0
 --- !u!114 &977568092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3016,6 +3018,8 @@ MonoBehaviour:
   inputField: {fileID: 1989568637}
   menu: {fileID: 1931138228}
   isPopup: 1
+  PopupFromJoin: 0
+  PopupFromHost: 0
 --- !u!114 &1621941917
 MonoBehaviour:
   m_ObjectHideFlags: 0

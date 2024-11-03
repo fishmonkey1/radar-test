@@ -1,0 +1,12 @@
+{
+    "noiseType": 3,
+    "seed": 10,
+    "noiseScale": 8.0,
+    "frequency": 0.006709999870508909,
+    "fractalType": 3,
+    "fractalOctaves": 1,
+    "fractalGain": 0.0,
+    "fractalLacunarity": 1.0,
+    "weightedStrength": 0.0,
+    "raisedPower": 13.100000381469727
+}

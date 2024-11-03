@@ -1,81 +1,22 @@
 {
-    "terrainSize": 5,
-    "MeshRenderer": {
-        "instanceID": 26592
-    },
-    "MeshFilter": {
-        "instanceID": 26594
-    },
-    "X": 256,
-    "Y": 256,
-    "depth": 32,
-    "elevationLayers": {
-        "NoisePairs": [
-            {
-                "NoiseParams": {
-                    "noiseType": 3,
-                    "seed": 10,
-                    "noiseScale": 6.0,
-                    "frequency": 0.00139999995008111,
-                    "fractalType": 3,
-                    "fractalOctaves": 5,
-                    "fractalGain": 0.4320000112056732,
-                    "fractalLacunarity": 2.6500000953674318,
-                    "weightedStrength": 0.0,
-                    "raisedPower": 10.0,
-                    "minValue": 0.18000000715255738
-                },
-                "JSON": {
-                    "instanceID": 25642
-                },
-                "UseJsonFile": false
-            }
-        ]
-    },
-    "moistureLayers": {
-        "NoisePairs": [
-            {
-                "NoiseParams": {
-                    "noiseType": 0,
-                    "seed": 0,
-                    "noiseScale": 3.0,
-                    "frequency": 0.009739999659359455,
-                    "fractalType": 2,
-                    "fractalOctaves": 1,
-                    "fractalGain": 0.04899999871850014,
-                    "fractalLacunarity": 1.25,
-                    "weightedStrength": 0.0,
-                    "raisedPower": 4.900000095367432,
-                    "minValue": 0.0
-                },
-                "JSON": {
-                    "instanceID": 25644
-                },
-                "UseJsonFile": true
-            }
-        ]
-    },
-    "highest_e": 0.9668549299240112,
-    "DrawInEditor": true,
-    "autoUpdate": true,
-    "genTopo": {
-        "instanceID": 0
-    },
-    "topoObject": {
-        "instanceID": 0
-    },
-    "numberOfTopoLevels": 0,
-    "topoColor1": {
-        "r": 0.0,
-        "g": 0.0,
-        "b": 0.0,
-        "a": 0.0
-    },
-    "topoColor2": {
-        "r": 0.0,
-        "g": 0.0,
-        "b": 0.0,
-        "a": 0.0
-    },
-    "makeTerrainTextureTopo": false
+    "NoisePairs": [
+        {
+            "NoiseParams": {
+                "noiseType": 3,
+                "seed": 10,
+                "noiseScale": 3.0,
+                "frequency": 0.00139999995008111,
+                "fractalType": 3,
+                "fractalOctaves": 5,
+                "fractalGain": 0.4320000112056732,
+                "fractalLacunarity": 2.6500000953674318,
+                "weightedStrength": 0.0,
+                "raisedPower": 8.0
+            },
+            "JSON": {
+                "instanceID": 25804
+            },
+            "UseJsonFile": true
+        }
+    ]
 }
