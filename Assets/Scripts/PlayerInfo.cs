@@ -30,8 +30,8 @@ public class PlayerInfo : NetworkBehaviour
     /// <summary>
     /// This function is called by the server when it changes the syncVar for CurrentRole
     /// </summary>
-    /// <param name="oldRole"></param>
-    /// <param name="newRole"></param>
+    /// <param name="oldRole">The last role the player had, if any. Can be null.</param>
+    /// <param name="newRole">The role that's being assigned to the PlayerInfo</param>
     public void NetworkChangeRole(Role oldRole, Role newRole)
     {
         Debug.Log("SyncVar for Role changed. Picking new role.");
@@ -50,11 +50,9 @@ public class PlayerInfo : NetworkBehaviour
             if (isLocal)
             {
                 CamCycle.Instance.ChangeRoles(oldRole, role);
-                Debug.Log("Setting up local player camera");
                 if (horniTank != null)
                 {
                     Debug.Log("Assigning player to spawned tank");
-                    Debug.Log("Role equals gunner: " + (role.Name == CrewRoles.Gunner.Name));
                     if (role.Name == CrewRoles.Gunner.Name)
                         horniTank.GetComponent<Turret>().SetPlayer(this);
                     if (role.Name == CrewRoles.Driver.Name)
@@ -84,6 +82,9 @@ public class PlayerInfo : NetworkBehaviour
         currentRoleIndex++; //Increment to get the next role
         if (currentRoleIndex >= CrewRoles.ImplementedRoles.Length)
             currentRoleIndex = 0;
+        //We just skip the unassigned role, since I'd probably set up some different debug stuff for testing that
+        if (currentRoleIndex == CrewRoles.UnassignedRole.ID)
+            currentRoleIndex++;
 
         PickRole(CrewRoles.ImplementedRoles[currentRoleIndex]); //Cycle the role over to the newly picked one
     }
