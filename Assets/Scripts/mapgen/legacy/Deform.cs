@@ -94,7 +94,7 @@ public class Deform : MonoBehaviour
         //This stays for now, but if slices of the terrain can't be grabbed this should instead use map.FetchFloatValues
         //If there is a chance that multiple deforms can happen this needs to instead mark the LayerTerrain as dirty and wait until all operations are complete before updating the Terrain
         float[,] heights = map.FetchFloatValuesSlice(layer, 0, map.Width, 0, map.Height);
-        terrain.UpdateTerrainHeightmap(0,0,heights);
+        //terrain.UpdateTerrainHeightmap(0,0,heights);
         
         //gameManager.loadNewData();
         //instead run refresh hook

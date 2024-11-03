@@ -52,7 +52,7 @@ public class Biomes : MonoBehaviour
 
     // Creates new noise map for moisture\
     // this does nothing yet
-    public void GenerateBiomes()
+    /*public void GenerateBiomes()
     {
         for (int i = 0; i < moistureLayers.NoisePairs.Count; i++)
         {
@@ -66,7 +66,7 @@ public class Biomes : MonoBehaviour
         
         }
         layerTerrain.NormalizeFinalMap(LayersEnum.Moisture, 0, 1); //Make the final map only span from 0 to 1
-    }
+    }*/
 
 
     public void SetBiomes()

@@ -213,8 +213,6 @@ public class LayerTerrain : MonoBehaviour
             }
         }
 
-
-
         if (print_debug)
         {
             Debug.Log($"Lowest value before normalizing was {lowest} and highest was {highest} on {layer} layer ");
@@ -222,49 +220,35 @@ public class LayerTerrain : MonoBehaviour
         }
     }
 
-    public void UpdateTerrainHeightmap(int xBase, int yBase, float[,] heightmap) //MOVE?
-    { // TODO: This might need work to instead mark the terrain as dirty until all deform operations are done, and THEN we set the heights
-       // terrain.terrainData.SetHeights(xBase, yBase, heightmap); //Fuck you SetHeights, why do you pretend like I can update regions with the xBase and yBase when you actually suck?
 
-        //Because fuck you, that's why! >:)
-    }
-
-    public void SerializeNoiseParamsToJson() //MOVE
+    public void LoadNoiseParamsFromJson(MapNoisePair pair) 
     {
         string folderPath = Path.Combine(Application.dataPath, "JSON/NoiseParams");
-        string filePath = Path.Combine(folderPath, $"test.json");
+        string filePath = EditorUtility.OpenFilePanel("Load NoiseParams From Json", folderPath, "json");
+        string json = File.ReadAllText(filePath);
+        pair.NoiseParams = JsonUtility.FromJson<NoiseParams>(json);
+    }
 
-        if (EditorUtility.DisplayDialog("Serialize Map to Json...", $"Would you like to save a new file, or overwrite '{mapName}'?", "Save New...", "Overwrite"))
+
+    public void SerializeNoiseParamsToJson(MapNoisePair pair)
+    {
+        string folderPath = Path.Combine(Application.dataPath, "JSON/NoiseParams");
+        string filePath = EditorUtility.SaveFilePanel("Save new", folderPath, "", "json");
+
+        if (!Directory.Exists(folderPath))
         {
-            filePath = EditorUtility.SaveFilePanel("Save new", folderPath, mapName, "json");
+            Directory.CreateDirectory(folderPath);
         }
-        else
+
+        if (filePath.Length > 5)
         {
-            filePath = Path.Combine(folderPath, $"{mapName}.json");
-        }
-
-
-        //For each NoiseParam in our layers we serialize them with the naming convention of layer + index in list
-        for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
-        {
-            MapNoisePair pair = elevationLayers.NoisePairs[i];
-            string json = pair.NoiseParams.SerializeParamsToJson(); // Get the JSON string
-
-            // Define the path for the JSON file in the JSON folder inside the Assets folder
-            //string folderPath = Path.Combine(Application.dataPath, "JSON");
-            //string filePath = Path.Combine(folderPath, $"layer{i}.json");
-
-            // Create the JSON folder if it doesn't exist
-            if (!Directory.Exists(folderPath))
+            string json = pair.NoiseParams.SerializeParamsToJson();
+            if (json != null)
             {
-                Directory.CreateDirectory(folderPath);
+                // Write the JSON string to the file
+                File.WriteAllText(filePath, json);
+                Debug.Log($"single NoiseParams JSON file saved to: {filePath}");
             }
-
-            // Write the JSON string to the file
-            File.WriteAllText(filePath, json);
-
-            Debug.Log($"JSON file saved to: {filePath}");
-            //SerializeMapToJson();
         }
     }
 
@@ -310,7 +294,6 @@ public class LayerTerrain : MonoBehaviour
         }
     }
 
-    
     public void LoadMapFromJson()
     {
         string folderPath = Path.Combine(Application.dataPath, "JSON");
@@ -319,25 +302,6 @@ public class LayerTerrain : MonoBehaviour
 
         elevationLayers = JsonUtility.FromJson<MapLayers>(json);
         GenerateTerrain();
-    }
-
-
-    public void LoadNoiseParamsFromJson() //MOVE
-    {
-        string folderPath = Path.Combine(Application.dataPath, "JSON/NoiseParams");
-        string filePath = EditorUtility.OpenFilePanel("Load NoisePArams From Json", folderPath, "json");
-        string json = File.ReadAllText(filePath);
-
-
-
-        for (int i = 0; i < elevationLayers.NoisePairs.Count; i++)
-        {
-            MapNoisePair pair = elevationLayers.NoisePairs[i];
-            if (pair.UseJsonFile && pair.JSON.text != string.Empty)
-            { //Only load if the bool is on and the json asset is assigned
-                pair.NoiseParams = JsonUtility.FromJson<NoiseParams>(pair.JSON.text);
-            }
-        }
     }
 
     public void runMapGen()

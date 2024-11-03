@@ -4,37 +4,41 @@
             "NoiseParams": {
                 "noiseType": 3,
                 "seed": 10,
-                "noiseScale": 3.0,
-                "frequency": 0.00139999995008111,
+                "noiseScale": 8.0,
+                "frequency": 0.008249999955296517,
                 "fractalType": 3,
-                "fractalOctaves": 5,
-                "fractalGain": 0.4320000112056732,
-                "fractalLacunarity": 4.070000171661377,
-                "weightedStrength": 1.0,
-                "raisedPower": 5.0
+                "fractalOctaves": 4,
+                "fractalGain": 0.6290000081062317,
+                "fractalLacunarity": 1.2400000095367432,
+                "weightedStrength": 0.3790000081062317,
+                "raisedPower": 13.100000381469727
             },
             "JSON": {
-                "instanceID": 25804
+                "instanceID": 25808
             },
-            "UseJsonFile": false
+            "UseJsonFile": false,
+            "LoadFromJSON": false,
+            "SaveToJSON": false
         },
         {
             "NoiseParams": {
                 "noiseType": 3,
                 "seed": 10,
-                "noiseScale": 1.0,
-                "frequency": 0.00892999954521656,
-                "fractalType": 2,
-                "fractalOctaves": 4,
-                "fractalGain": 0.06700000166893006,
-                "fractalLacunarity": 4.070000171661377,
-                "weightedStrength": 0.5,
-                "raisedPower": 20.0
+                "noiseScale": 8.0,
+                "frequency": 0.00139999995008111,
+                "fractalType": 3,
+                "fractalOctaves": 8,
+                "fractalGain": 0.8069999814033508,
+                "fractalLacunarity": 4.179999828338623,
+                "weightedStrength": 0.7870000004768372,
+                "raisedPower": 6.300000190734863
             },
             "JSON": {
-                "instanceID": 25804
+                "instanceID": 25808
             },
-            "UseJsonFile": false
+            "UseJsonFile": false,
+            "LoadFromJSON": false,
+            "SaveToJSON": false
         }
     ]
 }
