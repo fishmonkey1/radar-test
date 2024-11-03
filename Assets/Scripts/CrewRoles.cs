@@ -1,13 +1,15 @@
 public static class CrewRoles
 {
-    public static readonly Role Driver = new Role("Driver", 0, 1);
-    public static readonly Role Gunner = new Role("Gunner", 1, 1);
-    public static readonly Role Spotter = new Role("Spotter", 2, 1);
-    public static readonly Role Radar = new Role("Radar", 3, 1);
+    public static readonly Role UnassignedRole = new Role("Unassigned", 0, 999);
+    public static readonly Role Driver = new Role("Driver", 1, 1);
+    public static readonly Role Gunner = new Role("Gunner", 2, 1);
+    public static readonly Role Spotter = new Role("Spotter", 3, 1);
+    public static readonly Role Radar = new Role("Radar", 4, 1);
 
-    public static readonly Role[] ImplementedRoles = new Role[] { Driver, Gunner, };
+    //Implemented roles array contains all the roles that actually work so far
+    public static readonly Role[] ImplementedRoles = new Role[] { UnassignedRole, Driver, Gunner, };
     //The AllRoles array might not be all that important, but I'm leaving it in for now
-    public static readonly Role[] AllRoles = new Role[] { Driver, Gunner, Spotter, Radar };
+    public static readonly Role[] AllRoles = new Role[] { UnassignedRole, Driver, Gunner, Spotter, Radar };
 
     public static Role GetRoleByID(uint id)
     {
