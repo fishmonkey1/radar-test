@@ -28,6 +28,7 @@ public class TankRoomManager : NetworkRoomManager
 
     public override GameObject OnRoomServerCreateGamePlayer(NetworkConnectionToClient conn, GameObject roomPlayer)
     {
+        //Called on the server when creating the prefab for the player
         // get start position from base class
         Transform startPos = GetStartPosition();
         GameObject gamePlayer = startPos != null
@@ -62,7 +63,8 @@ public class TankRoomManager : NetworkRoomManager
     public override void OnRoomServerConnect(NetworkConnectionToClient conn)
     {
         //This is called on the server when a client disconnects.
-
+        string playerName = conn.identity.GetComponent<PlayerInfo>().PlayerName; //Nab the connected player's name for sending
+        //Getting support in place for sending server messages...
         //Debug.Log($"Client connected to the server with server connection id of {conn.connectionId}");
     }
 
@@ -93,6 +95,8 @@ public class TankRoomManager : NetworkRoomManager
             NetworkServer.Spawn(enemyManager);
         }
     }
+
+    
 
     //This no worky. I'll have to try some other way
     /*public override void OnRoomClientExit()
