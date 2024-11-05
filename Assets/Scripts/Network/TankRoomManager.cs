@@ -9,12 +9,14 @@ public class TankRoomManager : NetworkRoomManager
     /// Don't let players ready up unless they have a role picked
     /// Figure out how I'm linking up roles with their associated scripts at some point :c
 
-    [SerializeField] GameObject rolePickerPrefab; //Try spawning the prefab instead of leaving it in the scene?
+    [SerializeField] GameObject lobbyUIPrefab; //Try spawning the prefab instead of leaving it in the scene?
     [SerializeField] GameObject chatroomPrefab;
     [SerializeField] GameObject enemyManagerPrefab; //I'm going to attempt to spawn the enemy stuff in here from the tank manager
     [SerializeField] GameObject horniTankPrefab; //For spawning after the game scene is loaded
     [SerializeField, ReadOnly] RolePicker rolePicker; //Cached after the UI is made
     [SerializeField] bool startInDebugMode = true;
+
+    Chat chatroom; //For sending join and disconnect messages on
 
     public static new TankRoomManager singleton => NetworkManager.singleton as TankRoomManager;
 
@@ -59,6 +61,8 @@ public class TankRoomManager : NetworkRoomManager
 
     public override void OnRoomServerConnect(NetworkConnectionToClient conn)
     {
+        //This is called on the server when a client disconnects.
+
         //Debug.Log($"Client connected to the server with server connection id of {conn.connectionId}");
     }
 
@@ -67,9 +71,10 @@ public class TankRoomManager : NetworkRoomManager
         if (sceneName == RoomScene)
         {
             //Debug.Log("Server moved into room scene, spawning canvas");
-            GameObject RolePickerObject = GameObject.Instantiate(rolePickerPrefab);
-            rolePicker = RolePickerObject.GetComponent<RolePicker>();
-            NetworkServer.Spawn(RolePickerObject);
+            GameObject LobbyUI = GameObject.Instantiate(lobbyUIPrefab);
+            chatroom = LobbyUI.GetComponentInChildren<Chat>(); //Finds the chat component inside the lobby ui
+            rolePicker = LobbyUI.GetComponent<RolePicker>();
+            NetworkServer.Spawn(LobbyUI);
         }
         if (sceneName == GameplayScene)
         {
@@ -79,8 +84,9 @@ public class TankRoomManager : NetworkRoomManager
             GameObject horniTank = GameObject.Instantiate(horniTankPrefab); //Double check this puts the tank at 0,0,0
             NetworkServer.Spawn(horniTank);
             GameObject canvas = GameObject.Find("Canvas");
-            GameObject chatroom = GameObject.Instantiate(chatroomPrefab, canvas.transform);
-            NetworkServer.Spawn(chatroom);
+            GameObject chatroomObject = GameObject.Instantiate(chatroomPrefab, canvas.transform);
+            chatroom = chatroomObject.GetComponent<Chat>();
+            NetworkServer.Spawn(chatroomObject);
             if (startInDebugMode)
                 canvas.SetActive(false); //Turn the UI off when we're in debug mode
             GameObject enemyManager = GameObject.Instantiate(enemyManagerPrefab); //Now spawn across the network
