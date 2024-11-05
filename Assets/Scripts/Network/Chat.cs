@@ -72,9 +72,13 @@ public class Chat : NetworkBehaviour
 
     public void SendServerMessage(string text, MessageTypes messageType)
     {
-        string fullMessage = $"<i>Server: {text}<i>"; //Try out using rich text tags to render server messages in italics
-        chatText.text += fullMessage; //Drop the sent message into the sender's chat (should be the server/host)
+        string fullMessage = "Unassigned";
+        if (messageType == MessageTypes.SERVER) //Render text with Server as the name for these kinds of messages
+            fullMessage = $"Server: <i>{text}</i>"; //Try out using rich text tags to render server messages in italics
+        if (messageType == MessageTypes.ERROR) //Error messages should be bolded and italicized when sent
+            fullMessage = $"Error: <b><i>{text}</i></b>";
         ChatMessage message = new ChatMessage(fullMessage, "Server", 0, MessageTypes.SERVER);
+        chatText.text += BuildMessage(message);
         RpcReceiveMessage(message);
     }
 
@@ -96,7 +100,7 @@ public class Chat : NetworkBehaviour
         if (message.messageType == MessageTypes.ALL) //This was the default case before
             return message.PlayerName + ": " + message.messageText + "\n";
         if (message.messageType == MessageTypes.SERVER)
-            return message.messageText; //The message is already good to go on server messages, so just write it into the textfield
+            return message.messageText + "\n"; //The message is already good to go on server messages, so just write it into the textfield
         else //Be mean to the programmer >:)
             return "MessageType is not supported, dumbass. Check your parameters and try again.";
     }

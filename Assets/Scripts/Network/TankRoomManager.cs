@@ -18,6 +18,8 @@ public class TankRoomManager : NetworkRoomManager
 
     Chat chatroom; //For sending join and disconnect messages on
 
+    public Dictionary<NetworkConnection, PlayerInfo> connectedPlayers = new(); //Anybody added to the server gets stashed in here for me to use instead of Mirror's stuff. I know it's duplicated, but let me cook
+
     public static new TankRoomManager singleton => NetworkManager.singleton as TankRoomManager;
 
     public override void ReadyStatusChanged()
@@ -60,14 +62,6 @@ public class TankRoomManager : NetworkRoomManager
         base.OnRoomStopServer();
     }
 
-    public override void OnRoomServerConnect(NetworkConnectionToClient conn)
-    {
-        //This is called on the server when a client disconnects.
-        string playerName = conn.identity.GetComponent<PlayerInfo>().PlayerName; //Nab the connected player's name for sending
-        //Getting support in place for sending server messages...
-        //Debug.Log($"Client connected to the server with server connection id of {conn.connectionId}");
-    }
-
     public override void OnRoomServerSceneChanged(string sceneName)
     {
         if (sceneName == RoomScene)
@@ -96,7 +90,16 @@ public class TankRoomManager : NetworkRoomManager
         }
     }
 
-    
+    public void AddPlayerToRoom(NetworkConnection conn, PlayerInfo info)
+    {
+        //This will be Vicky's spot to set up all the information on freshly joined clients.
+        connectedPlayers.Add(conn, info); //Place the info in our dictionary
+        if (NetworkClient.localPlayer.isServer)
+        { //This call is happening on the host, so we can go ahead and broadcast our connection message to everyone
+            Debug.Log($"Adding player {info.PlayerName} to room on the host.");
+            chatroom.SendServerMessage($"{info.PlayerName} connected", Chat.MessageTypes.SERVER);
+        }
+    }
 
     //This no worky. I'll have to try some other way
     /*public override void OnRoomClientExit()

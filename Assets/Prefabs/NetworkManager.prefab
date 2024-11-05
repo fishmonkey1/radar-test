@@ -91,11 +91,12 @@ MonoBehaviour:
   _allPlayersReady: 0
   roomSlots: []
   clientIndex: 0
-  rolePickerPrefab: {fileID: 2914714321878191827, guid: e7abf2eefe24d60489fabd76d7ce86c9, type: 3}
+  lobbyUIPrefab: {fileID: 2914714321878191827, guid: e7abf2eefe24d60489fabd76d7ce86c9, type: 3}
   chatroomPrefab: {fileID: 8764900838701480349, guid: 385a122923061ec49947541c307248f8, type: 3}
   enemyManagerPrefab: {fileID: 5274330537421434379, guid: dd08b167fd0f39542977c9ffa6b36b98, type: 3}
   horniTankPrefab: {fileID: 4283197213913971331, guid: cc463bf9a62b9234994922418126b6e2, type: 3}
   rolePicker: {fileID: 0}
+  startInDebugMode: 1
 --- !u!114 &606322544417988642
 MonoBehaviour:
   m_ObjectHideFlags: 0
