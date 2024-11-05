@@ -223,15 +223,18 @@ public class LayerTerrain : MonoBehaviour
 
     public void LoadNoiseParamsFromJson(MapNoisePair pair) 
     {
+    #if UNITY_EDITOR
         string folderPath = Path.Combine(Application.dataPath, "JSON/NoiseParams");
         string filePath = EditorUtility.OpenFilePanel("Load NoiseParams From Json", folderPath, "json");
         string json = File.ReadAllText(filePath);
         pair.NoiseParams = JsonUtility.FromJson<NoiseParams>(json);
+    #endif
     }
 
 
     public void SerializeNoiseParamsToJson(MapNoisePair pair)
     {
+    #if UNITY_EDITOR
         string folderPath = Path.Combine(Application.dataPath, "JSON/NoiseParams");
         string filePath = EditorUtility.SaveFilePanel("Save new", folderPath, "", "json");
 
@@ -250,10 +253,12 @@ public class LayerTerrain : MonoBehaviour
                 Debug.Log($"single NoiseParams JSON file saved to: {filePath}");
             }
         }
+    #endif
     }
 
     public void SerializeMapToJson()
     {
+    #if UNITY_EDITOR
         string folderPath = Path.Combine(Application.dataPath, "JSON");
         string filePath;
 
@@ -292,16 +297,19 @@ public class LayerTerrain : MonoBehaviour
                 Debug.Log($"wholemap JSON file saved to: {filePath}");
             }
         }
+    #endif
     }
 
     public void LoadMapFromJson()
     {
+    #if UNITY_EDITOR
         string folderPath = Path.Combine(Application.dataPath, "JSON");
         string filePath = EditorUtility.OpenFilePanel("Load Map From Json",folderPath,"json");
         string json = File.ReadAllText(filePath);
 
         elevationLayers = JsonUtility.FromJson<MapLayers>(json);
         GenerateTerrain();
+    #endif
     }
 
     public void runMapGen()
