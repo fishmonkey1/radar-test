@@ -109,8 +109,8 @@ public class TankRoomManager : NetworkRoomManager
     /// <summary>
     /// When a client connects to the game they send their profile across the network in TankRoomPlayer. This is called from TankRoomPlayer.CmdSendProfile so the server has this information.
     /// </summary>
-    /// <param name="identity"></param>
-    /// <param name="profile"></param>
+    /// <param name="identity">The networkidentity that owns this profile</param>
+    /// <param name="profile">The player profile to be saved on the server</param>
     public void AddProfileToRoom(NetworkIdentity identity, PlayerProfile profile)
     {
         if (connectedPlayers.ContainsKey(identity))
@@ -121,9 +121,11 @@ public class TankRoomManager : NetworkRoomManager
         {
             connectedPlayers.Add(identity, profile);
         }
+        //TODO: I want to add random connection messages like discord does with people joining a server. There is a trello card for this request.
+        chatroom.SendServerMessage($"{profile.PlayerName} has connected!", Chat.MessageTypes.SERVER);
     }
 
-    public void AddPlayerToRoom(NetworkConnection conn, PlayerInfo info)
+    /*public void AddPlayerToRoom(NetworkConnection conn, PlayerInfo info)
     {
         //This will be Vicky's spot to set up all the information on freshly joined clients.
         connectedPlayers.Add(conn, info); //Place the info in our dictionary
@@ -132,7 +134,7 @@ public class TankRoomManager : NetworkRoomManager
             Debug.Log($"Adding player {info.PlayerName} to room on the host.");
             chatroom.SendServerMessage($"{info.PlayerName} connected", Chat.MessageTypes.SERVER);
         }
-    }
+    }*/
 
     //This no worky. I'll have to try some other way
     /*public override void OnRoomClientExit()

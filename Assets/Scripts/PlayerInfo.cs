@@ -61,7 +61,7 @@ public class PlayerInfo : NetworkBehaviour
     public void CmdRegisterPlayerInfo(PlayerInfo info, NetworkConnectionToClient conn = null)
     {
         TankRoomManager room = TankRoomManager.singleton; //Nab the server's RoomManager
-        room.AddPlayerToRoom(conn, info); //And assign the player to the room
+        //room.AddPlayerToRoom(conn, info); //And assign the player to the room
         //Finally, we broadcast the registration to all the clients
         //RpcBroadcastRegistration(info);
     }
