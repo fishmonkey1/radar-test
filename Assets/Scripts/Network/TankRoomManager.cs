@@ -18,7 +18,7 @@ public class TankRoomManager : NetworkRoomManager
 
     Chat chatroom; //For sending join and disconnect messages on
 
-    public Dictionary<NetworkConnection, PlayerInfo> connectedPlayers = new(); //Anybody added to the server gets stashed in here for me to use instead of Mirror's stuff. I know it's duplicated, but let me cook
+    public Dictionary<NetworkIdentity, PlayerProfile> connectedPlayers = new(); //Anybody added to the server gets stashed in here for me to use instead of Mirror's stuff. I know it's duplicated, but let me cook
 
     public static new TankRoomManager singleton => NetworkManager.singleton as TankRoomManager;
 
@@ -103,6 +103,23 @@ public class TankRoomManager : NetworkRoomManager
                 canvas.SetActive(false); //Turn the UI off when we're in debug mode
             GameObject enemyManager = GameObject.Instantiate(enemyManagerPrefab); //Now spawn across the network
             NetworkServer.Spawn(enemyManager);
+        }
+    }
+
+    /// <summary>
+    /// When a client connects to the game they send their profile across the network in TankRoomPlayer. This is called from TankRoomPlayer.CmdSendProfile so the server has this information.
+    /// </summary>
+    /// <param name="identity"></param>
+    /// <param name="profile"></param>
+    public void AddProfileToRoom(NetworkIdentity identity, PlayerProfile profile)
+    {
+        if (connectedPlayers.ContainsKey(identity))
+        { //If the identity already exists in the dictionary then we're merely swapping out their profile for the new one
+            connectedPlayers[identity] = profile;
+        }
+        else
+        {
+            connectedPlayers.Add(identity, profile);
         }
     }
 

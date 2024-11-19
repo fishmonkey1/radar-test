@@ -40,6 +40,8 @@ public class TankRoomPlayer : NetworkRoomPlayer
     { //At the moment, the playername is the only thing in a profile. Later this needs to send unlocks and experience as well
         PlayerProfile profile = identity.GetComponent<PlayerProfile>(); //Fetch that player's component
         profile.PlayerName = PlayerName; //Update their name on the server
+        TankRoomManager room = TankRoomManager.singleton;
+        room.AddProfileToRoom(identity, profile);
         //Technically that's all, folks. Now we tell all the clients about the new profile
         RpcBroadcastProfile(PlayerName, identity);
     }
