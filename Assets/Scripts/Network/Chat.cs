@@ -70,6 +70,12 @@ public class Chat : NetworkBehaviour
         RpcReceiveMessage(message);
     }
 
+    /// <summary>
+    /// This can only be called from the server and sends a message to all clients that is formatted differently from user chat messages.
+    /// </summary>
+    /// <param name="text">The text to display with server formatting.</param>
+    /// <param name="messageType">For each type supplied the message will appear in those chats.</param>
+    [Server]
     public void SendServerMessage(string text, MessageTypes messageType)
     {
         string fullMessage = "Unassigned";
