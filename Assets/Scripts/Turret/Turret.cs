@@ -19,15 +19,15 @@ public class Turret : NetworkBehaviour, IRoleNeeded
 
     [SerializeField, ReadOnly]Vector2 turretInput = Vector2.zero;
     Camera currentCam;
-    PlayerInfo playerInfo; //The player that has the Gunner role goes here
+    PlayerProfile playerProfile; //The player that has the Gunner role goes here
 
     public Role RoleNeeded => CrewRoles.Gunner;
 
     public void OnMove(InputValue input)
     {
-        if (playerInfo == null)
+        if (playerProfile == null)
             return; //This role is unused, so do nothing
-        if (!((IRoleNeeded)this).HaveRole(playerInfo.CurrentRole))
+        if (!((IRoleNeeded)this).HaveRole(playerProfile.CurrentRole))
             return; //Don't allow turret inputs if you don't have the gunner role selected
         if (isServer) //Only move the turret locally and replicate if you're the host
             turretInput = input.Get<Vector2>();
@@ -44,12 +44,12 @@ public class Turret : NetworkBehaviour, IRoleNeeded
 
     public void OnFire()
     {
-        if (playerInfo == null)
+        if (playerProfile == null)
         {
             Debug.Log("No playerInfo on turret to call OnFire with.");
             return; //This role is unused, so do nothing
         }
-        if (!((IRoleNeeded)this).HaveRole(playerInfo.CurrentRole))
+        if (!((IRoleNeeded)this).HaveRole(playerProfile.CurrentRole))
         {
             Debug.Log("Ignoring fire order from Non-Gunner player");
             return;
@@ -79,30 +79,30 @@ public class Turret : NetworkBehaviour, IRoleNeeded
 
     public void OnCameraToggle()
     {
-        if (playerInfo == null)
+        if (playerProfile == null)
             return; //This role is unused, so do nothing
-        if (!((IRoleNeeded)this).HaveRole(playerInfo.CurrentRole))
+        if (!((IRoleNeeded)this).HaveRole(playerProfile.CurrentRole))
             return;
 
         currentCam = CamCycle.Instance.GetNextCamera(RoleNeeded, currentCam);
     }
 
-    public void SetPlayer(PlayerInfo info)
+    public void SetPlayer(PlayerProfile profile)
     {
         Debug.Log("Assigning local player in Turret.");
-        playerInfo = info;
-        if (RoleNeeded.Name == info.CurrentRole.Name)
+        playerProfile = profile;
+        if (RoleNeeded.Name == profile.CurrentRole.Name)
         {
             Debug.Log("Local player's role matches for Turret");
             currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded);
         }
-        if (playerInfo.OnRoleChange == null)
+        if (playerProfile.OnRoleChange == null)
         {
-            playerInfo.OnRoleChange = new PlayerInfo.RoleChangeDelegate(OnRoleChange);
+            playerProfile.OnRoleChange = new PlayerProfile.RoleChangeDelegate(OnRoleChange);
         }
         else
         {
-            playerInfo.OnRoleChange += OnRoleChange;
+            playerProfile.OnRoleChange += OnRoleChange;
         }
     }
 
