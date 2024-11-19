@@ -10,8 +10,8 @@ public class TankRoomPlayer : NetworkRoomPlayer
     /// Sends a message to the server when they've picked a role so everybody gets updated on which are left
     /// Can't ready up til you've picked a role
 
-    [SyncVar (hook=nameof(PickRole))] public uint RoleID = CrewRoles.UnassignedRole.ID; //Init to the UnassignedRole
-    [SyncVar] public string PlayerName = null;
+    public uint RoleID = CrewRoles.UnassignedRole.ID; //Init to the UnassignedRole
+    public string PlayerName = null;
     public Role role = CrewRoles.UnassignedRole; //All players are created with the UnassignedRole
 
     public override void Start()

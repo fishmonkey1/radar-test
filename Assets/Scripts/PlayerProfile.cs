@@ -50,4 +50,19 @@ public class PlayerProfile : NetworkBehaviour
         Debug.Log($"PlayerProfile loaded from {filePath}");
         return profile;
     }
+
+    // Check if a profile exists and load it into the out parameter if found
+    public static bool TryLoadProfile(string directoryPath, string playerName, out PlayerProfile profile)
+    {
+        string filePath = Path.Combine(directoryPath, $"{playerName}.json");
+
+        if (File.Exists(filePath))
+        {
+            profile = ImportFromJson(filePath);
+            return true;
+        }
+
+        profile = null;
+        return false;
+    }
 }

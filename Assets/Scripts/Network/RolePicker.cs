@@ -37,7 +37,6 @@ public class RolePicker : NetworkBehaviour
 
     public void BackToMenuButton()
     {
-        //Note to future me, we might want to change this to call the menu by name instead of build index
         if (isServer)
         { //You're hosting the game, so lets shut it down
             TankRoomManager.singleton.StopHost();
@@ -46,6 +45,7 @@ public class RolePicker : NetworkBehaviour
         { //You've joined somebody else's game and need to leave
             TankRoomManager.singleton.StopClient();
         }
+        //Note to future me, we might want to change this to call the menu by name instead of build index
         SceneManager.LoadScene(0); //Take us back to the main menu
     }
 
