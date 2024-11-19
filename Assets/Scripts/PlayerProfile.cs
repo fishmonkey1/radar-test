@@ -1,9 +1,10 @@
 using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
+using Mirror;
 
 [System.Serializable]
-public class PlayerProfile
+public class PlayerProfile : NetworkBehaviour
 {
     public string PlayerName = "default";
 
