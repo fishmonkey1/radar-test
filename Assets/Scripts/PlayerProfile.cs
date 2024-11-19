@@ -7,6 +7,8 @@ public class PlayerProfile
 {
     public string PlayerName = "default";
 
+    public static string LoadedProfile = null;
+
     [JsonIgnore] // Ignore during serialization
     public Role CurrentRole = CrewRoles.UnassignedRole;
 

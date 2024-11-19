@@ -20,7 +20,7 @@ public class NamePicker : MonoBehaviour
 
     void UpdatePlayerName()
     {
-        PlayerInfo.localPlayerName = inputField.text;
+        PlayerProfile.LoadedProfile = inputField.text;
         if (PopupFromHost)
         {
             menu.HostGame();

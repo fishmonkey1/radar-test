@@ -23,11 +23,11 @@ public class MainMenu : MonoBehaviour
 
     public void HostGame()
     {
-        if (PlayerInfo.localPlayerName == "default")
+        if (PlayerProfile.LoadedProfile == null)
         { //Pick a name before hosting
-            ShowNamePopup();
             //If you host or join and get a name popup, this is true and makes the popup join the game
             NamePopup.GetComponent<NamePicker>().PopupFromHost = true;
+            ShowNamePopup();
             return;
         }
         TankRoomManager manager = NetworkManager.singleton as TankRoomManager;
@@ -43,7 +43,8 @@ public class MainMenu : MonoBehaviour
 
     public void ShowJoinScreen()
     {
-        if (PlayerInfo.localPlayerName == "default")
+        //Check the local PlayerProfile to check that there's a loaded profile
+        if (PlayerProfile.LoadedProfile == null)
         { //Pick a name before joining
             ShowNamePopup();
             //If you host or join and get a name popup, this is true and makes the popup join the game
