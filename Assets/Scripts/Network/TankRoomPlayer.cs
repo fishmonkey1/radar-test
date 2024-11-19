@@ -30,6 +30,32 @@ public class TankRoomPlayer : NetworkRoomPlayer
                 profile.PlayerName = PlayerProfile.LoadedProfile; //Technically that's all that needs to be done for now
                 profile.ExportToJson(Application.persistentDataPath + "/PlayerProfiles");
             }
+            //Now that our profile is set up, we need to let the server know
+            CmdSendProfile(profile.PlayerName, NetworkClient.localPlayer); 
+        }
+    }
+
+    [Command]
+    public void CmdSendProfile(string PlayerName, NetworkIdentity identity)
+    { //At the moment, the playername is the only thing in a profile. Later this needs to send unlocks and experience as well
+        PlayerProfile profile = identity.GetComponent<PlayerProfile>(); //Fetch that player's component
+        profile.PlayerName = PlayerName; //Update their name on the server
+        //Technically that's all, folks. Now we tell all the clients about the new profile
+        RpcBroadcastProfile(PlayerName, identity);
+    }
+
+    [ClientRpc]
+    public void RpcBroadcastProfile(string PlayerName, NetworkIdentity identity)
+    { //The server runs this on all connected clients, excluding the person who sent the message
+        if (string.Equals(PlayerProfile.LoadedProfile, PlayerName))
+        {
+            Debug.Log("Received broadcasted profile, but it matches our loaded profile.");
+        }
+        else
+        { //Otherwise we have somebody else's profile, so lets update things
+            PlayerProfile profile = identity.GetComponent<PlayerProfile>();
+            profile.PlayerName = PlayerName;
+            Debug.Log($"Received broadcasted profile named {profile.PlayerName} and updated their component");
         }
     }
 
