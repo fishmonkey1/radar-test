@@ -11,18 +11,25 @@ public class TankRoomPlayer : NetworkRoomPlayer
     /// Can't ready up til you've picked a role
 
     public uint RoleID = CrewRoles.UnassignedRole.ID; //Init to the UnassignedRole
-    public string PlayerName = null;
     public Role role = CrewRoles.UnassignedRole; //All players are created with the UnassignedRole
 
     public override void Start()
     {
         base.Start();
         //Debug.Log($"IsLocalPlayer equals {isLocalPlayer}");
+        //If you are the local player, we need to either load your profile or create it
         if (isLocalPlayer)
         {
-            PlayerName = PlayerInfo.localPlayerName;
-            GetComponent<PlayerInfo>().PickName(PlayerName);
-            CmdSetName(PlayerInfo.localPlayerName);
+            PlayerProfile profile = GetComponent<PlayerProfile>();
+            if (PlayerProfile.TryLoadProfile(Application.persistentDataPath + "/PlayerProfiles", PlayerProfile.LoadedProfile, out profile))
+            {
+                Debug.Log($"Loaded player profile with name: {profile.PlayerName}");
+            }
+            else
+            { //If we couldn't find your profile, let's assume it's new and export it
+                profile.PlayerName = PlayerProfile.LoadedProfile; //Technically that's all that needs to be done for now
+                profile.ExportToJson(Application.persistentDataPath + "/PlayerProfiles");
+            }
         }
     }
 
@@ -45,16 +52,11 @@ public class TankRoomPlayer : NetworkRoomPlayer
 
     public bool HasAnyRole()
     {
-        if (RoleID == 999)
-            return false; //You're on the default role
+        if (RoleID == CrewRoles.UnassignedRole.ID)
+            return false; //You're on the unassigned role
         if (role != null)
             return true;
         return false;
-    }
-
-    public void CmdSetName(string newName)
-    {
-        PlayerName = newName; //And that's pretty much it
     }
 
     public override void OnGUI()
