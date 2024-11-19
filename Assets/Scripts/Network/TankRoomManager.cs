@@ -28,6 +28,12 @@ public class TankRoomManager : NetworkRoomManager
         //Debug.Log("Player is now ready");
     }
 
+    /// <summary>
+    /// Handles creation of the game prefab and copies over information that was held in the PlayerProfile from the RoomPlayer.
+    /// </summary>
+    /// <param name="conn"></param>
+    /// <param name="roomPlayer"></param>
+    /// <returns></returns>
     public override GameObject OnRoomServerCreateGamePlayer(NetworkConnectionToClient conn, GameObject roomPlayer)
     {
         //Called on the server when creating the prefab for the player
@@ -37,11 +43,21 @@ public class TankRoomManager : NetworkRoomManager
             ? Instantiate(playerPrefab, startPos.position, startPos.rotation)
             : Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
 
-        PlayerInfo newInfo = gamePlayer.GetComponent<PlayerInfo>();
-        TankRoomPlayer roomInfo = roomPlayer.GetComponent<TankRoomPlayer>();
+        PlayerProfile gameProfile = gamePlayer.GetComponent<PlayerProfile>();
+        PlayerProfile roomProfile = roomPlayer.GetComponent<PlayerProfile>();
 
-        newInfo.PickRole(CrewRoles.GetRoleByID(roomInfo.RoleID)); //Set the role to what was in the room player
-        newInfo.PickName(roomInfo.PlayerName);
+        //The gameProfile needs to have all its info copied over from the roomProfile
+        //For now this is just the player's name and their role
+        gameProfile.PlayerName = roomProfile.PlayerName;
+        //HEY FUTURE VICKY! ADD ROLE STUFF TO THE PLAYERPROFILE, YOU DUMB BITCH!
+
+        //Yes ma'am, role stuff is added now <3
+        gameProfile.SelectRole(roomProfile.CurrentRole); //Assign the game profile to have the same role as the room profile
+
+
+        //This is all trash now
+        //newInfo.PickRole(CrewRoles.GetRoleByID(roomInfo.RoleID)); //Set the role to what was in the room player
+        //newInfo.PickName(roomInfo.PlayerName);
 
         return gamePlayer; //Send the player prefab back
     }
