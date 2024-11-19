@@ -85,6 +85,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "RadarZoomScroll",
+                    "type": "Value",
+                    "id": "b5e2d34b-447d-4c90-8f8b-b2c09864d022",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -283,6 +292,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "ToggleChatWindow",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d1df3a95-5ca3-4a1a-8678-633273175663",
+                    "path": "<Mouse>/scroll",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RadarZoomScroll",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
