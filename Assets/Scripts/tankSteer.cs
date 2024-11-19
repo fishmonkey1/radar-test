@@ -27,7 +27,7 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
     [SerializeField] float engineForce;
 
     public Role RoleNeeded => CrewRoles.Driver;
-    PlayerInfo playerInfo;
+    PlayerProfile playerProfile;
 
 
     //[SerializeField] private GameManager gm;
@@ -46,19 +46,19 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
         layerMask = LayerMask.GetMask("Terrain");
     }
 
-    public void SetPlayer(PlayerInfo info)
+    public void SetPlayer(PlayerProfile profile)
     {
-        Debug.Log("Assigning local player to tankSteer. info's role is " + info.CurrentRole);
-        if(RoleNeeded.Name == info.CurrentRole.Name)
+        Debug.Log("Assigning local player to tankSteer. info's role is " + profile.CurrentRole);
+        if(RoleNeeded.Name == profile.CurrentRole.Name)
         {
             Debug.Log("Player's role matches for tankSteer");
             currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded);
         }
-        playerInfo = info;
-        if (playerInfo.OnRoleChange == null)
-            playerInfo.OnRoleChange = new PlayerInfo.RoleChangeDelegate(OnRoleChange);
+        playerProfile = profile;
+        if (playerProfile.OnRoleChange == null)
+            playerProfile.OnRoleChange = new PlayerProfile.RoleChangeDelegate(OnRoleChange);
         else
-            playerInfo.OnRoleChange += OnRoleChange;
+            playerProfile.OnRoleChange += OnRoleChange;
         //We have to fetch a camera in Start since the debug stuff assumes you start as the driver
         //PlayerInfo does the PickRole stuff for the driver before this class registers for the delegate
         //So we can't just handle it normally in OnRoleChange for now until there's UI for picking roles
@@ -124,9 +124,9 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
 
     public void OnMove(InputValue value)
     {
-        if (playerInfo == null)
+        if (playerProfile == null)
             return; //This role is unused, so do nothing
-        if (!((IRoleNeeded)this).HaveRole(playerInfo.CurrentRole))
+        if (!((IRoleNeeded)this).HaveRole(playerProfile.CurrentRole))
             return; //Don't allow driving inputs if you don't have the driver role selected
         if (isServer) //Only apply locally if you are the host
             driverInput = value.Get<Vector2>();
@@ -144,9 +144,9 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
 
     public void OnCameraToggle()
     {
-        if (playerInfo == null)
+        if (playerProfile == null)
             return; //This role is unused, so do nothing
-        if (!((IRoleNeeded)this).HaveRole(playerInfo.CurrentRole))
+        if (!((IRoleNeeded)this).HaveRole(playerProfile.CurrentRole))
             return;
 
         currentCam = CamCycle.Instance.GetNextCamera(RoleNeeded, currentCam);
