@@ -10,7 +10,8 @@ public class TankRoomPlayer : NetworkRoomPlayer
     /// Sends a message to the server when they've picked a role so everybody gets updated on which are left
     /// Can't ready up til you've picked a role
 
-    PlayerProfile playerProfile;
+    public PlayerProfile playerProfile;
+    public Role role = CrewRoles.UnassignedRole;
 
     public override void Start()
     {
@@ -68,7 +69,6 @@ public class TankRoomPlayer : NetworkRoomPlayer
     public void CmdPickRole(uint roleID)
     {
         role = CrewRoles.GetRoleByID(roleID);
-        RoleID = roleID;
     }
 
     public void PickRole(uint oldID, uint newID) 
@@ -77,13 +77,12 @@ public class TankRoomPlayer : NetworkRoomPlayer
         if (newRole != role)
         {
             role = newRole;
-            RoleID = newRole.ID;
         }
     }
 
     public bool HasAnyRole()
     {
-        if (RoleID == CrewRoles.UnassignedRole.ID)
+        if (role == CrewRoles.UnassignedRole)
             return false; //You're on the unassigned role
         if (role != null)
             return true;

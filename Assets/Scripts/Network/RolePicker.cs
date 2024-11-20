@@ -14,10 +14,9 @@ public class RolePicker : NetworkBehaviour
     [SerializeField]
     Button ReadyButtonObject; //For enabling/disabling when you pick a role
 
-    public readonly Dictionary<Role, uint> selectedRoles = new();
+    List<Role> selectedRoles = new();
 
     List<GameObject> buttons = new List<GameObject>();
-    TankRoomPlayer localRoomPlayer;
 
     void Start()
     {
@@ -28,11 +27,15 @@ public class RolePicker : NetworkBehaviour
             buttonText.text = role.Name;
             Button buttonScript = newButton.GetComponent<Button>();
             buttonScript.onClick.AddListener(() => SelectRole(role.Name));
+            if (role == CrewRoles.UnassignedRole)
+            { //If we're rendering the unassigned button, it should render as clicked here at Start.
+                buttonScript.interactable = false; //Can't assign yourself as unassigned when you start that way
+            }
             buttons.Add(newButton);
         }
         ReadyButtonObject.interactable = false; //Can't ready up until you pick a role
         //When the client enters the room we should update to reflect any roles that were picked before they joined
-        CmdGetServerSelectedRoles(); //Ask for any roles that were picked so far
+        CmdGetServerSelectedRoles(NetworkClient.localPlayer); //Ask for any roles that were picked so far
     }
 
     public void BackToMenuButton()
@@ -59,176 +62,103 @@ public class RolePicker : NetworkBehaviour
 
     void SelectRole(string roleName)
     {
-        //Fetch the local owner
-        uint ownerID = NetworkClient.localPlayer.netId;
-        Debug.Log($"Called select role with role name of {roleName} and an owner with netId of {ownerID}");
-        if (localRoomPlayer == null)
-            localRoomPlayer = NetworkClient.connection.identity.GetComponent<TankRoomPlayer>();
-        //Try picking the role right away for the button update
-        if (localRoomPlayer.role != null)
-            localRoomPlayer.PickRole(localRoomPlayer.role.ID, CrewRoles.GetRoleByName(roleName).ID);
-        else
-            localRoomPlayer.PickRole(999, CrewRoles.GetRoleByName(roleName).ID);
-        localRoomPlayer.CmdPickRole(CrewRoles.GetRoleByName(roleName).ID);
-        CmdSelectRole(roleName, ownerID); //Send this to the server
+        Debug.Log("Called select role locally, attempting to select role name " + roleName);
+        //We need the server to confirm we got the role, so we just convert to a Role object and yeet it over to the server
+        CmdSelectRole(CrewRoles.GetRoleByName(roleName), NetworkClient.localPlayer);
     }
 
+    /// <summary>
+    /// Called from the buttons in the rolepicker. Passes the desired role along and checks that it isn't picked on the server
+    /// </summary>
+    /// <param name="role">The role to be picked by the client</param>
+    /// <param name="sender">The client that wants to take this role</param>
     [Command(requiresAuthority = false)]
-    void CmdSelectRole(string roleName, uint ownerID)
-    { //Called on the server to pick a role and add to the Dict
-        Debug.Log("Server ran the select role and updated the sync dict");
-        Role pickedRole = CrewRoles.GetRoleByName(roleName);
-        Role oldRole = OwnerHasRole(ownerID);
-        if (oldRole != null)
-        {
-            selectedRoles.Remove(oldRole);
-            RpcRemoveRole(oldRole.Name);
-            Debug.Log("Removed old role with name " + oldRole.Name);
+    void CmdSelectRole(Role role, NetworkIdentity sender)
+    {
+        //I'm gonna see if this works with using the sent Identity as a key. Maybe it will...
+        PlayerProfile senderProfile = TankRoomManager.singleton.connectedPlayers[sender];
+        Debug.Log($"Server is attempting to select a role named {role.Name} for player {senderProfile.PlayerName}");
+        Role oldRole = senderProfile.CurrentRole;
+        if (!selectedRoles.Contains(role))
+        { //If it isn't in the list, then you can have it
+            if (oldRole != CrewRoles.UnassignedRole)
+            { //Take your old role out of the list as long as you had picked something
+                selectedRoles.Remove(oldRole);
+            }
+            selectedRoles.Add(role); //And put your new role in the selected list
+            senderProfile.SelectRole(role); //Make sure the server has you set up with the same role
+            Debug.Log("Server assigned role to player.");
+            TargetAssignRole(sender.connectionToClient, role); //Actually give the client their role
+            RpcBroadcastSelectedRoles(selectedRoles); //And then update all clients about the changed list
         }
+    }
 
-        selectedRoles.Add(pickedRole, ownerID);
-        RpcSelectRole(roleName, ownerID);
+    /// <summary>
+    /// If a client succeeds in requesting a role, then this function gets called from CmdSelectRole.
+    /// </summary>
+    /// <param name="target">The client to receive the role</param>
+    /// <param name="role">The role to give the client</param>
+    [TargetRpc]
+    void TargetAssignRole(NetworkConnection target, Role role)
+    { //The server has confirmed that you got your role assigned
+        PlayerProfile profile = NetworkClient.localPlayer.GetComponent<PlayerProfile>();
+        profile.SelectRole(role);
+        Debug.Log("Client received a role from the server and assigned it.");
+    }
+
+    /// <summary>
+    /// Whenever the roles list is updated, this function gets called by the server to update the clients' lists.
+    /// </summary>
+    /// <param name="roles">The revised list from the server</param>
+    [ClientRpc]
+    void RpcBroadcastSelectedRoles(List<Role> roles)
+    {
+        if (!isServer)
+        { //The server's list already has all the right stuff in it, so ignore the server for this
+            selectedRoles = roles;
+        }
         UpdateButtons();
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdRemoveRoleByID(uint id)
+    void CmdGetServerSelectedRoles(NetworkIdentity sender)
+    { //A client wants to know what roles have been set up, so lets send them the list
+        TargetReceiveSelectedRoles(sender.connectionToClient, selectedRoles);
+    }
+
+    /// <summary>
+    /// Called from the server to deliver the updated selectedRoles list to a single requesting client
+    /// </summary>
+    /// <param name="target">The client who receives the updated list</param>
+    /// <param name="roles">The list of roles the client will update to</param>
+    [TargetRpc]
+    void TargetReceiveSelectedRoles(NetworkConnection target,  List<Role> roles)
     {
-        Role role = null;
-        foreach (KeyValuePair<Role, uint> pair in selectedRoles)
-        {
-            if (pair.Value == id)
-            {
-                role = pair.Key;
-                break;
-            }
-        }
-        if (role == null)
-            return; //This player didn't have a role selected
-        if (selectedRoles.ContainsKey(role))
-        {
-            selectedRoles.Remove(role);
-            RpcRemoveRole(role.Name);
-        }
-    }
-
-    [ClientRpc]
-    void RpcRemoveRole(string roleName)
-    {
-        Debug.Log("Client is running remove command with role " + roleName);
-        if (isServer)
-        {
-            Debug.Log("Skipping remove call on host");
-            return;
-        }
-
-        Role oldRole = CrewRoles.GetRoleByName(roleName);
-        selectedRoles.Remove(oldRole);
-        UpdateButtons(); //Refresh the buttons after the change
-    }
-
-    [ClientRpc]
-    void RpcSelectRole(string roleName, uint ownerID)
-    {
-        if (isServer)
-        {
-            Debug.Log("Skipping add call for host.");
-            return;
-        }
-
-        Role selectedRole = CrewRoles.GetRoleByName(roleName);
-        selectedRoles.Add(selectedRole, ownerID);
-        UpdateButtons(); //Refresh the buttons after the change
-    }
-
-    [Command(requiresAuthority = false)]
-    public void CmdGetServerSelectedRoles()
-    { //This collects the entries from the dictionary and then send them to the client
-        if (selectedRoles.Count == 0)
-            return; //No need to do this if there's no selected roles
-        Role[] roles = new Role[selectedRoles.Count];
-        uint[] ids = new uint[selectedRoles.Count];
-        int index = 0;
-        foreach (KeyValuePair<Role, uint> pair in selectedRoles)
-        { //Build out the two arrays for sending
-            roles[index] = pair.Key;
-            ids[index] = pair.Value;
-            index++;
-        }
-        RpcUpdateSelectedRoles(roles, ids);
-    }
-
-    [ClientRpc]
-    public void RpcUpdateSelectedRoles(Role[] roles, uint[] ids)
-    { //Called from the server after someone joins an in-progress room
-        //TODO: Target this function to only players that have joined
-        bool changed = false; //If there is an updated element then we update the buttons
-        for (int i = 0; i < roles.Length; i++)
-        { //Roles and ids array are the same size, so lets check for them in the local dictionary
-            if (!selectedRoles.ContainsKey(roles[i]))
-            {
-                selectedRoles.Add(roles[i], ids[i]);
-                changed = true;
-            }
-        }
-        if (changed)
-        { //This gets sent to every client right now, so only update buttons if there is new info
-            UpdateButtons();
-        }
-    }
-
-    Role OwnerHasRole(uint ownerID)
-    {
-        foreach (KeyValuePair<Role, uint> pair in selectedRoles)
-        {
-            if (pair.Value == ownerID)
-                return pair.Key;
-        }
-        return null;
+        selectedRoles = roles;
+        UpdateButtons();
     }
 
     void UpdateButtons()
     {
-        string syncDictKVPs = "";
-        foreach (KeyValuePair<Role, uint> pair in selectedRoles)
+        Role localRole = NetworkClient.localPlayer.GetComponent<PlayerProfile>().CurrentRole;
+        foreach (GameObject buttonObj in buttons)
         {
-            syncDictKVPs += $"Key: {pair.Key.Name} Value: {pair.Value} ";
-        }
-        Debug.Log($"Updating buttons. IsClient: {isClient}, IsServer: {isServer}, SyncDict: {syncDictKVPs}");
-        foreach (GameObject button in buttons)
-        {
-            TextMeshProUGUI text = button.GetComponentInChildren<TextMeshProUGUI>();
-            Role role = CrewRoles.GetRoleByName(text.text);
-            bool usedRole = false;
-            foreach (KeyValuePair<Role, uint> pair in selectedRoles)
-            {
-                if (pair.Key.Name == role.Name)
-                {
-                    usedRole = true;
-                    break;
-                }
-            }
-            if (usedRole)
-            {
-                button.GetComponent<Button>().interactable = false;
-                Debug.Log("Found a used role with name " + role.Name);
+            //Get the text so we can figure out which role it represents
+            TextMeshProUGUI text = buttonObj.GetComponentInChildren<TextMeshProUGUI>();
+            Role buttonRole = CrewRoles.GetRoleByName(text.text);
+            Button button = buttonObj.GetComponent<Button>();
+            if (selectedRoles.Contains(buttonRole))
+            { //This role has been picked, so turn off interactions
+                button.interactable = false;
             }
             else
-            {
-                Debug.Log($"Role {role.Name} is unused.");
-                button.GetComponent<Button>().interactable = true;
+            { //Since the selectedRoles will NEVER contain the UnassignedRole, it will turn on provided you don't have it
+                button.interactable = true;
             }
-        }
-        if (localRoomPlayer == null) //Grab the room player before checking roles
-            localRoomPlayer = NetworkClient.connection.identity.GetComponent<TankRoomPlayer>();
-        if (localRoomPlayer.HasAnyRole())
-        {
-            Debug.Log("Local player has a role, turning ready button on.");
-            ReadyButtonObject.interactable = true; //You picked a role so you can now ready up
-        }
-        else
-        {
-            Debug.Log($"No role on local player. RoleID is {localRoomPlayer.RoleID} and Role name is {localRoomPlayer.role.Name}");
+            if (buttonRole == CrewRoles.UnassignedRole && localRole == CrewRoles.UnassignedRole)
+            { //If this is the Unassigned button and you have the role, we mark this button as unclickable, and the else statement handles turning it back on
+                button.interactable = false;
+            }
         }
     }
 
