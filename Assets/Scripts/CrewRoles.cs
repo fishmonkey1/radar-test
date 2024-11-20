@@ -34,6 +34,9 @@ public static class CrewRoles
 
 }
 
+/// <summary>
+/// Represents a role that the player can take, including what the displayed name is, the role's internal ID, and the number of players that can take the role per vehicle.
+/// </summary>
 [System.Serializable]
 public class Role
 {
@@ -48,5 +51,34 @@ public class Role
         Name = name;
         ID = id;
         PlayerLimit = limit;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is Role otherRole)
+        {
+            return ID == otherRole.ID;
+        }
+        return false;
+    }
+
+    //Override GetHashCode to align with overriden Equals statement
+    public override int GetHashCode()
+    {
+        return ID.GetHashCode();
+    }
+
+    //Overload equality operator for niceness in comparing roles
+    public static bool operator ==(Role leftRole, Role rightRole)
+    {
+        if (ReferenceEquals(leftRole, rightRole)) return true;
+        if (leftRole == null || rightRole == null) return false;
+        return leftRole.ID == rightRole.ID;
+    }
+
+    //And overload inequality operator so we don't get yelled at in the above overload
+    public static bool operator !=(Role leftRole, Role rightRole)
+    { //Just do the equality operator but flipped
+        return !(leftRole == rightRole);
     }
 }
