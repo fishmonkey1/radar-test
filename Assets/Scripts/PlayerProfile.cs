@@ -39,9 +39,9 @@ public class PlayerProfile : NetworkBehaviour
                 if (HorniTank != null)
                 {
                     Debug.Log("Assigning player to spawned tank");
-                    if (role.Name == CrewRoles.Gunner.Name)
+                    if (role == CrewRoles.Gunner)
                         HorniTank.GetComponent<Turret>().SetPlayer(this);
-                    if (role.Name == CrewRoles.Driver.Name)
+                    if (role == CrewRoles.Driver)
                         HorniTank.GetComponent<tankSteer>().SetPlayer(this);
                 }
             }
