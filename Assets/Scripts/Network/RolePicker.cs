@@ -35,7 +35,7 @@ public class RolePicker : NetworkBehaviour
         }
         ReadyButtonObject.interactable = false; //Can't ready up until you pick a role
         //When the client enters the room we should update to reflect any roles that were picked before they joined
-        CmdGetServerSelectedRoles(NetworkClient.localPlayer); //Ask for any roles that were picked so far
+        CmdGetServerSelectedRoles(); //Ask for any roles that were picked so far
     }
 
     public void BackToMenuButton()
@@ -121,9 +121,9 @@ public class RolePicker : NetworkBehaviour
     }
 
     [Command(requiresAuthority = false)]
-    void CmdGetServerSelectedRoles(NetworkIdentity sender)
+    void CmdGetServerSelectedRoles(NetworkConnectionToClient conn = null)
     { //A client wants to know what roles have been set up, so lets send them the list
-        TargetReceiveSelectedRoles(sender.connectionToClient, selectedRoles);
+        TargetReceiveSelectedRoles(conn, selectedRoles);
     }
 
     /// <summary>

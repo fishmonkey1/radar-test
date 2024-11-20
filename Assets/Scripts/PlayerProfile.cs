@@ -4,10 +4,11 @@ using System.IO;
 using Mirror;
 
 [System.Serializable]
-public class PlayerProfile : NetworkBehaviour
+public class PlayerProfile
 {
     public string PlayerName = "default";
 
+    [JsonIgnore]
     public static string LoadedProfileName = null;
 
     [JsonIgnore] // Ignore during serialization
@@ -32,6 +33,7 @@ public class PlayerProfile : NetworkBehaviour
         CurrentRole = role;
         if (Utils.IsSceneActive(TankRoomManager.singleton.GameplayScene))
         {
+            GameObject ow
             bool isLocal = GameObject.ReferenceEquals(gameObject, NetworkClient.localPlayer.gameObject);
             if (isLocal)
             {

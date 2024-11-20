@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using UnityEngine.Profiling;
 
 public class TankRoomPlayer : NetworkRoomPlayer
 {
@@ -13,29 +14,33 @@ public class TankRoomPlayer : NetworkRoomPlayer
     public PlayerProfile playerProfile;
     public Role role = CrewRoles.UnassignedRole;
 
-    public override void Start()
+    public override void OnClientEnterRoom()
     {
-        base.Start();
-        //Debug.Log($"IsLocalPlayer equals {isLocalPlayer}");
+        base.OnClientEnterRoom();
+        Debug.Log($"IsLocalPlayer equals {isLocalPlayer}");
         //If you are the local player, we need to either load your profile or create it
         if (isLocalPlayer)
         {
-            PlayerProfile profile = GetComponent<PlayerProfile>();
-            if (PlayerProfile.TryLoadProfile(Application.persistentDataPath + "/PlayerProfiles", PlayerProfile.LoadedProfileName, out profile))
+            playerProfile = GetComponent<PlayerProfile>();
+            PlayerProfile attemptLoad;
+            Debug.Log("Value of playerProfile is: " + playerProfile);
+            if (PlayerProfile.TryLoadProfile(Application.dataPath + "JSON/PlayerProfiles/", PlayerProfile.LoadedProfileName, out attemptLoad))
             {
-                Debug.Log($"Loaded player profile with name: {profile.PlayerName}");
+                Debug.Log($"Loaded player profile with name: {playerProfile.PlayerName}");
+                playerProfile = attemptLoad;
             }
             else
             { //If we couldn't find your profile, let's assume it's new and export it
-                profile.PlayerName = PlayerProfile.LoadedProfileName; //Technically that's all that needs to be done for now
-                profile.ExportToJson(Application.persistentDataPath + "/PlayerProfiles");
-                Debug.Log($"Exported player profile to path: {Application.persistentDataPath + "/PlayerProfiles"}");
+                Debug.Log("LoadedProfileName: " + PlayerProfile.LoadedProfileName);
+                Debug.Log("playerProfile: " + playerProfile);
+                playerProfile.PlayerName = PlayerProfile.LoadedProfileName; //Technically that's all that needs to be done for now
+                playerProfile.ExportToJson(Application.dataPath + "JSON/PlayerProfiles/");
+                Debug.Log($"Exported player profile to path: {Application.dataPath + "JSON/PlayerProfiles/"}");
             }
-            //Assign our profile to our player now
-            playerProfile = profile;
-            //Now that our profile is set up, we need to let the server know
-            CmdSendProfile(profile, NetworkClient.localPlayer); 
         }
+        //Now that our profile is set up, we need to let the server know
+        Debug.Log("Value of playerProfile at end of EnterRoom is: " + playerProfile);
+        CmdSendProfile(playerProfile, NetworkClient.localPlayer);
     }
 
     [Command]
