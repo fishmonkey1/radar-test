@@ -3,6 +3,7 @@ using UnityEngine;
 using ProcGenTiles;
 using System.IO;
 using System.Collections.Generic;
+using System;
 
 
 public class LayerTerrain : MonoBehaviour
@@ -108,18 +109,11 @@ public class LayerTerrain : MonoBehaviour
         NormalizeFinalMap(LayersEnum.Elevation, lowest_e, elevationLayers.NoisePairs[0].NoiseParams.raisedPower); //Make the final map only span from 0 to 1
 
         CreateMeshFromHeightmap(); 
+
     }
 
 
-    public void CreateMeshFromHeightmap()
-    {
-        float[,] fmap = finalMap.FetchFloatValues(LayersEnum.Elevation);
-
-        MeshData meshData = MeshGenerator.GenerateTerrainMesh(fmap, depth, meshHeightCurve);
-        Mesh mesh = meshData.CreateMesh(mesh_32bit_buffer);
-        
-        MeshFilter.sharedMesh = mesh;
-    }
+ 
 
     public void ReadNoiseParams(NoiseParams noiseParams) //STAYS
     {
@@ -312,6 +306,95 @@ public class LayerTerrain : MonoBehaviour
         elevationLayers = JsonUtility.FromJson<MapLayers>(json);
         GenerateTerrain();
     #endif
+    }
+
+    public void CreateMeshFromHeightmap()
+    {
+        float[,] fmap = finalMap.FetchFloatValues(LayersEnum.Elevation);
+
+        MeshData meshData = MeshGenerator.GenerateTerrainMesh(fmap, depth, meshHeightCurve);
+        Mesh mesh = meshData.CreateMesh(mesh_32bit_buffer);
+
+        MeshFilter.sharedMesh = mesh;
+
+        CreateTopoTexture();
+
+    }
+
+    public void CreateTopoTexture()
+    {
+        Texture2D texture = new Texture2D(X, Y);
+
+        //topo is plane, origin is middle of it. Set to center of mesh, 2px below
+        topoObject.transform.position = new Vector3(X / 2, -2, Y / 2);
+        topoObject.transform.position = new Vector3(transform.position.x + (X / 2), -2, transform.position.z + (Y / 2));
+        //topoObject.transform.localScale = new Vector3((float)X * .1f, 1, (float)Y * .1f);
+
+        // make list of all the colors
+        List<Color> colors = new List<Color>();
+        float currLerp = 0f;
+        float lerpStep = 1f / (float)numberOfTopoLevels;
+        for (int i = 0; i < numberOfTopoLevels; i++)
+        {
+            var tileColor = Color.Lerp(topoColor1, topoColor2, currLerp);
+            tileColor.a = .5f;
+            colors.Add(tileColor);
+            currLerp += lerpStep;
+        }
+        if (print_debug) Debug.Log($"Created {colors.Count} colors");
+
+        // make list of bands
+        List<float> bands = new List<float>();
+        float bandDistance = depth / numberOfTopoLevels;
+        float val = 0;
+        while (val < depth)
+        {
+            val += bandDistance;
+            float lerpedval = Mathf.InverseLerp(0f, (float)depth, val);
+            bands.Add(lerpedval);
+        }
+        if (print_debug) Debug.Log($"Created {bands.Count} bands");
+
+        // Creating colormap
+        Color[] colorMap = new Color[X * Y];
+
+        List<int> usedColors = new List<int>();
+
+        for (int y = 0; y < Y; y++)
+        {
+            for (int x = 0; x < X; x++)
+            {
+                float elevation = finalMap.GetTile(x, y).ValuesHere[LayersEnum.Elevation];
+                for (int j = 0; j < bands.Count; j++)
+                {
+                    if (elevation < bands[j])
+                    {
+                        // TODO: This fails if numberOfTopoLevels != 10. Definitely rounding something wrong
+                        if (!usedColors.Contains(j)) usedColors.Add(j);
+                        try
+                        {
+                            colorMap[x * X + y] = colors[j];
+                            //break; //dont need to check rest of bands
+                        }
+                        catch (System.IndexOutOfRangeException e) {
+                            Debug.Log(X*Y);
+                            Debug.Log(x*X+y);
+                        }
+
+
+                    }
+                }
+            }
+        }
+        if (print_debug) Debug.Log($"Created colorMap with {usedColors.Count} colors");
+
+
+        Renderer rend = topoObject.GetComponent<Renderer>();
+        texture.SetPixels(colorMap); //TODO: change to SetPixels32, it's faster. Especially if doing live reload
+        texture.Apply();
+        rend.sharedMaterial.mainTexture = texture; //cuz doing shit in editor too
+        //rend.material.mainTexture = texture;
+
     }
 
     public void runMapGen()

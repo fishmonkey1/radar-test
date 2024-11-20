@@ -13,7 +13,7 @@ public class CreateTopoMap : MonoBehaviour
     private bool makeTerrainTopographic;
     Texture2D texture;
 
-    public void createTopoTextures(int start_x, int start_y, int end_x, int end_y, bool deform, float[,] noiseMap)
+    public void CreateTopoTextures(int start_x, int start_y, int end_x, int end_y, bool deform, float[,] noiseMap)
     {
         if (print_debug) Debug.Log("Running Topo Stuff");
 
