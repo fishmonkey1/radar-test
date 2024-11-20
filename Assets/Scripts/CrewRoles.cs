@@ -72,7 +72,7 @@ public class Role
     public static bool operator ==(Role leftRole, Role rightRole)
     {
         if (ReferenceEquals(leftRole, rightRole)) return true;
-        if (leftRole == null || rightRole == null) return false;
+        if (ReferenceEquals(leftRole, null) || ReferenceEquals(rightRole, null)) return false;
         return leftRole.ID == rightRole.ID;
     }
 
