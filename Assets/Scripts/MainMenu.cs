@@ -23,7 +23,7 @@ public class MainMenu : MonoBehaviour
 
     public void HostGame()
     {
-        if (PlayerProfile.LoadedProfile == null)
+        if (PlayerProfile.LoadedProfileName == null)
         { //Pick a name before hosting
             //If you host or join and get a name popup, this is true and makes the popup join the game
             NamePopup.GetComponent<NamePicker>().PopupFromHost = true;
@@ -44,7 +44,7 @@ public class MainMenu : MonoBehaviour
     public void ShowJoinScreen()
     {
         //Check the local PlayerProfile to check that there's a loaded profile
-        if (PlayerProfile.LoadedProfile == null)
+        if (PlayerProfile.LoadedProfileName == null)
         { //Pick a name before joining
             ShowNamePopup();
             //If you host or join and get a name popup, this is true and makes the popup join the game

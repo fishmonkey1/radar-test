@@ -10,8 +10,7 @@ public class TankRoomPlayer : NetworkRoomPlayer
     /// Sends a message to the server when they've picked a role so everybody gets updated on which are left
     /// Can't ready up til you've picked a role
 
-    public uint RoleID = CrewRoles.UnassignedRole.ID; //Init to the UnassignedRole
-    public Role role = CrewRoles.UnassignedRole; //All players are created with the UnassignedRole
+    PlayerProfile playerProfile;
 
     public override void Start()
     {
@@ -21,42 +20,46 @@ public class TankRoomPlayer : NetworkRoomPlayer
         if (isLocalPlayer)
         {
             PlayerProfile profile = GetComponent<PlayerProfile>();
-            if (PlayerProfile.TryLoadProfile(Application.persistentDataPath + "/PlayerProfiles", PlayerProfile.LoadedProfile, out profile))
+            if (PlayerProfile.TryLoadProfile(Application.persistentDataPath + "/PlayerProfiles", PlayerProfile.LoadedProfileName, out profile))
             {
                 Debug.Log($"Loaded player profile with name: {profile.PlayerName}");
             }
             else
             { //If we couldn't find your profile, let's assume it's new and export it
-                profile.PlayerName = PlayerProfile.LoadedProfile; //Technically that's all that needs to be done for now
+                profile.PlayerName = PlayerProfile.LoadedProfileName; //Technically that's all that needs to be done for now
                 profile.ExportToJson(Application.persistentDataPath + "/PlayerProfiles");
+                Debug.Log($"Exported player profile to path: {Application.persistentDataPath + "/PlayerProfiles"}");
             }
+            //Assign our profile to our player now
+            playerProfile = profile;
             //Now that our profile is set up, we need to let the server know
-            CmdSendProfile(profile.PlayerName, NetworkClient.localPlayer); 
+            CmdSendProfile(profile, NetworkClient.localPlayer); 
         }
     }
 
     [Command]
-    public void CmdSendProfile(string PlayerName, NetworkIdentity identity)
+    public void CmdSendProfile(PlayerProfile profile, NetworkIdentity identity)
     { //At the moment, the playername is the only thing in a profile. Later this needs to send unlocks and experience as well
-        PlayerProfile profile = identity.GetComponent<PlayerProfile>(); //Fetch that player's component
-        profile.PlayerName = PlayerName; //Update their name on the server
+        PlayerProfile serverProfile = identity.GetComponent<PlayerProfile>(); //Fetch that player's component on the server
+        serverProfile.PlayerName = profile.PlayerName; //Update their name on the server
         TankRoomManager room = TankRoomManager.singleton;
-        room.AddProfileToRoom(identity, profile);
+        room.AddProfileToRoom(identity, serverProfile);
         //Technically that's all, folks. Now we tell all the clients about the new profile
-        RpcBroadcastProfile(PlayerName, identity);
+        RpcBroadcastProfile(profile, identity);
     }
 
     [ClientRpc]
-    public void RpcBroadcastProfile(string PlayerName, NetworkIdentity identity)
+    public void RpcBroadcastProfile(PlayerProfile profile, NetworkIdentity identity)
     { //The server runs this on all connected clients, excluding the person who sent the message
-        if (string.Equals(PlayerProfile.LoadedProfile, PlayerName))
+        if (string.Equals(PlayerProfile.LoadedProfileName, profile.PlayerName))
         {
             Debug.Log("Received broadcasted profile, but it matches our loaded profile.");
         }
         else
         { //Otherwise we have somebody else's profile, so lets update things
-            PlayerProfile profile = identity.GetComponent<PlayerProfile>();
-            profile.PlayerName = PlayerName;
+            PlayerProfile localProfile = identity.GetComponent<PlayerProfile>();
+            localProfile.PlayerName = profile.PlayerName; //Set the name to match what was sent
+            //Later this will read in the experience and other sections of the profile
             Debug.Log($"Received broadcasted profile named {profile.PlayerName} and updated their component");
         }
     }

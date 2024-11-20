@@ -2,14 +2,13 @@ using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
 using Mirror;
-using System.Data;
 
 [System.Serializable]
 public class PlayerProfile : NetworkBehaviour
 {
     public string PlayerName = "default";
 
-    public static string LoadedProfile = null;
+    public static string LoadedProfileName = null;
 
     [JsonIgnore] // Ignore during serialization
     public Role CurrentRole = CrewRoles.UnassignedRole;

@@ -58,7 +58,7 @@ public class Chat : NetworkBehaviour
     void SendChatMessage(string text, MessageTypes messageType)
     { //This happens on the local machine, giving us a chance to collect info before sending to the server
         chatInput.text = ""; //Clear the text out of the inputField
-        CmdSendChatMessage(text, NetworkClient.connection.connectionId, PlayerInfo.localPlayerName, messageType);
+        CmdSendChatMessage(text, NetworkClient.connection.connectionId, PlayerProfile.LoadedProfileName, messageType);
     }
 
     [Command(requiresAuthority = false)]
