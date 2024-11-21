@@ -2,13 +2,14 @@ using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
 using Mirror;
+using System;
 
 [System.Serializable]
 public class PlayerProfile
 {
     public string PlayerName = "default";
 
-    [JsonIgnore]
+    [JsonIgnore, NonSerialized]
     public static string LoadedProfileName = null;
 
     [JsonIgnore] // Ignore during serialization
@@ -16,11 +17,13 @@ public class PlayerProfile
 
     public delegate void RoleChangeDelegate(Role oldRole, Role newRole);
 
-    [JsonIgnore]
+   [JsonIgnore, NonSerialized]
     public RoleChangeDelegate OnRoleChange;
 
-    [JsonIgnore] // Ignore GameObject references
+    [JsonIgnore, NonSerialized] // Ignore GameObject references
     private GameObject HorniTank;
+
+    public PlayerProfile() { }
 
     /// <summary>
     /// Called from the RolePicker script, this function assigns the role and runs cleanup on the old role. If the gameplay scene is up, this will also inform the CamCycle script and the relevant control script as well. In the lobby, there is no HorniTank spawned, so info is carried over when the lobby ends and the game begins.
@@ -33,7 +36,7 @@ public class PlayerProfile
         CurrentRole = role;
         if (Utils.IsSceneActive(TankRoomManager.singleton.GameplayScene))
         {
-            GameObject ow
+            GameObject gameObject = null;
             bool isLocal = GameObject.ReferenceEquals(gameObject, NetworkClient.localPlayer.gameObject);
             if (isLocal)
             {
