@@ -43,8 +43,8 @@ public class TankRoomManager : NetworkRoomManager
             ? Instantiate(playerPrefab, startPos.position, startPos.rotation)
             : Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
 
-        PlayerProfile gameProfile = gamePlayer.GetComponent<PlayerProfile>();
-        PlayerProfile roomProfile = roomPlayer.GetComponent<PlayerProfile>();
+        PlayerProfile gameProfile = gamePlayer.GetComponent<ProfileHolder>().Profile;
+        PlayerProfile roomProfile = roomPlayer.GetComponent<ProfileHolder>().Profile;
 
         //The gameProfile needs to have all its info copied over from the roomProfile
         //For now this is just the player's name and their role
@@ -53,11 +53,6 @@ public class TankRoomManager : NetworkRoomManager
 
         //Yes ma'am, role stuff is added now <3
         gameProfile.SelectRole(roomProfile.CurrentRole); //Assign the game profile to have the same role as the room profile
-
-
-        //This is all trash now
-        //newInfo.PickRole(CrewRoles.GetRoleByID(roomInfo.RoleID)); //Set the role to what was in the room player
-        //newInfo.PickName(roomInfo.PlayerName);
 
         return gamePlayer; //Send the player prefab back
     }
@@ -124,27 +119,6 @@ public class TankRoomManager : NetworkRoomManager
         //TODO: I want to add random connection messages like discord does with people joining a server. There is a trello card for this request.
         chatroom.SendServerMessage($"{profile.PlayerName} has connected!", Chat.MessageTypes.SERVER);
     }
-
-    /*public void AddPlayerToRoom(NetworkConnection conn, PlayerInfo info)
-    {
-        //This will be Vicky's spot to set up all the information on freshly joined clients.
-        connectedPlayers.Add(conn, info); //Place the info in our dictionary
-        if (NetworkClient.localPlayer.isServer)
-        { //This call is happening on the host, so we can go ahead and broadcast our connection message to everyone
-            Debug.Log($"Adding player {info.PlayerName} to room on the host.");
-            chatroom.SendServerMessage($"{info.PlayerName} connected", Chat.MessageTypes.SERVER);
-        }
-    }*/
-
-    //This no worky. I'll have to try some other way
-    /*public override void OnRoomClientExit()
-    { //If the client leaves during the room scene then we should free up their 
-        if (Utils.IsSceneActive(GameplayScene))
-            return; //Not handling clients leaving the game yet
-        if (rolePicker == null)
-            rolePicker = GameObject.Find("LobbyCanvas").GetComponent<RolePicker>(); //Fetch the component
-        rolePicker.CmdRemoveRoleByID(NetworkClient.localPlayer.netId);
-    }*/
 
     public override void OnGUI()
     {

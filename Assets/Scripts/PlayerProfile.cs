@@ -12,6 +12,15 @@ public class PlayerProfile
     [JsonIgnore, NonSerialized]
     public static string LoadedProfileName = null;
 
+    //Make a struct that holds info about what unlocks they have bought with XP
+
+    //Make a field that handles how much XP they have earned
+
+    //Make a stats portion that tracks how long they've played on the profile, how many kills the tank has gotten while they were in it, pride flags collected
+
+    [JsonIgnore, NonSerialized]
+    public ProfileHolder Holder; //The MonoBehaviour that references this profile
+
     [JsonIgnore] // Ignore during serialization
     public Role CurrentRole = CrewRoles.UnassignedRole;
 
@@ -23,7 +32,10 @@ public class PlayerProfile
     [JsonIgnore, NonSerialized] // Ignore GameObject references
     private GameObject HorniTank;
 
-    public PlayerProfile() { }
+    public PlayerProfile() 
+    {
+        PlayerName = LoadedProfileName;
+    }
 
     /// <summary>
     /// Called from the RolePicker script, this function assigns the role and runs cleanup on the old role. If the gameplay scene is up, this will also inform the CamCycle script and the relevant control script as well. In the lobby, there is no HorniTank spawned, so info is carried over when the lobby ends and the game begins.
@@ -36,10 +48,11 @@ public class PlayerProfile
         CurrentRole = role;
         if (Utils.IsSceneActive(TankRoomManager.singleton.GameplayScene))
         {
-            GameObject gameObject = null;
-            bool isLocal = GameObject.ReferenceEquals(gameObject, NetworkClient.localPlayer.gameObject);
+            Debug.Log("Profile is in the game scene.");
+            bool isLocal = Holder.IsLocalPlayer(); //Check if we're on the player's owned profile before doing CamCycle
             if (isLocal)
             {
+                Debug.Log("Profile is local, setting up cameras and control scripts");
                 CamCycle.Instance.ChangeRoles(oldRole, role);
                 if (HorniTank != null)
                 {
@@ -68,6 +81,7 @@ public class PlayerProfile
     /// <param name="directoryPath">The directory to save the profile to. Currently it is Application.persistantDataPath + "/PlayerProfiles"</param>
     public void ExportToJson(string directoryPath)
     {
+        this.PlayerName = LoadedProfileName;
         string json = JsonConvert.SerializeObject(this, Formatting.Indented);
         string filePath = Path.Combine(directoryPath, $"{PlayerName}.json");
 

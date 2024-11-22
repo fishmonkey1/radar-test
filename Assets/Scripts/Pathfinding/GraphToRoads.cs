@@ -56,13 +56,13 @@ public class GraphToRoads : MonoBehaviour
 
     public void TraverseGraph()
     {
+        graph = Graph.Instance; //Get a reference to the one and only graph in the scene
         if (graph.nodes.Count <= 1)
         {
             Debug.Log("Not enough nodes to render roads! Add more nodes or check GraphToRoads for issues.");
             return;
         }
 
-        graph = Graph.Instance; //Get a reference to the one and only graph in the scene
         Visited.Clear(); //I highly doubt we'll be calling this more than once, but it never hurts
         RoadDraws.Clear();
 

@@ -32,6 +32,7 @@ public class RolePicker : NetworkBehaviour
                 buttonScript.interactable = false; //Can't assign yourself as unassigned when you start that way
             }
             buttons.Add(newButton);
+            Debug.Log($"Added button for Role named {role.Name} and ID of {role.ID}");
         }
         ReadyButtonObject.interactable = false; //Can't ready up until you pick a role
         //When the client enters the room we should update to reflect any roles that were picked before they joined
@@ -101,7 +102,7 @@ public class RolePicker : NetworkBehaviour
     [TargetRpc]
     void TargetAssignRole(NetworkConnection target, Role role)
     { //The server has confirmed that you got your role assigned
-        PlayerProfile profile = NetworkClient.localPlayer.GetComponent<PlayerProfile>();
+        PlayerProfile profile = NetworkClient.localPlayer.GetComponent<ProfileHolder>().Profile;
         profile.SelectRole(role);
         Debug.Log("Client received a role from the server and assigned it.");
     }
@@ -140,7 +141,7 @@ public class RolePicker : NetworkBehaviour
 
     void UpdateButtons()
     {
-        Role localRole = NetworkClient.localPlayer.GetComponent<PlayerProfile>().CurrentRole;
+        Role localRole = NetworkClient.localPlayer.GetComponent<ProfileHolder>().Profile.CurrentRole;
         foreach (GameObject buttonObj in buttons)
         {
             //Get the text so we can figure out which role it represents
@@ -159,6 +160,10 @@ public class RolePicker : NetworkBehaviour
             { //If this is the Unassigned button and you have the role, we mark this button as unclickable, and the else statement handles turning it back on
                 button.interactable = false;
             }
+        }
+        if (localRole != CrewRoles.UnassignedRole)
+        { //You've picked a role, so you can ready up now
+            ReadyButtonObject.interactable = true;
         }
     }
 

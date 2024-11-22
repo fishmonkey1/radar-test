@@ -7,7 +7,7 @@ public static class CrewRoles
     public static readonly Role Radar = new Role("Radar", 4, 1);
 
     //Implemented roles array contains all the roles that actually work so far
-    public static readonly Role[] ImplementedRoles = new Role[] { UnassignedRole, Driver, Gunner, };
+    public static readonly Role[] ImplementedRoles = new Role[] { UnassignedRole, Driver, Gunner };
     //The AllRoles array might not be all that important, but I'm leaving it in for now
     public static readonly Role[] AllRoles = new Role[] { UnassignedRole, Driver, Gunner, Spotter, Radar };
 

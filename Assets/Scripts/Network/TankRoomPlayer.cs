@@ -7,7 +7,7 @@ using UnityEngine.Profiling;
 public class TankRoomPlayer : NetworkRoomPlayer
 {
     /// Inherit from the NetworkRoomPlayer and take a look at using the hooks or overriding one of the funtions
-    /// Needs to track the role the player picked and assign that info to PlayerInfo
+    /// Needs to track the role the player picked and assign that info to the PlayerProfile
     /// Sends a message to the server when they've picked a role so everybody gets updated on which are left
     /// Can't ready up til you've picked a role
 
@@ -21,32 +21,33 @@ public class TankRoomPlayer : NetworkRoomPlayer
         //If you are the local player, we need to either load your profile or create it
         if (isLocalPlayer)
         {
-            playerProfile = GetComponent<PlayerProfile>();
+            ProfileHolder holder = GetComponent<ProfileHolder>();
+            playerProfile = holder.Profile; //Get the profile off of the holder
             PlayerProfile attemptLoad;
-            Debug.Log("Value of playerProfile is: " + playerProfile);
-            if (PlayerProfile.TryLoadProfile(Application.dataPath + "JSON/PlayerProfiles/", PlayerProfile.LoadedProfileName, out attemptLoad))
+            if (PlayerProfile.TryLoadProfile(Application.dataPath + "/JSON/PlayerProfiles/", PlayerProfile.LoadedProfileName, out attemptLoad))
             {
                 Debug.Log($"Loaded player profile with name: {playerProfile.PlayerName}");
                 playerProfile = attemptLoad;
+                holder.Profile = playerProfile;
             }
             else
             { //If we couldn't find your profile, let's assume it's new and export it
                 Debug.Log("LoadedProfileName: " + PlayerProfile.LoadedProfileName);
                 Debug.Log("playerProfile: " + playerProfile);
                 playerProfile.PlayerName = PlayerProfile.LoadedProfileName; //Technically that's all that needs to be done for now
-                playerProfile.ExportToJson(Application.dataPath + "JSON/PlayerProfiles/");
-                Debug.Log($"Exported player profile to path: {Application.dataPath + "JSON/PlayerProfiles/"}");
+                playerProfile.ExportToJson(Application.dataPath + "/JSON/PlayerProfiles/");
+                Debug.Log($"Exported player profile to path: {Application.dataPath + "/JSON/PlayerProfiles/"}");
             }
         }
         //Now that our profile is set up, we need to let the server know
-        Debug.Log("Value of playerProfile at end of EnterRoom is: " + playerProfile);
+        Debug.Log("Value of playerProfile is: " + playerProfile + " and profile is named " + playerProfile.PlayerName);
         CmdSendProfile(playerProfile, NetworkClient.localPlayer);
     }
 
     [Command]
     public void CmdSendProfile(PlayerProfile profile, NetworkIdentity identity)
     { //At the moment, the playername is the only thing in a profile. Later this needs to send unlocks and experience as well
-        PlayerProfile serverProfile = identity.GetComponent<PlayerProfile>(); //Fetch that player's component on the server
+        PlayerProfile serverProfile = identity.GetComponent<ProfileHolder>().Profile; //Fetch that player's component on the server
         serverProfile.PlayerName = profile.PlayerName; //Update their name on the server
         TankRoomManager room = TankRoomManager.singleton;
         room.AddProfileToRoom(identity, serverProfile);
@@ -63,7 +64,7 @@ public class TankRoomPlayer : NetworkRoomPlayer
         }
         else
         { //Otherwise we have somebody else's profile, so lets update things
-            PlayerProfile localProfile = identity.GetComponent<PlayerProfile>();
+            PlayerProfile localProfile = identity.GetComponent<ProfileHolder>().Profile;
             localProfile.PlayerName = profile.PlayerName; //Set the name to match what was sent
             //Later this will read in the experience and other sections of the profile
             Debug.Log($"Received broadcasted profile named {profile.PlayerName} and updated their component");
