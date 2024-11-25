@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using System.Linq;
 
 public class TankRoomManager : NetworkRoomManager
 {
@@ -18,7 +19,16 @@ public class TankRoomManager : NetworkRoomManager
 
     Chat chatroom; //For sending join and disconnect messages on
 
+    [SyncVar(hook = nameof(SetHorniTank))]
+    public GameObject HorniTank = null; //When our one and only tank gets spawned, we assign it here.
+
+    //Implement delegate as an event for encapsulation. This prevents subscribers from clearing the delegate or invoking it themselves
+    public event OnChangeHorniTank OnChangeHorniTankEvent;
+    public delegate void OnChangeHorniTank(GameObject HorniTank); //Delegate to fire when we change the tank reference
+
     public Dictionary<NetworkIdentity, PlayerProfile> connectedPlayers = new(); //Anybody added to the server gets stashed in here for me to use instead of Mirror's stuff. I know it's duplicated, but let me cook
+
+    public Dictionary<ProfileGroup, GameObject> GroupToVehicles = new(); //This is for supporting multiple tanks later on
 
     public static new TankRoomManager singleton => NetworkManager.singleton as TankRoomManager;
 
@@ -82,14 +92,18 @@ public class TankRoomManager : NetworkRoomManager
             chatroom = LobbyUI.GetComponentInChildren<Chat>(); //Finds the chat component inside the lobby ui
             rolePicker = LobbyUI.GetComponent<RolePicker>();
             NetworkServer.Spawn(LobbyUI);
+            GroupToVehicles.Clear(); //Make sure this is empty when a room starts
+            GroupToVehicles.Add(new ProfileGroup(), null); //The gameobject is null until we go into the game scene
         }
         if (sceneName == GameplayScene)
         {
             //Time to spawn the tank in
             //We'll worry about picking a proper spawn point later on
             //Debug.Log("Server moved into gameplay scene, spawning tank");
-            GameObject horniTank = GameObject.Instantiate(horniTankPrefab); //Double check this puts the tank at 0,0,0
-            NetworkServer.Spawn(horniTank);
+            HorniTank = GameObject.Instantiate(horniTankPrefab); //Double check this puts the tank at 0,0,0
+            NetworkServer.Spawn(HorniTank);
+            OnChangeHorniTankEvent?.Invoke(HorniTank); //Only invoke the horniTank event if there are subscribers
+
             GameObject canvas = GameObject.Find("Canvas");
             GameObject chatroomObject = GameObject.Instantiate(chatroomPrefab, canvas.transform);
             chatroom = chatroomObject.GetComponent<Chat>();
@@ -114,10 +128,18 @@ public class TankRoomManager : NetworkRoomManager
         }
         else
         {
-            connectedPlayers.Add(identity, profile);
+            connectedPlayers.Add(identity, profile); //Put them in the connected dictionary
+            ProfileGroup group = GroupToVehicles.Keys.First();
+            group.Group.Add(profile); //Stick their profile in the one and only group we have for now
         }
         //TODO: I want to add random connection messages like discord does with people joining a server. There is a trello card for this request.
         chatroom.SendServerMessage($"{profile.PlayerName} has connected!", Chat.MessageTypes.SERVER);
+    }
+
+    void SetHorniTank(GameObject oldTank, GameObject newTank)
+    {
+        Debug.Log("HorniTank has been updated, SyncVar hook called on client");
+        OnChangeHorniTankEvent?.Invoke(newTank);
     }
 
     public override void OnGUI()

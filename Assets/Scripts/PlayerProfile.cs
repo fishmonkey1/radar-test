@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System.IO;
 using Mirror;
 using System;
+using System.Collections.Generic;
 
 [System.Serializable]
 public class PlayerProfile
@@ -133,4 +134,9 @@ public class PlayerProfile
         profile = null;
         return false;
     }
+}
+
+public class ProfileGroup
+{
+    public List<PlayerProfile> Group = new();
 }
