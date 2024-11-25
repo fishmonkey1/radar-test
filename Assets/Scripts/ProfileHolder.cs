@@ -4,17 +4,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Literally just holds a PlayerProfile reference and does nothing else
+/// Literally just holds a PlayerProfile reference and handles checking if the player is local
 /// </summary>
 public class ProfileHolder : MonoBehaviour
 {
 
-    public PlayerProfile Profile = new();
+    public PlayerProfile Profile;
 
     void Awake()
     {
-        if (Profile != null)
-            Profile.Holder = this;
+        Profile = new(); //Create a profile to hold
+        Profile.Holder = this;
     }
 
     public bool IsLocalPlayer()

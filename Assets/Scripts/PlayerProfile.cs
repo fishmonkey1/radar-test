@@ -36,7 +36,11 @@ public class PlayerProfile
     public PlayerProfile() 
     {
         PlayerName = LoadedProfileName;
-        TankRoomManager.singleton.RoomNetworking.OnChangeHorniTankEvent += SetHorniTank;
+        if (TankRoomManager.singleton != null)
+        { //Okay. Let's try this instead so it doesn't try to run in the editor
+            if (TankRoomManager.singleton.RoomNetworking != null)
+                TankRoomManager.singleton.RoomNetworking.OnChangeHorniTankEvent += SetHorniTank;
+        }
     }
 
     void SetHorniTank(GameObject horniTank)
@@ -44,7 +48,11 @@ public class PlayerProfile
         if (HorniTank == null)
         { //A tank hasn't been assigned, so let's update our reference
             HorniTank = horniTank; //And that's pretty much it
+            //Attempt setting up the camera now that there's a tank to use
+            Debug.Log("HorniTank was set via a SyncVar hook. Attempting to set up cameras");
+            SelectRole(CurrentRole);
         }
+        //Otherwise we'll ignore this for now, since I only have one tank. TODO: Support other vehicles
     }
 
     /// <summary>
@@ -58,8 +66,13 @@ public class PlayerProfile
         CurrentRole = role;
         if (Utils.IsSceneActive(TankRoomManager.singleton.GameplayScene))
         {
-            Debug.Log("Profile is in the game scene.");
+            if (Holder == null)
+            { //I don't know why I'm getting a NullReferenceError here, so I'm gonna try this :c
+                Holder = NetworkClient.localPlayer.GetComponent<ProfileHolder>();
+                Holder.Profile = this;
+            }
             bool isLocal = Holder.IsLocalPlayer(); //Check if we're on the player's owned profile before doing CamCycle
+            Debug.Log($"Profile is in the game scene. isLocal is set to {isLocal}");
             if (isLocal)
             {
                 Debug.Log("Profile is local, setting up cameras and control scripts. HorniTank value is " + HorniTank);

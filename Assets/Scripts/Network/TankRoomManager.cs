@@ -20,7 +20,7 @@ public class TankRoomManager : NetworkRoomManager
     Chat chatroom; //For sending join and disconnect messages on
 
     /// <summary>
-    /// A component on the Manager's gameobject that allows it to send messages back and forth. I dislike that the NetworkManager can't do that on it's own.
+    /// A gameobject that allows the manager to send messages back and forth. I dislike that the NetworkManager can't do that on it's own.
     /// </summary>
     public RoomNetworking RoomNetworking;
 
@@ -29,12 +29,6 @@ public class TankRoomManager : NetworkRoomManager
     public Dictionary<ProfileGroup, GameObject> GroupToVehicles = new(); //This is for supporting multiple tanks later on
 
     public static new TankRoomManager singleton => NetworkManager.singleton as TankRoomManager;
-
-    public override void Awake()
-    {
-        base.Awake(); //I don't know what the manager does on awake, so just let it do its thing I guess
-        RoomNetworking = GetComponent<RoomNetworking>(); //Nab the component so we can send messages later
-    }
 
     public override void ReadyStatusChanged()
     {
@@ -96,6 +90,7 @@ public class TankRoomManager : NetworkRoomManager
             chatroom = LobbyUI.GetComponentInChildren<Chat>(); //Finds the chat component inside the lobby ui
             rolePicker = LobbyUI.GetComponent<RolePicker>();
             NetworkServer.Spawn(LobbyUI);
+            //Let me spawn the RoomNetworking over the network too, just to be safe
             GroupToVehicles.Clear(); //Make sure this is empty when a room starts
             GroupToVehicles.Add(new ProfileGroup(), null); //The gameobject is null until we go into the game scene
         }
@@ -105,8 +100,10 @@ public class TankRoomManager : NetworkRoomManager
             //We'll worry about picking a proper spawn point later on
             
             //Since the HorniTank is a syncvar we shouldn't need to manually invoke the event handler. This should just work
-            RoomNetworking.HorniTank = GameObject.Instantiate(horniTankPrefab); //Double check this puts the tank at 0,0,0
-            NetworkServer.Spawn(RoomNetworking.HorniTank); //Spawn the tank across the server for everyone
+            GameObject tank = GameObject.Instantiate(horniTankPrefab); //Double check this puts the tank at 0,0,0
+            NetworkServer.Spawn(tank); //Spawn the tank across the server for everyone
+            RoomNetworking.HorniTank = tank;
+            Debug.Log($"Tank var is {tank} and RoomNetworking is {RoomNetworking} with its HorniTank set to {RoomNetworking.HorniTank}");
 
             GameObject canvas = GameObject.Find("Canvas");
             GameObject chatroomObject = GameObject.Instantiate(chatroomPrefab, canvas.transform);

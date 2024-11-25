@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 3162481371258705236}
   - component: {fileID: 866066013436264815}
   - component: {fileID: 606322544417988642}
+  - component: {fileID: 2334820280576599181}
+  - component: {fileID: 3596819922408750185}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -97,6 +99,7 @@ MonoBehaviour:
   horniTankPrefab: {fileID: 4283197213913971331, guid: cc463bf9a62b9234994922418126b6e2, type: 3}
   rolePicker: {fileID: 0}
   startInDebugMode: 1
+  RoomNetworking: {fileID: 0}
 --- !u!114 &606322544417988642
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -126,3 +129,36 @@ MonoBehaviour:
   debugLog: 0
   statisticsGUI: 0
   statisticsLog: 0
+--- !u!114 &2334820280576599181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7960848840884369540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  _assetId: 274282492
+  serverOnly: 0
+  visibility: 0
+  hasSpawned: 0
+--- !u!114 &3596819922408750185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7960848840884369540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eed8e456542de2442b1ba13d09a35afe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  HorniTank: {fileID: 0}

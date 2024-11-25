@@ -38,6 +38,8 @@ public class TankRoomPlayer : NetworkRoomPlayer
                 playerProfile.ExportToJson(Application.dataPath + "/JSON/PlayerProfiles/");
                 Debug.Log($"Exported player profile to path: {Application.dataPath + "/JSON/PlayerProfiles/"}");
             }
+            playerProfile.Holder = holder;
+            holder.Profile = playerProfile;
         }
         //Now that our profile is set up, we need to let the server know
         Debug.Log("Value of playerProfile is: " + playerProfile + " and profile is named " + playerProfile.PlayerName);
