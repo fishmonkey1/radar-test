@@ -31,11 +31,20 @@ public class PlayerProfile
     public RoleChangeDelegate OnRoleChange;
 
     [JsonIgnore, NonSerialized] // Ignore GameObject references
-    private GameObject HorniTank;
+    GameObject HorniTank = null;
 
     public PlayerProfile() 
     {
         PlayerName = LoadedProfileName;
+        TankRoomManager.singleton.RoomNetworking.OnChangeHorniTankEvent += SetHorniTank;
+    }
+
+    void SetHorniTank(GameObject horniTank)
+    {
+        if (HorniTank == null)
+        { //A tank hasn't been assigned, so let's update our reference
+            HorniTank = horniTank; //And that's pretty much it
+        }
     }
 
     /// <summary>
@@ -53,7 +62,7 @@ public class PlayerProfile
             bool isLocal = Holder.IsLocalPlayer(); //Check if we're on the player's owned profile before doing CamCycle
             if (isLocal)
             {
-                Debug.Log("Profile is local, setting up cameras and control scripts");
+                Debug.Log("Profile is local, setting up cameras and control scripts. HorniTank value is " + HorniTank);
                 CamCycle.Instance.ChangeRoles(oldRole, role);
                 if (HorniTank != null)
                 {
@@ -70,10 +79,7 @@ public class PlayerProfile
             Debug.Log($"Assigned role named {role.Name} to player");
         else
             Debug.Log($"Changed role from {oldRole.Name} to {role.Name}");
-        if (OnRoleChange != null)
-        {
-            OnRoleChange(oldRole, role);
-        }
+        OnRoleChange?.Invoke(oldRole, role);
     }
 
     /// <summary>
