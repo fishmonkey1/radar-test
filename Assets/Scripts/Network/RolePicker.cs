@@ -74,7 +74,7 @@ public class RolePicker : NetworkBehaviour
     /// <param name="role">The role to be picked by the client</param>
     /// <param name="sender">The client that wants to take this role</param>
     [Command(requiresAuthority = false)]
-    void CmdSelectRole(Role role, NetworkIdentity sender)
+    public void CmdSelectRole(Role role, NetworkIdentity sender)
     {
         //I'm gonna see if this works with using the sent Identity as a key. Maybe it will...
         PlayerProfile senderProfile = TankRoomManager.singleton.connectedPlayers[sender];

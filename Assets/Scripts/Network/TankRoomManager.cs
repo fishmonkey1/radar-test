@@ -65,20 +65,43 @@ public class TankRoomManager : NetworkRoomManager
         return gamePlayer; //Send the player prefab back
     }
 
+    public override void OnRoomServerDisconnect(NetworkConnectionToClient conn)
+    {
+        //I do not need to call the base implementation as it is virtual
+        if (conn.identity != null)
+        { //Handle a proper disconnect
+            if (connectedPlayers.ContainsKey(conn.identity))
+            { //We have properly connected them before
+                PlayerProfile profile = connectedPlayers[conn.identity]; //Grab the profile for the disconnect chat message
+                chatroom.SendServerMessage($"{profile.PlayerName} has disconnected!", Chat.MessageTypes.SERVER);
+                //TODO: Check if we need to do any further cleanup on other clients. This should be it for now
+                if (Utils.IsSceneActive(RoomScene))
+                { //If a player disconnects in the middle of role picking, we should free up their role if they picked one
+                    if (profile.CurrentRole != CrewRoles.UnassignedRole)
+                    {
+                        //Role cleanup in here.
+                        //Tell the rolePicker to set this player back to unassigned and free up their role
+                        rolePicker.CmdSelectRole(CrewRoles.UnassignedRole, conn.identity);
+                        //And for now, that appears to be it for cleanup
+                    }
+                }
+                connectedPlayers.Remove(conn.identity); //Take the player out of the connected list now that they're gone
+            }
+            else
+            { //Otherwise something weird is going on and we should let the programmer know
+                Debug.LogWarning("Attempted to disconnect player with valid identity, but that was not set up in TankRoomManager.connectedPlayers. Investigate this.");
+            }
+        }
+        else
+        { //Handle a connection that didn't go well
+            Debug.Log("Disconnected a client that had no connection.identity set.");
+        }
+    }
+
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
         base.OnServerAddPlayer(conn);
         //Debug.Log("Server added a player with a netId of " + conn.identity.netId);
-    }
-
-    public override void OnRoomStopClient()
-    {
-        base.OnRoomStopClient();
-    }
-
-    public override void OnRoomStopServer()
-    {
-        base.OnRoomStopServer();
     }
 
     public override void OnRoomServerSceneChanged(string sceneName)
