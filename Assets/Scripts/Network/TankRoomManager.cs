@@ -73,7 +73,7 @@ public class TankRoomManager : NetworkRoomManager
             if (connectedPlayers.ContainsKey(conn.identity))
             { //We have properly connected them before
                 PlayerProfile profile = connectedPlayers[conn.identity]; //Grab the profile for the disconnect chat message
-                chatroom.SendServerMessage($"{profile.PlayerName} has disconnected!", Chat.MessageTypes.SERVER);
+                chatroom.SendServerMessage($"{profile.PlayerName} has disconnected!", new Chat.MessageContext(Chat.MessageTypes.SERVER, false, true)); 
                 //TODO: Check if we need to do any further cleanup on other clients. This should be it for now
                 if (Utils.IsSceneActive(RoomScene))
                 { //If a player disconnects in the middle of role picking, we should free up their role if they picked one
@@ -157,7 +157,7 @@ public class TankRoomManager : NetworkRoomManager
             group.Group.Add(profile); //Stick their profile in the one and only group we have for now
         }
         //TODO: I want to add random connection messages like discord does with people joining a server. There is a trello card for this request.
-        chatroom.SendServerMessage($"{profile.PlayerName} has connected!", Chat.MessageTypes.SERVER);
+        chatroom.SendServerMessage($"{profile.PlayerName} has connected!", new Chat.MessageContext(Chat.MessageTypes.SERVER, true, false));
     }
 
     public override void OnGUI()

@@ -43,11 +43,24 @@ public class Chat : NetworkBehaviour
         ERROR
     }
 
+    [Serializable]
+    public struct MessageContext
+    {
+        public MessageTypes messageType;
+        public bool connection, disconnection; //Flag the message as part of a connection or disconnection message
+        public MessageContext(MessageTypes type, bool connectionMessage = false, bool disconnectionMessage = false)
+        {
+            messageType = type;
+            connection = connectionMessage;
+            disconnection = disconnectionMessage;
+        }
+    }
+
     /// <summary>
     /// Arbitrary list of messages to append after a connection message.
     /// TODO: Yank these out into a JSON file we can load
     /// </summary>
-    string[] connectionMessages = { "Everybody say hello!", "SERVER hopes you don't blow up. c:", "Watch this one, they're cool.", "Prepare yourselves for silly.", "B)" };
+    string[] connectionMessages = { "Everybody say hello!", "SERVER hopes you don't blow up. c:", "Watch this one, they're cool.", "Prepare yourselves for silliness.", "B)", "Good luck!", "Prepare for battle!" };
     /// <summary>
     /// Same idea as the connectionMessages, but for when they exit the server
     /// </summary>
@@ -86,15 +99,16 @@ public class Chat : NetworkBehaviour
     /// <param name="text">The text to display with server formatting.</param>
     /// <param name="messageType">For each type supplied the message will appear in those chats.</param>
     [Server]
-    public void SendServerMessage(string text, MessageTypes messageType)
+    public void SendServerMessage(string text, MessageContext context)
     {
+        MessageTypes messageType = context.messageType;
         string fullMessage = "Unassigned";
         if (messageType == MessageTypes.SERVER) //Render text with Server as the name for these kinds of messages
             fullMessage = $"Server: <i>{text}</i>"; //Try out using rich text tags to render server messages in italics
         if (messageType == MessageTypes.ERROR) //Error messages should be bolded and italicized when sent
             fullMessage = $"Error: <b><i>{text}</i></b>";
         ChatMessage message = new ChatMessage(fullMessage, "Server", 0, MessageTypes.SERVER);
-        chatText.text += BuildMessage(message);
+        chatText.text += BuildMessage(message, context.connection, context.disconnection); //Pass the context stuff along
         RpcReceiveMessage(message);
     }
 
@@ -111,12 +125,26 @@ public class Chat : NetworkBehaviour
         }
     }
 
-    string BuildMessage(ChatMessage message)
+    string BuildMessage(ChatMessage message, bool addConnectionMessage = false, bool addDisconnectionMessage = false)
     {
         if (message.messageType == MessageTypes.ALL) //This was the default case before
             return message.PlayerName + ": " + message.messageText + "\n";
         if (message.messageType == MessageTypes.SERVER)
-            return message.messageText + "\n"; //The message is already good to go on server messages, so just write it into the textfield
+        {
+            string extraMessage = "";
+            if (addConnectionMessage)
+            {
+                extraMessage = connectionMessages[UnityEngine.Random.Range(0, connectionMessages.Length)];
+            }
+            if (addDisconnectionMessage)
+            {
+                extraMessage = disconnectMessages[UnityEngine.Random.Range(0, disconnectMessages.Length)];
+            }
+            if (addConnectionMessage && addDisconnectionMessage) //Be mean to the programmer if they mess up
+                Debug.LogWarning("You asked to build a message with both add and disconnect messages. Check your code, stupid.");
+            return message.messageText + " " + extraMessage + "\n"; //The message is already good to go on server messages, so just write it into the textfield, unless they want extra messages which gets appended
+
+        }
         else //Be mean to the programmer >:)
             return "MessageType is not supported, dumbass. Check your parameters and try again.";
     }
