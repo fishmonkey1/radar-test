@@ -40,9 +40,9 @@ public static class CrewRoles
 [System.Serializable]
 public class Role
 {
-    public string Name;
-    public uint ID;
-    public uint PlayerLimit;
+    public readonly string Name;
+    public readonly uint ID;
+    public readonly uint PlayerLimit;
 
     public Role() { }
 
