@@ -6,7 +6,7 @@ public class Radar : MonoBehaviour
 {
     [Header("Radar Dependencies")]
     [SerializeField] Transform radar;
-    [SerializeField] GameObject playerCamera;
+    //[SerializeField] GameObject playerCamera;
     [SerializeField] GameObject radarCamera;
     [SerializeField] GameObject Player_MinimapIcon;
     [SerializeField] LineRenderer radarSweepLine;

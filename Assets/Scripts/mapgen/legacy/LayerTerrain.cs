@@ -13,9 +13,11 @@ public class LayerTerrain : MonoBehaviour
 
     [HideInInspector] public int X;
     [HideInInspector] public int Y;
-    private bool mesh_32bit_buffer = false;
+    
 
     [SerializeField] [Range(5, 100)] public int depth; //Maybe rename to height instead? depth is kinda lame
+    [SerializeField] AnimationCurve meshHeightCurve;
+
     private float noiseScale; //For transforming the int coords into smaller float values to sample the noise better. Functions as zoom in effect
 
     //Assign layers from the inspector. In the future I either want ScriptableObjects that can be dragged in or JSON serialization so these don't get lost on a reset
@@ -45,7 +47,7 @@ public class LayerTerrain : MonoBehaviour
     // ----------------- DEBUG STUFF
     bool print_debug = false;
 
-
+    private bool mesh_32bit_buffer = false;
     [HideInInspector] public bool mapLoadedFromJSON = false;
     [HideInInspector] public string mapName = "";
 
@@ -113,7 +115,7 @@ public class LayerTerrain : MonoBehaviour
     {
         float[,] fmap = finalMap.FetchFloatValues(LayersEnum.Elevation);
 
-        MeshData meshData = MeshGenerator.GenerateTerrainMesh(fmap, depth);
+        MeshData meshData = MeshGenerator.GenerateTerrainMesh(fmap, depth, meshHeightCurve);
         Mesh mesh = meshData.CreateMesh(mesh_32bit_buffer);
         
         MeshFilter.sharedMesh = mesh;
