@@ -11,7 +11,7 @@ public class Chat : NetworkBehaviour
     [SerializeField] TMP_Text chatText;
 
     public delegate void OnMessageReceived(ChatMessage message);
-    public OnMessageReceived OnMessageArrival;
+    public event OnMessageReceived OnMessageArrival;
 
     [Serializable]
     public struct ChatMessage
@@ -42,6 +42,16 @@ public class Chat : NetworkBehaviour
         SERVER,
         ERROR
     }
+
+    /// <summary>
+    /// Arbitrary list of messages to append after a connection message.
+    /// TODO: Yank these out into a JSON file we can load
+    /// </summary>
+    string[] connectionMessages = { "Everybody say hello!", "SERVER hopes you don't blow up. c:", "Watch this one, they're cool.", "Prepare yourselves for silly.", "B)" };
+    /// <summary>
+    /// Same idea as the connectionMessages, but for when they exit the server
+    /// </summary>
+    string[] disconnectMessages = { "Byeeeee~~!", "Oh no, we lost one!", "RIP.", "See you next time.", "D:" };
 
     // Start is called before the first frame update
     void Start()
