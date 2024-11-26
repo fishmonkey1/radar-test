@@ -102,14 +102,15 @@ public class Chat : NetworkBehaviour
     public void SendServerMessage(string text, MessageContext context)
     {
         MessageTypes messageType = context.messageType;
-        string fullMessage = "Unassigned";
-        if (messageType == MessageTypes.SERVER) //Render text with Server as the name for these kinds of messages
-            fullMessage = $"Server: <i>{text}</i>"; //Try out using rich text tags to render server messages in italics
-        if (messageType == MessageTypes.ERROR) //Error messages should be bolded and italicized when sent
-            fullMessage = $"Error: <b><i>{text}</i></b>";
-        ChatMessage message = new ChatMessage(fullMessage, "Server", 0, MessageTypes.SERVER);
-        chatText.text += BuildMessage(message, context.connection, context.disconnection); //Pass the context stuff along
-        RpcReceiveMessage(message);
+        string finishedMessage = text; //Kick things off here
+        //Then start with a basic message to build
+        ChatMessage message = new ChatMessage(finishedMessage, "Server", 0, MessageTypes.SERVER);
+        //
+        finishedMessage = BuildMessage(message, context.connection, context.disconnection); //Pass the context stuff along
+        finishedMessage = FormatMessage(messageType, finishedMessage); //Now format it
+        message.messageText = finishedMessage; //Update the struct's text with the built and formatted string
+        chatText.text += finishedMessage; //Spit out the message in the host's chat
+        RpcReceiveMessage(message); //Then yeet the struct across the network
     }
 
     [ClientRpc]
@@ -147,5 +148,15 @@ public class Chat : NetworkBehaviour
         }
         else //Be mean to the programmer >:)
             return "MessageType is not supported, dumbass. Check your parameters and try again.";
+    }
+
+    string FormatMessage(MessageTypes messageType, string text)
+    {
+        string formattedMessage = "";
+        if (messageType == MessageTypes.SERVER) //Render text with Server as the name for these kinds of messages
+            formattedMessage = $"Server: <i>{text}</i>"; //Try out using rich text tags to render server messages in italics
+        if (messageType == MessageTypes.ERROR) //Error messages should be bolded and italicized when sent
+            formattedMessage = $"Error: <b><i>{text}</i></b>";
+        return formattedMessage;
     }
 }
