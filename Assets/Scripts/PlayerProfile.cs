@@ -8,8 +8,14 @@ using System.Collections.Generic;
 [System.Serializable]
 public class PlayerProfile
 {
+    /// <summary>
+    /// The user's display name in the match.
+    /// </summary>
     public string PlayerName = "default";
 
+    /// <summary>
+    /// Set by <see cref="NamePicker"/> so the correct profile can be loaded or created by <see cref="TankRoomPlayer"/>
+    /// </summary>
     [JsonIgnore, NonSerialized]
     public static string LoadedProfileName = null;
 
@@ -19,20 +25,41 @@ public class PlayerProfile
 
     //Make a stats portion that tracks how long they've played on the profile, how many kills the tank has gotten while they were in it, pride flags collected
 
+    /// <summary>
+    /// Convenient reference to the MonoBehaviour holder for this profile.
+    /// </summary>
     [JsonIgnore, NonSerialized]
     public ProfileHolder Holder; //The MonoBehaviour that references this profile
 
+    /// <summary>
+    /// The Role that the profile selected with the <see cref="RolePicker"/>. Changing the current role triggers <see cref="OnRoleChange"/>
+    /// </summary>
     [JsonIgnore] // Ignore during serialization
     public Role CurrentRole = CrewRoles.UnassignedRole;
 
+    /// <summary>
+    /// Definition for the custom <see cref="OnRoleChange"/> delegate.
+    /// </summary>
+    /// <param name="oldRole">The role this profile had last.</param>
+    /// <param name="newRole">The role this profile picked.</param>
     public delegate void RoleChangeDelegate(Role oldRole, Role newRole);
 
+    /// <summary>
+    /// Implementation of <see cref="RoleChangeDelegate"/> that control scripts watch.
+    /// TODO: This should likely be flagged as an event so only the profile invokes it or deletes all the listeners.
+    /// </summary>
    [JsonIgnore, NonSerialized]
     public RoleChangeDelegate OnRoleChange;
 
+    /// <summary>
+    /// The HorniTank this profile has a role in. See <see cref="SetHorniTank(GameObject)"/>
+    /// </summary>
     [JsonIgnore, NonSerialized] // Ignore GameObject references
     GameObject HorniTank = null;
 
+    /// <summary>
+    /// Constructor assigns the static name to itself and subscribes to <see cref="RoomNetworking.OnChangeHorniTankEvent"/>
+    /// </summary>
     public PlayerProfile() 
     {
         PlayerName = LoadedProfileName;
@@ -43,6 +70,10 @@ public class PlayerProfile
         }
     }
 
+    /// <summary>
+    /// Called by the <see cref="TankRoomManager"/> when there is a tank spawned for this profile.
+    /// </summary>
+    /// <param name="horniTank">The tank spawned by the <see cref="TankRoomManager"/></param>
     void SetHorniTank(GameObject horniTank)
     {
         if (HorniTank == null)
@@ -155,6 +186,9 @@ public class PlayerProfile
     }
 }
 
+/// <summary>
+/// Convenience class for linking a group of profiles to a tank for when multiple vehicles are implemented.
+/// </summary>
 public class ProfileGroup
 {
     public List<PlayerProfile> Group = new();

@@ -1,9 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Mirror;
 
+/// <summary>
+/// This class implements all of the controls for driving a tank around. See <see cref="IRoleNeeded"/> for how the PlayerProfile is used to limit which controls are read.
+/// TODO: The controls will be separated into different mappings later, which means this will also need an update.
+/// </summary>
 public class tankSteer : NetworkBehaviour, IRoleNeeded
 {
     [SerializeField] private CharacterController controller;
@@ -26,11 +28,14 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
     [SerializeField] float currPitch;
     [SerializeField] float engineForce;
 
+    /// <summary>
+    /// Implementation of <see cref="IRoleNeeded"/> that only allows a PlayerProfile with the Driver role to send inputs
+    /// </summary>
     public Role RoleNeeded => CrewRoles.Driver;
+    /// <summary>
+    /// The PlayerProfile that this script is assigned to
+    /// </summary>
     PlayerProfile playerProfile;
-
-
-    //[SerializeField] private GameManager gm;
 
     private Vector2 driverInput;
     private Vector3 playerVelocity;
@@ -46,10 +51,14 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
         layerMask = LayerMask.GetMask("Terrain");
     }
 
+    /// <summary>
+    /// Called from the PlayerProfile script and sets tankSteer up to actually listen to their inputs.
+    /// </summary>
+    /// <param name="profile">The profile that owns this script</param>
     public void SetPlayer(PlayerProfile profile)
     {
         Debug.Log("Assigning local player to tankSteer. info's role is " + profile.CurrentRole);
-        if(RoleNeeded.Name == profile.CurrentRole.Name)
+        if(RoleNeeded == profile.CurrentRole)
         {
             Debug.Log("Player's role matches for tankSteer");
             currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded);
@@ -59,11 +68,11 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
             playerProfile.OnRoleChange = new PlayerProfile.RoleChangeDelegate(OnRoleChange);
         else
             playerProfile.OnRoleChange += OnRoleChange;
-        //We have to fetch a camera in Start since the debug stuff assumes you start as the driver
-        //PlayerInfo does the PickRole stuff for the driver before this class registers for the delegate
-        //So we can't just handle it normally in OnRoleChange for now until there's UI for picking roles
     }
 
+    /// <summary>
+    /// Handle moving the actual tank around in the scene. It's implied that this only happens on the host, as the inputs are routed to the server and then the position sent back to them.
+    /// </summary>
     private void FixedUpdate()
     {
         groundedPlayer = controller.isGrounded;
@@ -113,6 +122,11 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
 
     }
 
+    /// <summary>
+    /// Finds the correct camera for this role when the <see cref="PlayerProfile.OnRoleChange"/> delegate gets called.
+    /// </summary>
+    /// <param name="oldRole">The role the profile had last.</param>
+    /// <param name="newRole">The role the profile has now.</param>
     public void OnRoleChange(Role oldRole, Role newRole)
     {
         if (newRole != RoleNeeded) return;
@@ -122,6 +136,10 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
         Debug.Log($"Got first camera for {RoleNeeded.Name} role");
     }
 
+    /// <summary>
+    /// Captures input from Unity's InputSystem module and sends them to the server to be performed there unless they are the host. This method only allows players with the correct role to send these messages.
+    /// </summary>
+    /// <param name="value">The Vector2 value from the input system.</param>
     public void OnMove(InputValue value)
     {
         if (playerProfile == null)
@@ -134,6 +152,10 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
             CmdSendInputs(value.Get<Vector2>()); //Otherwise send to the server
     }
 
+    /// <summary>
+    /// Sent from clients to the server so it can be executed there and the results sent back to them.
+    /// </summary>
+    /// <param name="input">A Vector2 sent from <see cref="OnMove(InputValue)"/></param>
     [Command(requiresAuthority = false)]
     public void CmdSendInputs(Vector2 input)
     {
@@ -142,6 +164,9 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
         driverInput.y = input.y;
     }
 
+    /// <summary>
+    /// InputSystem capture for the cycle camera button. Calls CamCycle to get the next camera and assigns it to our currentCam.
+    /// </summary>
     public void OnCameraToggle()
     {
         if (playerProfile == null)
@@ -152,6 +177,10 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
         currentCam = CamCycle.Instance.GetNextCamera(RoleNeeded, currentCam);
     }
 
+    /// <summary>
+    /// TODO: Consider moving this elsewhere...
+    /// InputSystem capture for the ToggleRadar button which shows/hides the minimap in the corner.
+    /// </summary>
     public void OnToggleRadarMinimap()
     {
         if (radarCanvas.enabled)
