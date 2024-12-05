@@ -10,6 +10,10 @@ public class RadarTarget : MonoBehaviour
     /// </summary>
     public bool IsRadarVisible = true; //Set to false if it should not be shown on the radar for some reason
     /// <summary>
+    /// Handles keeping the icon on the map permenantly.
+    /// </summary>
+    public bool IsBuilding = false; //Set to true if this icon should remain on the map at all times.
+    /// <summary>
     /// The icon to display for this RadarTarget.
     /// </summary>
     public GameObject MinimapIconPrefab;
