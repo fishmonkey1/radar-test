@@ -7,11 +7,11 @@ using UnityEngine;
 public class CamCycle : MonoBehaviour
 {
     [SerializeField]
-    List<Camera> allCameras = new List<Camera>();
-    [SerializeField]
     List<Camera> gunnerCameras = new List<Camera>();
     [SerializeField]
     List<Camera> driverCameras = new List<Camera>();
+    [SerializeField]
+    List<Camera> radarCameras = new List<Camera>();
 
     Dictionary<Role, List<Camera>> roleCameras = new Dictionary<Role, List<Camera>>();
 
@@ -26,6 +26,7 @@ public class CamCycle : MonoBehaviour
         instance = this;
         roleCameras.Add(CrewRoles.Driver, driverCameras);
         roleCameras.Add(CrewRoles.Gunner, gunnerCameras);
+        roleCameras.Add(CrewRoles.Radar, radarCameras);
     }
 
     /// <summary>
