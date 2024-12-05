@@ -1,3 +1,6 @@
+/// <summary>
+/// The different types of enemies that we'll have in the game.
+/// </summary>
 public enum EnemyType
 {
     UNASSIGNED, //Note to future Vicky: Use this value as human error catching.

@@ -3,6 +3,9 @@ using Newtonsoft.Json;
 using System.IO;
 using UnityEngine;
 
+/// <summary>
+/// Stub for later when enemies need a way to size up a player and determine how difficult an encounter they should try.
+/// </summary>
 public static class ThreatMap
 {
 
@@ -25,6 +28,10 @@ public static class ThreatMap
         { EnemyType.JET, 2f }
     };
 
+    /// <summary>
+    /// Import the map from a saved JSON file.
+    /// </summary>
+    /// <param name="filePath"></param>
     public static void LoadThreatMapFromJson(string filePath)
     {
         try
@@ -57,6 +64,10 @@ public static class ThreatMap
         }
     }
 
+    /// <summary>
+    /// Export the map to a JSON file.
+    /// </summary>
+    /// <param name="filePath"></param>
     public static void SaveThreatMapToJson(string filePath)
     {
         if (EnemyThreatMap.Count == 0)

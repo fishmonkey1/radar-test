@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
+/// <summary>
+/// Tracks the Alert and Suspicion Levels of the enemy, and tracks what ongoing investigations are happening.
+/// </summary>
 public class EnemyManager : NetworkBehaviour
 {
 
@@ -78,6 +81,9 @@ public class EnemyManager : NetworkBehaviour
         return enemy.gameObject; //I don't entirely remember why I was doing it this way...
     }
 
+    /// <summary>
+    /// Create enemies for all the squads that need to be placed. Also handles assigning orders.
+    /// </summary>
     public void CreateSquads()
     {
         foreach (SquadSO_Pair pair in SquadTemplates)

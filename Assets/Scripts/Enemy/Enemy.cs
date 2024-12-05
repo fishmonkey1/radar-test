@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Partly unused script that holds information about enemies on the map.
+/// </summary>
 public class Enemy : MonoBehaviour
 {
     public float MinSpeed, MaxSpeed;

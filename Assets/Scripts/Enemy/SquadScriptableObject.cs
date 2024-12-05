@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Allows designers to specify prebuilt squads with either static or variable numbers of enemies in it.
+/// </summary>
 [CreateAssetMenu(fileName = "Squad", menuName = "ScriptableObjects/Squad")]
 public class SquadScriptableObject : ScriptableObject
 {

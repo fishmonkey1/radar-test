@@ -5,6 +5,10 @@ using Mirror;
 using TMPro;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Network UI screen that lets players pick which role they want to have.
+/// TODO: This screen will need to support multiple tanks in the future.
+/// </summary>
 public class RolePicker : NetworkBehaviour
 {
     [SerializeField]

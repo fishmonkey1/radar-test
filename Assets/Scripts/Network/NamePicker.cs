@@ -1,6 +1,9 @@
 using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// Prompts a player to pick a name, which is used to load/save a <see cref="PlayerProfile"/>
+/// </summary>
 public class NamePicker : MonoBehaviour
 {
 

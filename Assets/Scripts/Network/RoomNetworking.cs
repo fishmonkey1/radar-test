@@ -1,8 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
+/// <summary>
+/// Since the TankRoomManager can't send messages, this is my workaround so room messages can be passed around.
+/// </summary>
 public class RoomNetworking : NetworkBehaviour
 {
 

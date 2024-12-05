@@ -1,7 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Base class for enemy navigation.
+/// </summary>
 [RequireComponent(typeof(Enemy))]
 public class Navigation : MonoBehaviour
 {

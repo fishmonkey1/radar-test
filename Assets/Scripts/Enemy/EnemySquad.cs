@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Information about who is in an enemy squad and what orders they are following.
+/// </summary>
 [System.Serializable]
 public class EnemySquad
 {
@@ -21,6 +24,10 @@ public class EnemySquad
         OnOrderChanged = new(LogOrderChanged);
     }
 
+    /// <summary>
+    /// Assign an order to the squad.
+    /// </summary>
+    /// <param name="orderContext"></param>
     public void SetOrder(OrderContext orderContext)
     { //Assigning the new order to the squad.
         OrderContext = orderContext;
@@ -32,6 +39,10 @@ public class EnemySquad
         }
     }
 
+    /// <summary>
+    /// When enemies get spawned for the squad, this adds them in.
+    /// </summary>
+    /// <param name="Enemy"></param>
     public void AddEnemy(GameObject Enemy)
     {
         Enemy enemy = Enemy.GetComponent<Enemy>();
@@ -45,6 +56,10 @@ public class EnemySquad
         SquadMembers.Add(Enemy);
     }
 
+    /// <summary>
+    /// After all enemies have spawned and received orders, they get teleported to their starting location.
+    /// </summary>
+    /// <param name="location"></param>
     public void TeleportAll(Node location)
     {
         foreach (Enemy enemy in SquadMembers)

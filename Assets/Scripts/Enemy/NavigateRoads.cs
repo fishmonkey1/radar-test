@@ -2,6 +2,9 @@ using System.Collections;
 using UnityEngine;
 using PathCreation;
 
+/// <summary>
+/// Enemy pathfinding for moving along roads while following orders.
+/// </summary>
 public class NavigateRoads : Navigation
 {
 
@@ -15,6 +18,9 @@ public class NavigateRoads : Navigation
     [SerializeField] float currentSpeed;
     PatrolOrder patrolOrder; //Store a reference to this since I expect most usage of this script to be from patrols
 
+    /// <summary>
+    /// Collect all our starting info so we can start moving along towards nodes.
+    /// </summary>
     public void Initialize()
     {
         owner = GetComponent<Enemy>(); //Cache the enemy so we can pull their speeds and such
@@ -36,6 +42,9 @@ public class NavigateRoads : Navigation
         StartCoroutine(CheckDistanceToNextNode()); //Start the distance check
     }
 
+    /// <summary>
+    /// Drive along our road, searching for intersections ahead of us. Also handles aligning the car with the road.
+    /// </summary>
     void Update()
     {
         //Get the point the truck is going to move to
@@ -72,6 +81,10 @@ public class NavigateRoads : Navigation
         
     }
 
+    /// <summary>
+    /// Check how far we are from the node we're trying to reach, so we don't spam it in Update()
+    /// </summary>
+    /// <returns></returns>
     public IEnumerator CheckDistanceToNextNode()
     {
         while (true)
