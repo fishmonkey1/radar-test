@@ -1,7 +1,12 @@
+/// <summary>
+/// Describes all the damage characteristics for a <see cref="Projectile"/>.
+/// </summary>
 [System.Serializable]
 public class DamageInfo
 {
-
+    /// <summary>
+    /// The (currently) two types of areas to hit.
+    /// </summary>
     public enum AreaDamage
     {
         //I might add more later, but just these for now

@@ -1,3 +1,6 @@
+/// <summary>
+/// Statically defined roles, including arrays for checking which roles are implemented.
+/// </summary>
 public static class CrewRoles
 {
     public static readonly Role UnassignedRole = new Role("Unassigned", 0, 999);
@@ -11,6 +14,12 @@ public static class CrewRoles
     //The AllRoles array might not be all that important, but I'm leaving it in for now
     public static readonly Role[] AllRoles = new Role[] { UnassignedRole, Driver, Gunner, Spotter, Radar };
 
+    /// <summary>
+    /// Find the static role instance based on an ID.
+    /// </summary>
+    /// <param name="id">The role ID you want to convert</param>
+    /// <returns>The statically defined role the ID matches</returns>
+    /// <exception cref="System.Exception">Thrown if there isn't a defined Role for the ID passed.</exception>
     public static Role GetRoleByID(uint id)
     {
         foreach (Role role in AllRoles)
@@ -22,6 +31,12 @@ public static class CrewRoles
         throw new System.Exception($"No Role ID exists for passed ID {id} in CrewRoles!");
     }
 
+    /// <summary>
+    /// Find a role based on their name, used mostly by buttons.
+    /// </summary>
+    /// <param name="name">Name of the role</param>
+    /// <returns>The statically defined role with a matching name</returns>
+    /// <exception cref="System.Exception">Thrown if no role is found for passed name.</exception>
     public static Role GetRoleByName(string name)
     {
         foreach (Role role in AllRoles)

@@ -1,13 +1,20 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
+/// <summary>
+/// Holds all of the buildings that were found on the graph, along with the building weights.
+/// </summary>
 public class BuildingsManager : MonoBehaviour
 {
     public List<Node> BuildingNodes = new(); //If a node has a building, it ends up in here
     public Dictionary<Node, BuildingIntPair> WeightedNodeBuildings = new(); //Track the values of the nodes here
 
+    /// <summary>
+    /// Change the weight of a node, typically after an order includes the node.
+    /// </summary>
+    /// <param name="node"></param>
+    /// <param name="change"></param>
     public void ChangeBuildingValue(Node node, int change)
     { //Doing this so I can hook debug stuff up later if we need
         BuildingIntPair pair = WeightedNodeBuildings[node];
@@ -15,6 +22,12 @@ public class BuildingsManager : MonoBehaviour
         PrintWeightedNodes();
     }
 
+    /// <summary>
+    /// Get a list of all the buildings in the graph, sorted from the highest weighted to the lowest.
+    /// </summary>
+    /// <param name="numResults">How many buildings to fetch out of the list.</param>
+    /// <param name="exclude">Any buildings types you don't want returned in the list.</param>
+    /// <returns></returns>
     public List<Node> GetHighestValuedBuildings(int numResults, List<NodeBuilding> exclude = null)
     {
         exclude ??= new List<NodeBuilding>(); //Initialize the list if it doesnt get passed
@@ -29,6 +42,9 @@ public class BuildingsManager : MonoBehaviour
         return topBuildings;
     }
 
+    /// <summary>
+    /// Helper for peaking into the created lists, typically for verifying JSON loading.
+    /// </summary>
     public void PrintWeightedNodes()
     {
         string nodePairs = "Weighted nodes list: ";
@@ -40,6 +56,9 @@ public class BuildingsManager : MonoBehaviour
         Debug.Log(nodePairs);
     }
 
+    /// <summary>
+    /// Traverse the whole graph and collect up all of the buildings into our list.
+    /// </summary>
     public void FindBuildingsInGraph()
     {
         Graph graph = Graph.Instance;

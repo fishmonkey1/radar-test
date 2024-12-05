@@ -1,9 +1,11 @@
 using PathCreation;
 using PathCreation.Examples;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Turns a path of <see cref="Node"/> objects into a road mesh.
+/// </summary>
 [RequireComponent(typeof(RoadMeshCreator))]
 public class NodesToRoads : MonoBehaviour
 {
@@ -15,6 +17,9 @@ public class NodesToRoads : MonoBehaviour
     [SerializeField]
     RoadMeshCreator RoadMeshCreator; //Edit the values here
 
+    /// <summary>
+    /// Create the mesh creator and assign it all the node info.
+    /// </summary>
     public void DrawRoadsFromNodes()
     {
         if (RoadMeshCreator == null)
@@ -32,16 +37,29 @@ public class NodesToRoads : MonoBehaviour
         RoadMeshCreator.TriggerUpdate(); //Make the road mesh creator actually draw out the road
     }
 
+    /// <summary>
+    /// Add a node to the renderer's path.
+    /// </summary>
+    /// <param name="node"></param>
     public void AddNode(Node node)
     {
         nodes.Add(node); //Das it, mane
     }
 
+    /// <summary>
+    /// Ensure the renderer's list doesn't have duplicates.
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
     public bool ContainsNode(Node node)
     {
         return nodes.Contains(node);
     }
 
+    /// <summary>
+    /// For tweaking the meshes the creator builds.
+    /// </summary>
+    /// <returns></returns>
     public PathCreator GetPathCreator()
     {
         return RoadMeshCreator.pathCreator;

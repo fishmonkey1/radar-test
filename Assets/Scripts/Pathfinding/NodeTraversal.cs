@@ -1,3 +1,6 @@
+/// <summary>
+/// The different ways AI entities can navigate graphs, so that small alleyways can be set for smaller vehicles. Subject to change later...
+/// </summary>
 public enum NodeTraversal
 {
     NOT_SET, //Used as error handling, meaning you didn't assign anything to the node

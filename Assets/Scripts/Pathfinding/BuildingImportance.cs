@@ -3,12 +3,18 @@ using UnityEngine;
 using System.IO;
 using Newtonsoft.Json;
 
+/// <summary>
+/// JSON file that stores the handwritten weights for buildings in the <see cref="Graph"/>.
+/// </summary>
 public static class BuildingImportance
 {
 
     public static List<BuildingIntPair> BuildingValues = new();
     static string path = Application.dataPath + @"\JSON\BuildingImportance.json";
 
+    /// <summary>
+    /// Import or export from JSON when first being created.
+    /// </summary>
     static BuildingImportance()
     {
         //using @ so the string is a literal and there's no attempted escape sequence
@@ -23,6 +29,11 @@ public static class BuildingImportance
         }
     }
 
+    /// <summary>
+    /// Check the weight of a building.
+    /// </summary>
+    /// <param name="building"></param>
+    /// <returns></returns>
     public static BuildingIntPair GetBuildingValue(NodeBuilding building)
     {
         foreach (BuildingIntPair pair in BuildingValues)
@@ -33,6 +44,9 @@ public static class BuildingImportance
         return null;
     }
 
+    /// <summary>
+    /// Export the BuildingValues list to JSON.
+    /// </summary>
     public static void SaveToJSON()
     {
         var save = new BuildingPairList(BuildingValues);
@@ -41,6 +55,9 @@ public static class BuildingImportance
         Debug.Log("Wrote BuildingImportance.json to disk");
     }
 
+    /// <summary>
+    /// Import the BuildingValues list from a saved file.
+    /// </summary>
     public static void LoadFromJSON()
     {
         if (File.Exists(path))
@@ -57,6 +74,9 @@ public static class BuildingImportance
         }
     }
 
+    /// <summary>
+    /// If there is no file to load, then we use these hardcoded ones for now.
+    /// </summary>
     public static void AssignDefaults()
     {
         BuildingValues = new()
@@ -72,6 +92,9 @@ public static class BuildingImportance
 
 }
 
+/// <summary>
+/// Helper class for serializing the BuildingPairLists.
+/// </summary>
 public class BuildingPairList
 {
     public List<BuildingIntPair> List;
@@ -82,6 +105,9 @@ public class BuildingPairList
     }
 }
 
+/// <summary>
+/// A NodeBuilding and its paired weight, for saving/loading with our JSON file.
+/// </summary>
 public class BuildingIntPair
 {
     public NodeBuilding Building;

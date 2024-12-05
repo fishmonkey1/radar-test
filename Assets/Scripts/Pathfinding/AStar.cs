@@ -3,10 +3,19 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
+/// <summary>
+/// Homemade AStar implementation for use on <see cref="Graph"/> and <see cref="Node"/> objects.
+/// </summary>
 public static class AStar
 {
     static List<Node> Visited = new();
 
+    /// <summary>
+    /// Find a node in the graph from a starting point.
+    /// </summary>
+    /// <param name="start">The node to start the search from.</param>
+    /// <param name="end">The node to find at the end of the path.</param>
+    /// <returns>A list containing the path found from the start node to the end node.</returns>
     public static List<Node> GetPath(Node start, Node end)
     {
         List<Node> Path = new(); //Don't add the start node here since it'll be done on the first while loop
@@ -50,11 +59,22 @@ public static class AStar
         return Path; //And send back our located path
     }
 
+    /// <summary>
+    /// Helper function for checking shortest distances between nodes.
+    /// </summary>
+    /// <param name="start"></param>
+    /// <param name="end"></param>
+    /// <returns></returns>
     public static float GetEuclideanDistance(Node start, Node end)
     {
         return Vector3.Distance(start.transform.position, end.transform.position);
     }
 
+    /// <summary>
+    /// Count up the length of a path that was found.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
     public static float GetPathDistance(List<Node> path)
     {
         float totalDistance = 0;
@@ -74,6 +94,11 @@ public static class AStar
         return totalDistance;
     }
 
+    /// <summary>
+    /// Helper function for visualizing paths along the graph.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
     public static string PrintPath(List<Node> path)
     {
         string pathString = "Path: ";
