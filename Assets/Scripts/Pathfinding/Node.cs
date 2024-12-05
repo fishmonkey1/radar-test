@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Placed as a gameobject in the scene, this describes all of the information for this part of the road.
+/// </summary>
 public class Node : MonoBehaviour
 {
     public List<Node> Connections = new(); //Other nodes reachable from this one
@@ -19,11 +22,18 @@ public class Node : MonoBehaviour
             Graph.Instance.nodes.Add(this);
     }
 
+    /// <summary>
+    /// Assign the <see cref="NodesToRoads"/> object to this node, for later lookups.
+    /// </summary>
+    /// <param name="renderer"></param>
     public void SetRenderer(NodesToRoads renderer)
     {
         NodeRenderer = renderer; //Once the graph has had the roads built, the renderer gets assigned to it
     }
 
+    /// <summary>
+    /// Determine how far this node is from all of its neighbors.
+    /// </summary>
     public void CalculateConnectionDistances()
     {
         foreach (var node in Connections)

@@ -1,9 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using TMPro;
 
+/// <summary>
+/// Shows each of the screens, linked up to the buttons on the UI prefab.
+/// </summary>
 public class MainMenu : MonoBehaviour
 {
 
@@ -21,6 +22,9 @@ public class MainMenu : MonoBehaviour
         currentScreen = Menu;
     }
 
+    /// <summary>
+    /// Show the name popup if no profile is loaded, or start a game as the host. The Namepicker also calls this method after a profile is loaded.
+    /// </summary>
     public void HostGame()
     {
         if (PlayerProfile.LoadedProfileName == null)
@@ -34,6 +38,9 @@ public class MainMenu : MonoBehaviour
         manager.StartHost();
     }
 
+    /// <summary>
+    /// Let the player pick a name, which loads a profile currently.
+    /// </summary>
     public void ShowNamePopup()
     {
         currentScreen.SetActive(false);
@@ -41,6 +48,9 @@ public class MainMenu : MonoBehaviour
         currentScreen.SetActive(true);
     }
 
+    /// <summary>
+    /// Shows the join screen if a profile is loaded, otherwise it shows the NamePicker. NamePicker also calls this after a profile has been loaded.
+    /// </summary>
     public void ShowJoinScreen()
     {
         //Check the local PlayerProfile to check that there's a loaded profile
@@ -56,6 +66,9 @@ public class MainMenu : MonoBehaviour
         currentScreen.SetActive(true);
     }
 
+    /// <summary>
+    /// Returns to the starting menu, where the player can navigate to the other screens
+    /// </summary>
     public void ShowMenu()
     {
         currentScreen.SetActive(false);
@@ -63,13 +76,18 @@ public class MainMenu : MonoBehaviour
         currentScreen.SetActive(true);
     }
 
+    /// <summary>
+    /// Show the options screen, which currently holds a NamePicker.
+    /// </summary>
     public void ShowOptions()
     {
         currentScreen.SetActive(false);
         currentScreen = OptionsPopup;
         currentScreen.SetActive(true);
     }
-
+    /// <summary>
+    /// Shows the credits screen. TODO: Have this load from a credits.txt file we can keep updated.
+    /// </summary>
     public void ShowCredits()
     {
         currentScreen.SetActive(false);
@@ -77,6 +95,9 @@ public class MainMenu : MonoBehaviour
         currentScreen.SetActive(true);
     }
 
+    /// <summary>
+    /// Stops the editor, or closes the application down.
+    /// </summary>
     public void ExitGame()
     {
         #if UNITY_EDITOR
@@ -87,6 +108,7 @@ public class MainMenu : MonoBehaviour
                 Application.Quit();
         #endif
     }
+
 
     public void JoinGame()
     { //Just duplicating some of the stuff from the NetworkManagerHUD

@@ -1,3 +1,6 @@
+/// <summary>
+/// All of the building types that a node can be. Subject to change later...
+/// </summary>
 public enum NodeBuilding
 {
     NONE,

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 /// <summary>
@@ -20,6 +19,9 @@ public class OrdersManager
         { Orders.ASSAULT_STANDBY, 0 }, //Less important to assign to new squads unless they prefer being assault squads
     };
 
+    /// <summary>
+    /// Find all enemies that exist and assign orders to them.
+    /// </summary>
     public void StartingOrders()
     { //We assign all of the orders we need in here and place the enemies at their assigned node
         foreach (EnemySquad squad in EnemyManager.Instance.AllSquads)
@@ -54,6 +56,11 @@ public class OrdersManager
         }
     }
 
+    /// <summary>
+    /// Fill in the OrderContext so the correct function is run.
+    /// </summary>
+    /// <param name="order"></param>
+    /// <returns></returns>
     OrderContext PopulateOrderContext(OrderContext order)
     {
         //Stubbed this out for now, this should basically be a a switch statement

@@ -1,9 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
-using UnityEngine.Profiling;
 
+/// <summary>
+/// Holds all of the data for a player that has joined a game's lobby.
+/// </summary>
 public class TankRoomPlayer : NetworkRoomPlayer
 {
     /// Inherit from the NetworkRoomPlayer and take a look at using the hooks or overriding one of the funtions
@@ -14,6 +14,9 @@ public class TankRoomPlayer : NetworkRoomPlayer
     public PlayerProfile playerProfile;
     public Role role = CrewRoles.UnassignedRole;
 
+    /// <summary>
+    /// Check the player's profile and send it across the network.
+    /// </summary>
     public override void OnClientEnterRoom()
     {
         base.OnClientEnterRoom();
@@ -46,6 +49,11 @@ public class TankRoomPlayer : NetworkRoomPlayer
         CmdSendProfile(playerProfile, NetworkClient.localPlayer);
     }
 
+    /// <summary>
+    /// If you load a profile and aren't the host, your profile gets sent to everybody.
+    /// </summary>
+    /// <param name="profile"></param>
+    /// <param name="identity"></param>
     [Command]
     public void CmdSendProfile(PlayerProfile profile, NetworkIdentity identity)
     { //At the moment, the playername is the only thing in a profile. Later this needs to send unlocks and experience as well
@@ -57,6 +65,11 @@ public class TankRoomPlayer : NetworkRoomPlayer
         RpcBroadcastProfile(profile, identity);
     }
 
+    /// <summary>
+    /// When a profile is loaded, the server tells everybody about the new person that has joined.
+    /// </summary>
+    /// <param name="profile"></param>
+    /// <param name="identity"></param>
     [ClientRpc]
     public void RpcBroadcastProfile(PlayerProfile profile, NetworkIdentity identity)
     { //The server runs this on all connected clients, excluding the person who sent the message
@@ -73,11 +86,16 @@ public class TankRoomPlayer : NetworkRoomPlayer
         }
     }
 
+    /// <summary>
+    /// Assign a role over the network.
+    /// </summary>
+    /// <param name="roleID"></param>
     [Command]
     public void CmdPickRole(uint roleID)
     {
         role = CrewRoles.GetRoleByID(roleID);
     }
+
 
     public void PickRole(uint oldID, uint newID) 
     {

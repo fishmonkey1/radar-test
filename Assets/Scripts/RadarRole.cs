@@ -4,6 +4,10 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Mirror;
 
+/// <summary>
+/// This class handles all of the controls for the Radar role. See <see cref="IRoleNeeded"/> for how the PlayerProfile is used to limit which controls are read.
+/// TODO: The controls will be separated into different mappings later, which means this will also need an update.
+/// </summary>
 public class RadarRole : NetworkBehaviour, IRoleNeeded 
 {
     [Header("Radar Dependencies")]
@@ -12,12 +16,19 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
     [SerializeField] LineRenderer radarSweepLine;
     [SerializeField] GameObject SweepLine;
     
-    // This is a Dict of current blips on screen and when it was discovered
-    public Dictionary<GameObject, float> currentBlipsDict = new Dictionary<GameObject, float>();
+    /// <summary>
+    /// Tracks which icons are on screen and when the blip was added.
+    /// </summary>
+    public Dictionary<GameObject, float> currentBlipsDict = new Dictionary<GameObject, float>();// This is a Dict of current blips on screen and when it was discovered
 
-    // List of collided obj, so we don't get multiple hits on same obj
-    private List<Collider> collidedList = new List<Collider>();
+    /// <summary>
+    /// All objects that have already been displayed on the radar to prevent multiple hits.
+    /// </summary>
+    private List<Collider> collidedList = new List<Collider>();// List of collided obj, so we don't get multiple hits on same obj
 
+    /// <summary>
+    /// Defines which layers the radar will collide on. Default is the Minimap layer.
+    /// </summary>
     [Tooltip("The mask the radar is on. Should stay on Minimap")]
     [SerializeField] LayerMask layerMask;
 
@@ -28,9 +39,14 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
     [SerializeField] private Color sweepLineColor;
     [Range(.1f, 1f)] [SerializeField] private float sweepLineOpacity = 1f;
 
-    // role stuff
+    /// <summary>
+    /// Implementation of <see cref="IRoleNeeded"/> that only allows a PlayerProfile with the Radar role to send inputs
+    /// </summary>
     public Role RoleNeeded => CrewRoles.Radar;
-    PlayerInfo playerInfo;
+    /// <summary>
+    /// The PlayerProfile that this script is assigned to
+    /// </summary>
+    PlayerProfile playerProfile;
 
     // cam zoom stuff
     private Camera currentCam;
@@ -38,7 +54,11 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
     [Tooltip("Y val limit close to ground")] [SerializeField] public float closeZoomLevel = 75;
     [Tooltip("Y val limit far from ground")] [SerializeField] public float farZoomLevel = 125;
 
-
+    /// <summary>
+    /// Finds the correct camera for this role when the <see cref="PlayerProfile.OnRoleChange"/> delegate gets called.
+    /// </summary>
+    /// <param name="oldRole">The role the profile had last.</param>
+    /// <param name="newRole">The role the profile has now.</param>
     public void OnRoleChange(Role oldRole, Role newRole)
     {
         if (newRole != RoleNeeded) return;
@@ -57,7 +77,9 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
 
     }
 
-    // Update is called once per frame
+    /// <summary>
+    /// Handles drawing the radar sweep line and rotating the collider for the radar. See <see cref="OnTriggerEnter(Collider)"/> for where RadarTargets are acquired
+    /// </summary>
     void FixedUpdate()
     {   
         // don't think we're ever using this array lol
@@ -109,6 +131,10 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
         radarSweepLine.SetPosition(1, radar.transform.position + radar.TransformDirection(Vector3.forward * 50));
     }
 
+    /// <summary>
+    /// Gradually lerps the alpha of all of the blips that have been found. Blips are destroyed here when they have completely faded.
+    /// TODO: Object pooling for the blips so we aren't creating so much garbage.
+    /// </summary>
     private void FadeBlips()
     {
         // This handles fading for each ping
@@ -146,6 +172,12 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
             }
         }
     }
+
+    /// <summary>
+    /// Sent from clients to the server so it can be executed there and the results sent back to them.
+    /// TODO: Verify this is being called correctly, because it looks like input are only sent when the radar is zoomed
+    /// </summary>
+    /// <param name="input">A Vector2 sent from <see cref="OnRadarZoomScroll(InputValue)"/></param>
     [Command(requiresAuthority = false)]
     public void CmdSendInputs(Vector2 input)
     {
@@ -154,11 +186,15 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
         zoomInput.y = input.y;
     }
 
+    /// <summary>
+    /// Unity InputSystem handler which reads a Vector2 axis for the mouse wheel with default bindings.
+    /// </summary>
+    /// <param name="value">The Vector2 passed in by the InputSystem</param>
     public void OnRadarZoomScroll(InputValue value)
     {
-        if (playerInfo == null)
+        if (playerProfile == null)
             return; //This role is unused, so do nothing
-        if (!((IRoleNeeded)this).HaveRole(playerInfo.CurrentRole))
+        if (!((IRoleNeeded)this).HaveRole(playerProfile.CurrentRole))
             return; //Don't allow radar inputs if you don't have the radar role selected
         if (isServer) //Only apply locally if you are the host
             zoomInput = value.Get<Vector2>();
@@ -166,6 +202,10 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
             CmdSendInputs(value.Get<Vector2>()); //Otherwise send to the server
     }
 
+    /// <summary>
+    /// Called when the radar collider encounters an object. See <see cref="layerMask"/> for which layers are checked, and <see cref="FixedUpdate"/> for where the collider is rotated.
+    /// </summary>
+    /// <param name="collider">The collider of the object we encountered.</param>
     void OnTriggerEnter(Collider collider)
     {
         /*

@@ -1,7 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Handles moving the projectile on the host, and doing damage when it impacts.
+/// </summary>
 public class Projectile : MonoBehaviour
 {
 
@@ -16,6 +17,9 @@ public class Projectile : MonoBehaviour
         velocity = transform.forward * speed;
     }
 
+    /// <summary>
+    /// Move the projectile at its speed, and let gravity affect it. Then rotate to face direction of travel.
+    /// </summary>
     private void Update()
     {
         // Apply gravity to the velocity
@@ -31,6 +35,10 @@ public class Projectile : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Check the targets hit by using <see cref="DamageInfo"/>. Also handles destroying hit objects.
+    /// </summary>
+    /// <param name="collision"></param>
     private void OnCollisionEnter(Collision collision)
     {
 
@@ -64,6 +72,11 @@ public class Projectile : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Evaluate the curves, distance, and determine the amount of damage to do to each hit target.
+    /// </summary>
+    /// <param name="target">The GameObject hit by this projectile.</param>
+    /// <returns></returns>
     private float CalculateDamage(GameObject target)
     {
         float distance = Vector3.Distance(transform.position, target.transform.position);

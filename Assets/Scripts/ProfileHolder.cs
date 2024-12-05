@@ -1,6 +1,4 @@
 using Mirror;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -17,6 +15,10 @@ public class ProfileHolder : MonoBehaviour
         Profile.Holder = this;
     }
 
+    /// <summary>
+    /// Check if this profile is the local client's gameobject
+    /// </summary>
+    /// <returns></returns>
     public bool IsLocalPlayer()
     {
         GameObject localObject = NetworkClient.localPlayer.gameObject;

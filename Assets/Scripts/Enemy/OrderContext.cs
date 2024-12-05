@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Concrete order types inherit from this context, and the base class is capable of producing its child orders.
+/// </summary>
 [Serializable]
 public abstract class OrderContext
 {
@@ -11,6 +14,12 @@ public abstract class OrderContext
     public virtual void FinishOrder() { } //For use in children classes
     public virtual bool CheckOrderFinished() { return false; }
 
+    /// <summary>
+    /// Get an order based on the OrderType.
+    /// </summary>
+    /// <param name="order"></param>
+    /// <returns></returns>
+    /// <exception cref="System.ArgumentException"></exception>
     public static OrderContext CreateOrder(Orders order)
     {
         return order switch
@@ -28,6 +37,9 @@ public abstract class OrderContext
     }
 }
 
+/// <summary>
+/// Information for all of the nodes this squad will follow.
+/// </summary>
 public class PatrolOrder : OrderContext
 {
     //Holds all of the nodes the squad wants to visit
@@ -45,6 +57,12 @@ public class PatrolOrder : OrderContext
         }
     }
 
+    /// <summary>
+    /// Return the next node in the list to patrol along.
+    /// </summary>
+    /// <param name="currentNode"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
     public Node GetNextNode(Node currentNode)
     {
         int index = Nodes.IndexOf(currentNode);
@@ -70,6 +88,9 @@ public class PatrolOrder : OrderContext
 
 }
 
+/// <summary>
+/// Stub for searching for spotted players.
+/// </summary>
 public class InvestigateOrder : OrderContext
 {
     //I'll need stuff about the search pattern somewhere in here, so I'll leave this one as a stub until I figure out what I'm doing... :c
@@ -80,6 +101,9 @@ public class InvestigateOrder : OrderContext
     }
 }
 
+/// <summary>
+/// Stub for defending groups moving to a new location.
+/// </summary>
 public class RepositionOrder : OrderContext
 {
     //This one is also going to remain a stub for now until I decide if I'm going to have messages in the orders or in the containing class. I'm personally leaning towards having the manager sort it out, but we'll see
@@ -90,6 +114,9 @@ public class RepositionOrder : OrderContext
     }
 }
 
+/// <summary>
+/// Stub for when enemies arrive at a guard location.
+/// </summary>
 public class GuardOrder : OrderContext
 {
     public GuardOrder()
@@ -98,6 +125,9 @@ public class GuardOrder : OrderContext
     }
 }
 
+/// <summary>
+/// Stub for when enemies are idling at a location waiting to respond to player spottings.
+/// </summary>
 public class AssaultStandbyOrder : OrderContext
 {
     public AssaultStandbyOrder()
@@ -106,6 +136,9 @@ public class AssaultStandbyOrder : OrderContext
     }
 }
 
+/// <summary>
+/// Stub for when enemies are order from assault standby to engage players.
+/// </summary>
 public class AssaultOrder : OrderContext
 {
     public AssaultOrder()
@@ -114,6 +147,9 @@ public class AssaultOrder : OrderContext
     }
 }
 
+/// <summary>
+/// Stub for when enemies have taken losses and try to move to a safe node.
+/// </summary>
 public class RetreatOrder : OrderContext
 {
     public RetreatOrder()
@@ -122,6 +158,9 @@ public class RetreatOrder : OrderContext
     }
 }
 
+/// <summary>
+/// Stub for when enemies have lost the player or are called back to a location.
+/// </summary>
 public class FallbackOrder : OrderContext
 {
     public FallbackOrder()

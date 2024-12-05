@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// This script takes all of the placed nodes and draws roads for each found path.
+/// </summary>
 public class GraphToRoads : MonoBehaviour
 {
 
@@ -14,6 +17,9 @@ public class GraphToRoads : MonoBehaviour
 
     private Graph graph; //For traversing the graph from the first node and following the paths
 
+    /// <summary>
+    /// Used to determine when we need to create a new renderer for a different stretch of road.
+    /// </summary>
     public struct NodePair
     {
         public Node IntersectionNode;
@@ -32,6 +38,9 @@ public class GraphToRoads : MonoBehaviour
         DrawRoads();
     }
 
+    /// <summary>
+    /// Searches through the graph and creates a <see cref="NodesToRoads"/> object.
+    /// </summary>
     public void DrawRoads()
     {
         RoadsParent = GameObject.Find("Roads");

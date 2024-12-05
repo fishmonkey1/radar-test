@@ -1,10 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Mirror;
 
-
+/// <summary>
+/// Reads all of the controls for the turret and works over the network. See <see cref="IRoleNeeded"/>
+/// </summary>
 public class Turret : NetworkBehaviour, IRoleNeeded
 {
 
@@ -21,8 +21,15 @@ public class Turret : NetworkBehaviour, IRoleNeeded
     Camera currentCam;
     PlayerProfile playerProfile; //The player that has the Gunner role goes here
 
+    /// <summary>
+    /// Set the role needed to read controls to the statically defined Gunner role.
+    /// </summary>
     public Role RoleNeeded => CrewRoles.Gunner;
 
+    /// <summary>
+    /// Sent from the input system, which moves the turret around.
+    /// </summary>
+    /// <param name="input"></param>
     public void OnMove(InputValue input)
     {
         if (playerProfile == null)
@@ -35,6 +42,10 @@ public class Turret : NetworkBehaviour, IRoleNeeded
             CmdOnMove(input.Get<Vector2>());
     }
 
+    /// <summary>
+    /// If the local player isn't the host, we instead send our inputs to be done on the host.
+    /// </summary>
+    /// <param name="input"></param>
     [Command(requiresAuthority=false)]
     public void CmdOnMove(Vector2 input)
     {  //The transforms are synced across the network so this replicates to all clients
@@ -42,11 +53,15 @@ public class Turret : NetworkBehaviour, IRoleNeeded
         turretInput.y = input.y;
     }
 
+    /// <summary>
+    /// Sent from the input system, which fires the turret.
+    /// TODO: Create an inventory or ammo component so we can't fire forever.
+    /// </summary>
     public void OnFire()
     {
         if (playerProfile == null)
         {
-            Debug.Log("No playerInfo on turret to call OnFire with.");
+            Debug.Log("No PlayerProfile on turret to call OnFire with.");
             return; //This role is unused, so do nothing
         }
         if (!((IRoleNeeded)this).HaveRole(playerProfile.CurrentRole))
@@ -57,6 +72,9 @@ public class Turret : NetworkBehaviour, IRoleNeeded
         CmdOnFire();
     }
 
+    /// <summary>
+    /// If the local player isn't the host, we instead route our inputs to the host.
+    /// </summary>
     [Command(requiresAuthority=false)]
     public void CmdOnFire()
     {
@@ -68,6 +86,11 @@ public class Turret : NetworkBehaviour, IRoleNeeded
         NetworkServer.Spawn(projectileObject);
     }
 
+    /// <summary>
+    /// Setup the cameras for this role if the newRole matches, otherwise clean up if this is the old role.
+    /// </summary>
+    /// <param name="oldRole"></param>
+    /// <param name="newRole"></param>
     public void OnRoleChange(Role oldRole, Role newRole)
     {
         if (newRole != RoleNeeded) return;
@@ -77,6 +100,9 @@ public class Turret : NetworkBehaviour, IRoleNeeded
         Debug.Log($"Got first camera for {RoleNeeded.Name} role");
     }
 
+    /// <summary>
+    /// Ask the CamCycle script for the next camera.
+    /// </summary>
     public void OnCameraToggle()
     {
         if (playerProfile == null)
@@ -87,6 +113,10 @@ public class Turret : NetworkBehaviour, IRoleNeeded
         currentCam = CamCycle.Instance.GetNextCamera(RoleNeeded, currentCam);
     }
 
+    /// <summary>
+    /// Set when the tank is spawned, this allows for the local player to control this script.
+    /// </summary>
+    /// <param name="profile"></param>
     public void SetPlayer(PlayerProfile profile)
     {
         Debug.Log("Assigning local player in Turret.");

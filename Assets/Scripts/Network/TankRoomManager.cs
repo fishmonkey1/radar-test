@@ -1,9 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using System.Linq;
 
+/// <summary>
+/// Handles all of the networking for players trying to start a game.
+/// TODO: Needs to be updated to handle multiple tanks being placed in the scene.
+/// </summary>
 public class TankRoomManager : NetworkRoomManager
 {
     /// Subclass the NetworkRoomManager so it takes into account the roles that are able to be picked
@@ -65,6 +68,10 @@ public class TankRoomManager : NetworkRoomManager
         return gamePlayer; //Send the player prefab back
     }
 
+    /// <summary>
+    /// Clean up after a player leaves the game, and dispatch a server message announcing the disconnect.
+    /// </summary>
+    /// <param name="conn"></param>
     public override void OnRoomServerDisconnect(NetworkConnectionToClient conn)
     {
         //I do not need to call the base implementation as it is virtual
@@ -104,6 +111,11 @@ public class TankRoomManager : NetworkRoomManager
         //Debug.Log("Server added a player with a netId of " + conn.identity.netId);
     }
 
+    /// <summary>
+    /// Handle spawning networked UI and setting up the one HorniTank for players.
+    /// TODO: Make this handle having multiple tanks to spawn.
+    /// </summary>
+    /// <param name="sceneName"></param>
     public override void OnRoomServerSceneChanged(string sceneName)
     {
         if (sceneName == RoomScene)

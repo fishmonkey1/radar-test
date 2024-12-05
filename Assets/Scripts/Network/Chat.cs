@@ -4,6 +4,9 @@ using Mirror;
 using TMPro;
 using System;
 
+/// <summary>
+/// Networked script the handles writing messages from over the network into its UI window.
+/// </summary>
 public class Chat : NetworkBehaviour
 {
     [SerializeField] GameObject chatPanel;
@@ -11,8 +14,14 @@ public class Chat : NetworkBehaviour
     [SerializeField] TMP_Text chatText;
 
     public delegate void OnMessageReceived(ChatMessage message);
+    /// <summary>
+    /// For any scripts that want to know when the local player gets a message. Consider using this to play a sound when a message comes in.
+    /// </summary>
     public event OnMessageReceived OnMessageArrival;
 
+    /// <summary>
+    /// A small struct to send over the network with all the player's information.
+    /// </summary>
     [Serializable]
     public struct ChatMessage
     {
@@ -43,6 +52,9 @@ public class Chat : NetworkBehaviour
         ERROR
     }
 
+    /// <summary>
+    /// Extra information about the type of message, mostly for determining how something gets displayed.
+    /// </summary>
     [Serializable]
     public struct MessageContext
     {
@@ -66,7 +78,6 @@ public class Chat : NetworkBehaviour
     /// </summary>
     string[] disconnectMessages = { "Byeeeee~~!", "Oh no, we lost one!", "RIP.", "See you next time.", "D:" };
 
-    // Start is called before the first frame update
     void Start()
     {
         //TODO: Add variables to monitor which channels the Chat script is listening to.
@@ -84,6 +95,13 @@ public class Chat : NetworkBehaviour
         CmdSendChatMessage(text, NetworkClient.connection.connectionId, PlayerProfile.LoadedProfileName, messageType);
     }
 
+    /// <summary>
+    /// Send the message across the network if the host didn't send it.
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="connectionID"></param>
+    /// <param name="playerName"></param>
+    /// <param name="messageType"></param>
     [Command(requiresAuthority = false)]
     public void CmdSendChatMessage(string text, int connectionID, string playerName, MessageTypes messageType)
     { //Server finds the player's name, appends the text to make the whole message, then sends the message to all clients
@@ -113,6 +131,10 @@ public class Chat : NetworkBehaviour
         RpcReceiveMessage(message); //Then yeet the struct across the network
     }
 
+    /// <summary>
+    /// Clients format their received messages and then display them in the chat UI.
+    /// </summary>
+    /// <param name="message"></param>
     [ClientRpc]
     public void RpcReceiveMessage(ChatMessage message)
     { //The server send out a message to all clients so they render the message
@@ -126,6 +148,13 @@ public class Chat : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Format the message based on the context it came with.
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="addConnectionMessage"></param>
+    /// <param name="addDisconnectionMessage"></param>
+    /// <returns></returns>
     string BuildMessage(ChatMessage message, bool addConnectionMessage = false, bool addDisconnectionMessage = false)
     {
         if (message.messageType == MessageTypes.ALL) //This was the default case before
@@ -150,6 +179,12 @@ public class Chat : NetworkBehaviour
             return "MessageType is not supported, dumbass. Check your parameters and try again.";
     }
 
+    /// <summary>
+    /// Format the message from the network based on the context it was sent with.
+    /// </summary>
+    /// <param name="messageType"></param>
+    /// <param name="text"></param>
+    /// <returns></returns>
     string FormatMessage(MessageTypes messageType, string text)
     {
         string formattedMessage = "";

@@ -1,3 +1,6 @@
+/// <summary>
+/// Enum for all of the types of orders squads can get during a game. Subject to change as we go.
+/// </summary>
 public enum Orders
 {
     IDLE, //No orders are assigned, use to indicate a unit needs new orders
