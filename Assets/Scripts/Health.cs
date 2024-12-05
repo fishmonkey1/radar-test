@@ -1,8 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
+/// <summary>
+/// Networked health tracker for any objects that can be destroyed.
+/// </summary>
 public class Health : NetworkBehaviour
 {
     [SerializeField] float MaxHealth;
@@ -17,6 +18,10 @@ public class Health : NetworkBehaviour
         CurrentHealth = MaxHealth;
     }
 
+    /// <summary>
+    /// Currently unused, as we have nothing in the game that heals anything.
+    /// </summary>
+    /// <param name="health"></param>
     public void AddHealth(float health)
     { //Just leaving this here even though I doubt we'll be using it anytime soon
         CurrentHealth += health;
@@ -24,6 +29,11 @@ public class Health : NetworkBehaviour
             CurrentHealth = MaxHealth;
     }
 
+    /// <summary>
+    /// Used by projectiles to deal damage to things with health.
+    /// </summary>
+    /// <param name="health"></param>
+    /// <param name="damager"></param>
     public void RemoveHealth(float health, GameObject damager)
     {
         CurrentHealth -= health;

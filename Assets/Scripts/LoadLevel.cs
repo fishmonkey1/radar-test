@@ -1,10 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
-using ProcGenTiles;
 using UnityEngine.AI;
 
+/// <summary>
+/// TODO: Confirm if this script is still needed. Looks like a leftover import, but I should check with Lexi.
+/// </summary>
 public class LoadLevel : MonoBehaviour
 {   
     [Header("Terrain Settings")]
