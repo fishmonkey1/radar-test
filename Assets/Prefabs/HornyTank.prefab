@@ -368,18 +368,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radar: {fileID: 2285349122268979672}
-  playerCamera: {fileID: 8496116559467687038}
   radarCamera: {fileID: 5481536787013894122}
   Player_MinimapIcon: {fileID: 0}
   radarSweepLine: {fileID: 4345219941233378525}
   SweepLine: {fileID: 1344660305879264419}
-  MinimapIcon: {fileID: 0}
   layerMask:
     serializedVersion: 2
     m_Bits: 4294967295
   rotationsPerMinute: 10
   disappearTimerMax: 3
-  sweepLineUnderCameraOffset: -5
   sweepLineWidth: 0.5
   sweepLineColor: {r: 0.042452812, g: 1, b: 0.13898845, a: 0}
   sweepLineOpacity: 1
@@ -719,17 +716,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9213383a6156b4b4a81563ad8c8c3b81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allCameras:
-  - {fileID: 5794657405004911898}
-  - {fileID: 4339066053549183298}
-  - {fileID: 9205086570135376729}
-  - {fileID: 1038724502412647635}
   gunnerCameras:
   - {fileID: 1038724502412647635}
   - {fileID: 5794657405004911898}
   driverCameras:
   - {fileID: 9205086570135376729}
   - {fileID: 4339066053549183298}
+  radarCameras:
+  - {fileID: 4720236431368178803}
 --- !u!114 &2863812509401876521
 MonoBehaviour:
   m_ObjectHideFlags: 0
