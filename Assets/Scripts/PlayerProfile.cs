@@ -115,6 +115,8 @@ public class PlayerProfile
                         HorniTank.GetComponent<Turret>().SetPlayer(this);
                     if (role == CrewRoles.Driver)
                         HorniTank.GetComponent<tankSteer>().SetPlayer(this);
+                    if (role == CrewRoles.Radar)
+                        HorniTank.GetComponent<RadarRole>().SetPlayer(this);
                 }
             }
         }

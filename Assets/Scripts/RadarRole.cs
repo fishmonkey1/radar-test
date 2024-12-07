@@ -68,6 +68,25 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
         Debug.Log($"Got first camera for {RoleNeeded.Name} role");
     }
 
+    /// <summary>
+    /// Assigns the player profile to this script so that inputs are read.
+    /// </summary>
+    /// <param name="profile">The profile that owns this script.</param>
+    public void SetPlayer(PlayerProfile profile)
+    {
+        Debug.Log("Assigning local player to RadarRole. info's role is " + profile.CurrentRole);
+        if (RoleNeeded == profile.CurrentRole)
+        {
+            Debug.Log("Player's role matches for RadarRole");
+            currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded);
+        }
+        playerProfile = profile;
+        if (playerProfile.OnRoleChange == null)
+            playerProfile.OnRoleChange = new PlayerProfile.RoleChangeDelegate(OnRoleChange);
+        else
+            playerProfile.OnRoleChange += OnRoleChange;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
