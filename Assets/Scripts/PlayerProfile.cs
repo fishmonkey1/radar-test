@@ -111,13 +111,13 @@ public class PlayerProfile
                 Holder.Profile = this;
             }
             bool isLocal = Holder.IsLocalPlayer(); //Check if we're on the player's owned profile before doing CamCycle
-            Debug.Log($"Profile is in the game scene. isLocal is set to {isLocal}");
+            Debug.Log($"Profile is in the game scene. isLocal is set to {isLocal}. Current role is {CurrentRole.Name} and profile name is {PlayerName}");
             if (isLocal)
             {
                 Debug.Log("Profile is local, setting up cameras and control scripts. HorniTank value is " + HorniTank);
                 CamCycle.Instance.ChangeRoles(oldRole, role);
                 if (HorniTank != null)
-                {
+                { //We can't set up our roles if a tank hasn't been spawned
                     Debug.Log("Assigning player to spawned tank");
                     if (role == CrewRoles.Gunner)
                         HorniTank.GetComponent<Turret>().SetPlayer(this);

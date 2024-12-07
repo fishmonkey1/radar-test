@@ -85,15 +85,10 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
             playerProfile.OnRoleChange = new PlayerProfile.RoleChangeDelegate(OnRoleChange);
         else
             playerProfile.OnRoleChange += OnRoleChange;
-    }
 
-    // Start is called before the first frame update
-    void Start()
-    {
         // set default Y to close/far midpoint
-        var midZoomLevel = closeZoomLevel + ((farZoomLevel-closeZoomLevel)/2);
+        var midZoomLevel = closeZoomLevel + ((farZoomLevel - closeZoomLevel) / 2);
         currentCam.transform.position = new Vector3(currentCam.transform.position.x, midZoomLevel, currentCam.transform.position.z);
-
     }
 
     /// <summary>
