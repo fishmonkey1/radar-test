@@ -34,7 +34,7 @@ public class PlayerProfile
     /// <summary>
     /// The Role that the profile selected with the <see cref="RolePicker"/>. Changing the current role triggers <see cref="OnRoleChange"/>
     /// </summary>
-    [JsonIgnore] // Ignore during serialization
+    [JsonIgnore, SerializeField] // Ignore during serialization
     public Role CurrentRole = CrewRoles.UnassignedRole;
 
     /// <summary>
@@ -68,6 +68,14 @@ public class PlayerProfile
             if (TankRoomManager.singleton.RoomNetworking != null)
                 TankRoomManager.singleton.RoomNetworking.OnChangeHorniTankEvent += SetHorniTank;
         }
+    }
+
+    /// <summary>
+    /// Any delegates that are subscribed to get handled here, and this is called from <see cref="ProfileHolder"/> when it gets destroyed.
+    /// </summary>
+    public void Unsubscribe()
+    {
+        TankRoomManager.singleton.RoomNetworking.OnChangeHorniTankEvent -= SetHorniTank;
     }
 
     /// <summary>

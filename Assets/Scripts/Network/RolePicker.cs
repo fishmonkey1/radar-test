@@ -93,7 +93,11 @@ public class RolePicker : NetworkBehaviour
             selectedRoles.Add(role); //And put your new role in the selected list
             senderProfile.SelectRole(role); //Make sure the server has you set up with the same role
             Debug.Log("Server assigned role to player.");
-            TargetAssignRole(sender.connectionToClient, role); //Actually give the client their role
+            if (!sender.isServer)
+            {
+                //Actually give the client the role, provided that they are not the host so we prevent duplicate messages
+                TargetAssignRole(sender.connectionToClient, role);
+            }
             RpcBroadcastSelectedRoles(selectedRoles); //And then update all clients about the changed list
         }
     }
