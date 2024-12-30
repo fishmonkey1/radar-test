@@ -34,7 +34,7 @@ public class PlayerProfile
     /// <summary>
     /// The Role that the profile selected with the <see cref="RolePicker"/>. Changing the current role triggers <see cref="OnRoleChange"/>
     /// </summary>
-    [JsonIgnore] // Ignore during serialization
+    [JsonIgnore, SerializeField] // Ignore during serialization
     public Role CurrentRole = CrewRoles.UnassignedRole;
 
     /// <summary>
@@ -71,6 +71,14 @@ public class PlayerProfile
     }
 
     /// <summary>
+    /// Any delegates that are subscribed to get handled here, and this is called from <see cref="ProfileHolder"/> when it gets destroyed.
+    /// </summary>
+    public void Unsubscribe()
+    {
+        TankRoomManager.singleton.RoomNetworking.OnChangeHorniTankEvent -= SetHorniTank;
+    }
+
+    /// <summary>
     /// Called by the <see cref="TankRoomManager"/> when there is a tank spawned for this profile.
     /// </summary>
     /// <param name="horniTank">The tank spawned by the <see cref="TankRoomManager"/></param>
@@ -103,23 +111,25 @@ public class PlayerProfile
                 Holder.Profile = this;
             }
             bool isLocal = Holder.IsLocalPlayer(); //Check if we're on the player's owned profile before doing CamCycle
-            Debug.Log($"Profile is in the game scene. isLocal is set to {isLocal}");
+            Debug.Log($"Profile is in the game scene. isLocal is set to {isLocal}. Current role is {CurrentRole.Name} and profile name is {PlayerName}");
             if (isLocal)
             {
                 Debug.Log("Profile is local, setting up cameras and control scripts. HorniTank value is " + HorniTank);
                 CamCycle.Instance.ChangeRoles(oldRole, role);
                 if (HorniTank != null)
-                {
+                { //We can't set up our roles if a tank hasn't been spawned
                     Debug.Log("Assigning player to spawned tank");
                     if (role == CrewRoles.Gunner)
                         HorniTank.GetComponent<Turret>().SetPlayer(this);
                     if (role == CrewRoles.Driver)
                         HorniTank.GetComponent<tankSteer>().SetPlayer(this);
+                    if (role == CrewRoles.Radar)
+                        HorniTank.GetComponent<RadarRole>().SetPlayer(this);
                 }
             }
         }
 
-        if (oldRole == null)
+        if (oldRole == null || oldRole == CrewRoles.UnassignedRole)
             Debug.Log($"Assigned role named {role.Name} to player");
         else
             Debug.Log($"Changed role from {oldRole.Name} to {role.Name}");

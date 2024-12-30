@@ -64,6 +64,9 @@ public class TankRoomManager : NetworkRoomManager
 
         //Yes ma'am, role stuff is added now <3
         gameProfile.SelectRole(roomProfile.CurrentRole); //Assign the game profile to have the same role as the room profile
+        NetworkServer.Destroy(roomPlayer); //Delete the room player after copying everything over to the game prefab
+
+        Debug.Log($"Server created game player. Game player values are PlayerName: {gameProfile.PlayerName}, CurrentRole: {gameProfile.CurrentRole.Name} and the room profile has role {roomProfile.CurrentRole.Name}");
 
         return gamePlayer; //Send the player prefab back
     }

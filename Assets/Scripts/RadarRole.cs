@@ -68,13 +68,27 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
         Debug.Log($"Got first camera for {RoleNeeded.Name} role");
     }
 
-    // Start is called before the first frame update
-    void Start()
+    /// <summary>
+    /// Assigns the player profile to this script so that inputs are read.
+    /// </summary>
+    /// <param name="profile">The profile that owns this script.</param>
+    public void SetPlayer(PlayerProfile profile)
     {
-        // set default Y to close/far midpoint
-        var midZoomLevel = closeZoomLevel + ((farZoomLevel-closeZoomLevel)/2);
-        currentCam.transform.position = new Vector3(currentCam.transform.position.x, midZoomLevel, currentCam.transform.position.z);
+        Debug.Log("Assigning local player to RadarRole. info's role is " + profile.CurrentRole);
+        if (RoleNeeded == profile.CurrentRole)
+        {
+            Debug.Log("Player's role matches for RadarRole");
+            currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded);
+        }
+        playerProfile = profile;
+        if (playerProfile.OnRoleChange == null)
+            playerProfile.OnRoleChange = new PlayerProfile.RoleChangeDelegate(OnRoleChange);
+        else
+            playerProfile.OnRoleChange += OnRoleChange;
 
+        // set default Y to close/far midpoint
+        var midZoomLevel = closeZoomLevel + ((farZoomLevel - closeZoomLevel) / 2);
+        currentCam.transform.position = new Vector3(currentCam.transform.position.x, midZoomLevel, currentCam.transform.position.z);
     }
 
     /// <summary>

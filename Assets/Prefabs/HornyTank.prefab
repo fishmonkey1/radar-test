@@ -368,18 +368,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radar: {fileID: 2285349122268979672}
-  playerCamera: {fileID: 8496116559467687038}
   radarCamera: {fileID: 5481536787013894122}
   Player_MinimapIcon: {fileID: 0}
   radarSweepLine: {fileID: 4345219941233378525}
   SweepLine: {fileID: 1344660305879264419}
-  MinimapIcon: {fileID: 0}
   layerMask:
     serializedVersion: 2
     m_Bits: 4294967295
   rotationsPerMinute: 10
   disappearTimerMax: 3
-  sweepLineUnderCameraOffset: -5
   sweepLineWidth: 0.5
   sweepLineColor: {r: 0.042452812, g: 1, b: 0.13898845, a: 0}
   sweepLineOpacity: 1
@@ -672,6 +669,7 @@ GameObject:
   - component: {fileID: 8580312667078399082}
   - component: {fileID: 2863812509401876521}
   - component: {fileID: 3665942379284337753}
+  - component: {fileID: 4918778592637312184}
   - component: {fileID: 1284342536998342120}
   - component: {fileID: 4413024497142797380}
   - component: {fileID: 2858318911895607928}
@@ -719,17 +717,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9213383a6156b4b4a81563ad8c8c3b81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allCameras:
-  - {fileID: 5794657405004911898}
-  - {fileID: 4339066053549183298}
-  - {fileID: 9205086570135376729}
-  - {fileID: 1038724502412647635}
   gunnerCameras:
   - {fileID: 1038724502412647635}
   - {fileID: 5794657405004911898}
   driverCameras:
   - {fileID: 9205086570135376729}
   - {fileID: 4339066053549183298}
+  radarCameras:
+  - {fileID: 4720236431368178803}
 --- !u!114 &2863812509401876521
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -779,6 +774,35 @@ MonoBehaviour:
   projectilePrefab: {fileID: 3237541956323890682, guid: bb121984466ce824084205ec73e2212b, type: 3}
   projectileSpawn: {fileID: 5793015795270388151}
   turretInput: {x: 0, y: 0}
+--- !u!114 &4918778592637312184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4283197213913971331}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30aa243567b6a534c8d2cf33805a67c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  radar: {fileID: 2285349122268979672}
+  Player_MinimapIcon: {fileID: 0}
+  radarSweepLine: {fileID: 4345219941233378525}
+  SweepLine: {fileID: 1344660305879264419}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  rotationsPerMinute: 10
+  disappearTimerMax: 3
+  sweepLineWidth: 0.5
+  sweepLineColor: {r: 0.007327318, g: 1, b: 0, a: 1}
+  sweepLineOpacity: 1
+  closeZoomLevel: 75
+  farZoomLevel: 125
 --- !u!65 &1284342536998342120
 BoxCollider:
   m_ObjectHideFlags: 0

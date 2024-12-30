@@ -20,7 +20,7 @@ public class TankRoomPlayer : NetworkRoomPlayer
     public override void OnClientEnterRoom()
     {
         base.OnClientEnterRoom();
-        Debug.Log($"IsLocalPlayer equals {isLocalPlayer}");
+        Debug.Log($"Client has entered the room. IsLocalPlayer equals {isLocalPlayer}");
         //If you are the local player, we need to either load your profile or create it
         if (isLocalPlayer)
         {
