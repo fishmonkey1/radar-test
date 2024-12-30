@@ -22,6 +22,8 @@ public class RolePicker : NetworkBehaviour
 
     List<GameObject> buttons = new List<GameObject>();
 
+    VehicleSpawnData VehicleSpawnData;
+
     void Start()
     {
         foreach (var role in CrewRoles.ImplementedRoles)
@@ -38,6 +40,7 @@ public class RolePicker : NetworkBehaviour
             buttons.Add(newButton);
             //Debug.Log($"Added button for Role named {role.Name} and ID of {role.ID}");
         }
+        VehicleSpawnData = GetComponent<VehicleSpawnData>(); //Fetch the componenet off of the RolePicker's prefab
         ReadyButtonObject.interactable = false; //Can't ready up until you pick a role
         //When the client enters the room we should update to reflect any roles that were picked before they joined
         CmdGetServerSelectedRoles(); //Ask for any roles that were picked so far

@@ -120,8 +120,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4709267876404003127}
   m_HandleRect: {fileID: 5006766158866082856}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 1
+  m_Value: 0
+  m_Size: 0
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -711,6 +711,7 @@ GameObject:
   - component: {fileID: 3034557967261564026}
   - component: {fileID: 657328333328737988}
   - component: {fileID: 4937584951079524170}
+  - component: {fileID: 6452972777191252163}
   - component: {fileID: 4456731233276219804}
   - component: {fileID: 5861544009316057617}
   - component: {fileID: 639100230933636976}
@@ -779,6 +780,19 @@ MonoBehaviour:
   chatPanel: {fileID: 468111798521378953}
   chatInput: {fileID: 3668226951223604811}
   chatText: {fileID: 4904864279550750604}
+--- !u!114 &6452972777191252163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2914714321878191827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d078c3a8cd73aba46bd6ccb06cad3f3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  VehicleData: []
 --- !u!223 &4456731233276219804
 Canvas:
   m_ObjectHideFlags: 0
@@ -1461,7 +1475,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.000015258789, y: -0.000045776367}
+  m_AnchoredPosition: {x: -0.000015258789, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &6910279031967597886
