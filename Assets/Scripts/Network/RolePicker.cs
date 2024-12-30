@@ -36,7 +36,7 @@ public class RolePicker : NetworkBehaviour
                 buttonScript.interactable = false; //Can't assign yourself as unassigned when you start that way
             }
             buttons.Add(newButton);
-            Debug.Log($"Added button for Role named {role.Name} and ID of {role.ID}");
+            //Debug.Log($"Added button for Role named {role.Name} and ID of {role.ID}");
         }
         ReadyButtonObject.interactable = false; //Can't ready up until you pick a role
         //When the client enters the room we should update to reflect any roles that were picked before they joined

@@ -129,7 +129,7 @@ public class PlayerProfile
             }
         }
 
-        if (oldRole == null)
+        if (oldRole == null || oldRole == CrewRoles.UnassignedRole)
             Debug.Log($"Assigned role named {role.Name} to player");
         else
             Debug.Log($"Changed role from {oldRole.Name} to {role.Name}");
