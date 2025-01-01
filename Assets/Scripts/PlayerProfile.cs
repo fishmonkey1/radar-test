@@ -71,14 +71,6 @@ public class PlayerProfile
     }
 
     /// <summary>
-    /// Any delegates that are subscribed to get handled here, and this is called from <see cref="ProfileHolder"/> when it gets destroyed.
-    /// </summary>
-    public void Unsubscribe()
-    {
-        TankRoomManager.singleton.RoomNetworking.OnChangeHorniTankEvent -= SetHorniTank;
-    }
-
-    /// <summary>
     /// Called by the <see cref="TankRoomManager"/> when there is a tank spawned for this profile.
     /// </summary>
     /// <param name="horniTank">The tank spawned by the <see cref="TankRoomManager"/></param>

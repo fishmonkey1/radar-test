@@ -27,13 +27,4 @@ public class ProfileHolder : MonoBehaviour
         else
             return false;
     }
-
-    private void OnDestroy()
-    {
-        if (Profile != null)
-        {
-            //We should unsubscribe the profile from the delegates it subscribed too
-            Profile.Unsubscribe();
-        }
-    }
 }
