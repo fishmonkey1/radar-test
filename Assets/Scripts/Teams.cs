@@ -53,6 +53,12 @@ namespace HorniTank
     [System.Serializable]
     public class TeamInfo
     {
+
+        public TeamInfo()
+        {
+            Teams.Instance.AllTeams.Add(this); //Try to add ourselves to the team list
+        }
+
         public string TeamName;
         /// <summary>
         /// TeamId is used as a primary key when determining which team we're trying to find.

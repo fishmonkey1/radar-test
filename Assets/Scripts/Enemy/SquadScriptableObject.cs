@@ -19,7 +19,7 @@ public class SquadScriptableObject : ScriptableObject
     /// <summary>
     /// Set which team this squad is on by default
     /// </summary>
-    public TeamInfo SquadTeam;
+    public TeamsScriptableObject SquadTeam;
 }
 
 [System.Serializable]

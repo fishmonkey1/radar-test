@@ -20,7 +20,7 @@ public class EnemySquad
     public delegate void OrderChangedDelegate(OrderContext order); //Enemy listens to this delegate
     public OrderChangedDelegate OnOrderChanged { get; protected set; } //Can fetch, but can't overwrite
 
-    public TeamInfo SquadTeam; //Assigned by the spawner
+    public TeamsScriptableObject SquadTeam; //Assigned by the spawner
 
     public EnemySquad()
     {
