@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using HorniTank;
 
 /// <summary>
 /// Information about who is in an enemy squad and what orders they are following.
@@ -18,6 +19,8 @@ public class EnemySquad
     public OrderContext OrderContext { get; protected set; } //This holds the extra data that the order has been assigned, currently NULL for the idle order
     public delegate void OrderChangedDelegate(OrderContext order); //Enemy listens to this delegate
     public OrderChangedDelegate OnOrderChanged { get; protected set; } //Can fetch, but can't overwrite
+
+    public TeamInfo SquadTeam; //Assigned by the spawner
 
     public EnemySquad()
     {

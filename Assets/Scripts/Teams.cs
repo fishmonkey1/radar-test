@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace HorniTank
 {
@@ -52,6 +50,7 @@ namespace HorniTank
 
     }
 
+    [System.Serializable]
     public class TeamInfo
     {
         public string TeamName;
