@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using UnityEngine;
+
 /// <summary>
 /// Statically defined roles, including arrays for checking which roles are implemented.
 /// </summary>
@@ -9,10 +12,10 @@ public static class CrewRoles
     public static readonly Role Spotter = new Role("Spotter", 3, 1);
     public static readonly Role Radar = new Role("Radar", 4, 1);
 
-    //Implemented roles array contains all the roles that actually work so far
-    public static readonly Role[] ImplementedRoles = new Role[] { UnassignedRole, Driver, Gunner, Radar };
+    //Implemented roles list contains all the roles that actually work so far
+    public static List<Role> ImplementedRoles { get; private set; } = new List<Role> { UnassignedRole, Driver, Gunner, Radar };
     //The AllRoles array might not be all that important, but I'm leaving it in for now
-    public static readonly Role[] AllRoles = new Role[] { UnassignedRole, Driver, Gunner, Spotter, Radar };
+    public static List<Role> AllRoles { get; private set; } = new List<Role> { UnassignedRole, Driver, Gunner, Spotter, Radar };
 
     /// <summary>
     /// Find the static role instance based on an ID.
@@ -45,6 +48,24 @@ public static class CrewRoles
                 return role;
         }
         throw new System.Exception($"No Role named {name} exists in CrewRoles!");
+    }
+
+    public static bool TryAddRole(Role role)
+    {
+        bool added = false;
+        if (!ImplementedRoles.Contains(role))
+        {
+            ImplementedRoles.Add(role);
+            added = true;
+        }
+        if (!AllRoles.Contains(role))
+        {
+            AllRoles.Add(role);
+            added = true;
+        }
+        if (added)
+            Debug.Log($"Added a new role to the CrewRoles internal lists. New Role information is Name: {role.Name}, ID: {role.ID}, PlayerLimit: {role.PlayerLimit}");
+        return added;
     }
 
 }

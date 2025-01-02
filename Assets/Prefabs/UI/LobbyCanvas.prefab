@@ -792,7 +792,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d078c3a8cd73aba46bd6ccb06cad3f3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VehicleData: []
+  VehicleData:
+  - VehicleRoles:
+    - {fileID: 11400000, guid: 2e1b10d6c7fb5d24595183e45a333be4, type: 2}
+    - {fileID: 11400000, guid: c775cd97977976645b495352eb1a730c, type: 2}
+    - {fileID: 11400000, guid: 10530d43f8685f64e9f658f521371ade, type: 2}
+    - {fileID: 11400000, guid: b532dded20aeaee41b81c57b1ac4cf32, type: 2}
+    PlayerProfiles: []
+    VehiclePrefab: {fileID: 4283197213913971331, guid: cc463bf9a62b9234994922418126b6e2, type: 3}
 --- !u!223 &4456731233276219804
 Canvas:
   m_ObjectHideFlags: 0
@@ -1475,7 +1482,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.000015258789, y: 0}
+  m_AnchoredPosition: {x: -0.000015258789, y: -0.000038146973}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &6910279031967597886
