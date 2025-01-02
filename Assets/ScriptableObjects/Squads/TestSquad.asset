@@ -19,3 +19,4 @@ MonoBehaviour:
   PreferredOrders:
   - Order: 1
     Weight: 1
+  SquadTeam: {fileID: 11400000, guid: 590be86fcd4bf4244a1425fdc9991989, type: 2}
