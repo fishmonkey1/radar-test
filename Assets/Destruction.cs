@@ -9,6 +9,7 @@ public class Destruction : MonoBehaviour
     
     //GameObject building_obj;
     Animator animator;
+    [SerializeField] ParticleSystem explosionParticles;
 
     // Start is called before the first frame update
     void Start()
@@ -24,6 +25,11 @@ public class Destruction : MonoBehaviour
 
     }
 
+    public void ExplosionParticles()
+    {
+        Instantiate(explosionParticles, transform.position, transform.rotation);
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         // trigger smoke
@@ -34,7 +40,8 @@ public class Destruction : MonoBehaviour
         Debug.Log("SHOULD HAVE DROPPED");
 
 
-        //Destroy(this);
+        Destroy(this, 10f);
+        //Destroy(explosionParticles,10);
     }
 
 }
