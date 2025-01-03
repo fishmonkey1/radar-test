@@ -19,7 +19,7 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
     /// <summary>
     /// Tracks which icons are on screen and when the blip was added.
     /// </summary>
-    public Dictionary<GameObject, float> currentBlipsDict = new Dictionary<GameObject, float>();// This is a Dict of current blips on screen and when it was discovered
+    public Dictionary<GameObject, float> currentBlipsOnRadarDict = new Dictionary<GameObject, float>();// This is a Dict of current blips on screen and when it was discovered
 
     /// <summary>
     /// All objects that have already been displayed on the radar to prevent multiple hits.
@@ -153,9 +153,9 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
     {
         // This handles fading for each ping
         List<GameObject> toDeleteFromDict = new List<GameObject>();
-        if (currentBlipsDict.Count > 0)
+        if (currentBlipsOnRadarDict.Count > 0)
         {
-            foreach (KeyValuePair<GameObject, float> blip in currentBlipsDict)
+            foreach (KeyValuePair<GameObject, float> blip in currentBlipsOnRadarDict)
             {
                 GameObject blipObject = blip.Key;
                 float ageInSeconds = Time.fixedTime - blip.Value;
@@ -180,7 +180,7 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
         {
             foreach (GameObject blipObject in toDeleteFromDict)
             {
-                currentBlipsDict.Remove(blipObject);
+                currentBlipsOnRadarDict.Remove(blipObject);
                 //can also delete from collidedList here too but brain no worky rn
                 //collidedList.Remove(???);
             }
@@ -230,7 +230,7 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
          * 3) on subsequent raycasts, ignore if in collidedList
          * 
          * TODO?
-         * We can probably have this done using the currentBlipsDict, 
+         * We can probably have this done using the currentBlipsOnRadarDict, 
          * checking the age of the blip and not counting it unless it's older than X time
          */
 
@@ -253,7 +253,7 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
                     //blip.transform.localScale = new Vector3(blipScale, blipScale, blipScale);
 
                     // Add to currently tracked blips dict
-                    currentBlipsDict.Add(blip, Time.fixedTime);
+                    currentBlipsOnRadarDict.Add(blip, Time.fixedTime);
 
                 }
             }
