@@ -147,7 +147,7 @@ GameObject:
   - component: {fileID: 7024817914176680793}
   - component: {fileID: 6850999740784927539}
   m_Layer: 5
-  m_Name: RoleButton
+  m_Name: ButtonPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

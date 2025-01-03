@@ -21,6 +21,28 @@ namespace HorniTank
         }
         public List<TeamInfo> AllTeams = new();
 
+        public static TeamInfo GetTeamByID(uint id)
+        {
+            foreach (TeamInfo team in Instance.AllTeams)
+            {
+                if (team.TeamId == id)
+                    return team;
+            }
+            UnityEngine.Debug.LogWarning($"Searched for a team ID of {id} but no teams match this. Investigate this.");
+            return null; //We didn't find anything for you.
+        }
+
+        public static TeamInfo GetTeamByName(string name)
+        {
+            foreach (TeamInfo team in Instance.AllTeams)
+            {
+                if (team.TeamName == name)
+                    return team;
+            }
+            UnityEngine.Debug.LogWarning($"Attempted to find a team with name {name} and but no teams match this. Investigate this.");
+            return null;
+        }
+
         public static bool CheckTeamsHostile(TeamInfo firstTeam, TeamInfo secondTeam)
         {
             if (firstTeam.EnemyTeamIds.Contains(secondTeam.TeamId) || secondTeam.EnemyTeamIds.Contains(firstTeam.TeamId))

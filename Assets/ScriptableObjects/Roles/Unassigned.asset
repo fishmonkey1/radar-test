@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cfec739d48143f4e92aaf733b27ffd6, type: 3}
   m_Name: Unassigned
   m_EditorClassIdentifier: 
-  RoleName: 
+  RoleName: Unassigned
   RoleId: 0
-  PlayerLimit: 0
+  PlayerLimit: 999

@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cfec739d48143f4e92aaf733b27ffd6, type: 3}
   m_Name: Driver
   m_EditorClassIdentifier: 
-  RoleName: 
-  RoleId: 0
-  PlayerLimit: 0
+  RoleName: Driver
+  RoleId: 1
+  PlayerLimit: 1

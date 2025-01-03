@@ -12,7 +12,7 @@ namespace HorniTank
 
         public static readonly List<Gamemode> Gamemodes = new() { Cooperative, Deathmatch, CaptureThePrideFlag };
 
-        static Gamemode CurrentGamemode = null;
+        static Gamemode CurrentGamemode = Cooperative; //This is our only implemented game mode so far
 
         public static Gamemode GetCurrentGameMode()
         {
