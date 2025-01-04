@@ -4,51 +4,63 @@ using UnityEngine;
 
 public class Destruction : MonoBehaviour
 {
-
-    //MeshCollider meshCollider;
-    
-    //GameObject building_obj;
     Animator animator;
-    [SerializeField] ParticleSystem explosionParticles;
 
+    [SerializeField] ParticleSystem DefaultExplosionParticles;
     Health health;
 
     // Start is called before the first frame update
     void Start()
     {
-    animator = GetComponent<Animator>();
-    health = GetComponent<Health>();    
+        animator = GetComponent<Animator>();
+        health = GetComponent<Health>();
+        
+        //SetDestructionType();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (health.CurrentHealth <= 0)
+    public void SetDestructionType()
+    {   if (health != null)
         {
-            animator.SetTrigger("collision");
+            if (gameObject.tag == "Building") health.OnDestroyed = DestroyBuilding;
+            else if (gameObject.tag == "Enemy") health.OnDestroyed = DestroyEnemy;
+            else health.OnDestroyed = DestroyDefault;
         }
     }
 
-    public void ExplosionParticles()
+ 
+    public void DestroyDefault(GameObject target, GameObject damager)
     {
-        Instantiate(explosionParticles, transform.position, transform.rotation);
+        Debug.Log("DestroyDefault");
+        animator.SetTrigger("Default Destruction");
+
+        void Particles()
+        {
+            Instantiate(DefaultExplosionParticles, transform.position, transform.rotation);
+        }
     }
 
-
-    // not doing this, going to use health system
-    /*private void OnCollisionEnter(Collision collision)
+    public void DestroyBuilding(GameObject target, GameObject damager)
     {
-        // trigger smoke
-        
+        Debug.Log("DestroyBuilding");
+        animator.SetTrigger("Building Destruction");
 
-        Debug.Log("BUILDING COLLISIONNNNNNNN");
-        // drop into ground
-        
-        Debug.Log("SHOULD HAVE DROPPED");
+        void Particles()
+        {
+            Instantiate(DefaultExplosionParticles, transform.position, transform.rotation);
+        }
+    }
 
+    public void DestroyEnemy(GameObject target, GameObject damager)
+    {
+        Debug.Log("DestroyEnemy");
+        animator.SetTrigger("Enemy Destruction");
 
-        Destroy(this, 10f);
-        //Destroy(explosionParticles,10);
-    }*/
+        void Particles()
+        {
+            Instantiate(DefaultExplosionParticles, transform.position, transform.rotation);
+        }
+    }
 
+    //runs from keyevent on animation
+    public void Cleanup() { health.Cleanup(); }
 }

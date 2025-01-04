@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: -2752569715652600743}
   m_Layer: 0
   m_Name: Tall2x1
-  m_TagString: Untagged
+  m_TagString: Building
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -50,7 +50,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dd8e7e0dcdea86489ef720ff20b1ba5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  explosionParticles: {fileID: 8845831988681202574, guid: fe4adf71302d9de4d89c8fe5b39df471, type: 3}
+  DefaultExplosionParticles: {fileID: 8845831988681202574, guid: fe4adf71302d9de4d89c8fe5b39df471, type: 3}
 --- !u!111 &8526194049269780721
 Animation:
   m_ObjectHideFlags: 0
@@ -105,7 +105,6 @@ MonoBehaviour:
   syncInterval: 0
   MaxHealth: 50
   CurrentHealth: 0
-  OverrideDefaultDestruction: 1
 --- !u!114 &-2752569715652600743
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -337,6 +336,10 @@ PrefabInstance:
     - target: {fileID: 7568490752907345818, guid: 962e47bec5a660d47b5e07c7f3c6fb28, type: 3}
       propertyPath: m_Name
       value: 1x1Block
+      objectReference: {fileID: 0}
+    - target: {fileID: 7568490752907345818, guid: 962e47bec5a660d47b5e07c7f3c6fb28, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 7750111104616084422, guid: 962e47bec5a660d47b5e07c7f3c6fb28, type: 3}
       propertyPath: _assetId

@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: -2710154204768199968}
   m_Layer: 0
   m_Name: 2x1Building
-  m_TagString: Untagged
+  m_TagString: Building
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -76,7 +76,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dd8e7e0dcdea86489ef720ff20b1ba5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  explosionParticles: {fileID: 8845831988681202574, guid: fe4adf71302d9de4d89c8fe5b39df471, type: 3}
+  DefaultExplosionParticles: {fileID: 8845831988681202574, guid: fe4adf71302d9de4d89c8fe5b39df471, type: 3}
 --- !u!111 &-3778413108288457952
 Animation:
   m_ObjectHideFlags: 0
@@ -131,7 +131,6 @@ MonoBehaviour:
   syncInterval: 0
   MaxHealth: 50
   CurrentHealth: 0
-  OverrideDefaultDestruction: 1
 --- !u!114 &-2710154204768199968
 MonoBehaviour:
   m_ObjectHideFlags: 0

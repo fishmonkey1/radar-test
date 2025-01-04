@@ -1,6 +1,7 @@
 using UnityEngine;
 using Mirror;
 
+
 /// <summary>
 /// Networked health tracker for any objects that can be destroyed.
 /// </summary>
@@ -11,14 +12,15 @@ public class Health : NetworkBehaviour
     public float CurrentHealth;
     public delegate void OnTargetDestroyed(GameObject target, GameObject damager);
     public OnTargetDestroyed OnDestroyed;
+    Destruction destruction;
 
-    // temporary...
-    [SerializeField] public bool OverrideDefaultDestruction = false;
 
     // Start is called before the first frame update
     void Start()
     {
         CurrentHealth = MaxHealth;
+        destruction = GetComponent<Destruction>();
+        if (destruction != null) destruction.SetDestructionType();
     }
 
     /// <summary>
@@ -40,16 +42,20 @@ public class Health : NetworkBehaviour
     public void RemoveHealth(float health, GameObject damager)
     {
         CurrentHealth -= health;
+
         if (CurrentHealth <= 0)
-        { //This object has been destroyed
-            if (!OverrideDefaultDestruction)
+        {
+            if (OnDestroyed != null)
             {
-                if (OnDestroyed != null) //Call any functions that were listening for this to be boomed
-                    OnDestroyed(gameObject, damager);
-                NetworkServer.Destroy(gameObject);
-                GameObject.Destroy(gameObject); //Remove the destroyed thingy
+                OnDestroyed(gameObject, damager); //Call any functions that were listening for this to be boomed
             }
         }
     }
-    
+
+    public void Cleanup() // This is called from Destruction
+    {
+        // This should probs be handled elsewhere...
+        NetworkServer.Destroy(gameObject);
+        GameObject.Destroy(gameObject); //Remove the destroyed thingy
+    }
 }
