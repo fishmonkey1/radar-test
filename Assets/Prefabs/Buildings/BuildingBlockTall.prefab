@@ -154,6 +154,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad8be3ba5989686429ec74a9b12b9ac0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3666926732791859472}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad8be3ba5989686429ec74a9b12b9ac0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -3343801200742773430}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad8be3ba5989686429ec74a9b12b9ac0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -8313902627549710253}
   m_SourcePrefab: {fileID: 100100000, guid: ad8be3ba5989686429ec74a9b12b9ac0, type: 3}
 --- !u!4 &4743050865431356928 stripped
 Transform:
@@ -209,9 +215,10 @@ Animation:
   m_Enabled: 1
   serializedVersion: 3
   m_Animation: {fileID: 7400000, guid: 2bbd5d9c139fabe499ae3483c05ba369, type: 2}
-  m_Animations: []
+  m_Animations:
+  - {fileID: 7400000, guid: 2bbd5d9c139fabe499ae3483c05ba369, type: 2}
   m_WrapMode: 0
-  m_PlayAutomatically: 1
+  m_PlayAutomatically: 0
   m_AnimatePhysics: 0
   m_CullingType: 0
 --- !u!95 &3666926732791859472
@@ -235,3 +242,38 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-3343801200742773430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5375436539794128058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f63365037180304badca42fd6743395, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  MaxHealth: 50
+  CurrentHealth: 0
+  OverrideDefaultDestruction: 1
+--- !u!114 &-8313902627549710253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5375436539794128058}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  _assetId: 1959842988
+  serverOnly: 0
+  visibility: 0
+  hasSpawned: 0

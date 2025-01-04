@@ -12,6 +12,9 @@ public class Health : NetworkBehaviour
     public delegate void OnTargetDestroyed(GameObject target, GameObject damager);
     public OnTargetDestroyed OnDestroyed;
 
+    // temporary...
+    [SerializeField] public bool OverrideDefaultDestruction = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -39,10 +42,13 @@ public class Health : NetworkBehaviour
         CurrentHealth -= health;
         if (CurrentHealth <= 0)
         { //This object has been destroyed
-            if (OnDestroyed != null) //Call any functions that were listening for this to be boomed
-                OnDestroyed(gameObject, damager);
-            NetworkServer.Destroy(gameObject);
-            GameObject.Destroy(gameObject); //Remove the destroyed thingy
+            if (!OverrideDefaultDestruction)
+            {
+                if (OnDestroyed != null) //Call any functions that were listening for this to be boomed
+                    OnDestroyed(gameObject, damager);
+                NetworkServer.Destroy(gameObject);
+                GameObject.Destroy(gameObject); //Remove the destroyed thingy
+            }
         }
     }
     

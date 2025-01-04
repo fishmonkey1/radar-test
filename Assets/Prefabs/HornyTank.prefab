@@ -771,7 +771,7 @@ MonoBehaviour:
   syncInterval: 0
   turret: {fileID: 7049589460280495168}
   barrel: {fileID: 1783248617948569194}
-  rotationSensitivity: 1
+  rotationSensitivity: 20
   projectilePrefab: {fileID: 3237541956323890682, guid: bb121984466ce824084205ec73e2212b, type: 3}
   projectileSpawn: {fileID: 5793015795270388151}
   turretInput: {x: 0, y: 0}

@@ -67,7 +67,7 @@ public class Projectile : MonoBehaviour
         }
 
         //Then create the explosion and destroy this projectile
-        GameObject.Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+        //GameObject.Instantiate(explosionPrefab, transform.position, Quaternion.identity);
         GameObject.Destroy(gameObject); //Destroy our projectile
 
     }

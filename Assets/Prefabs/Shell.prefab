@@ -127,7 +127,7 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   speed: 50
-  explosionPrefab: {fileID: 145106533576243339, guid: dfbdf81406f8ffe4c8b6033ec0c37941, type: 3}
+  explosionPrefab: {fileID: 1828176872806910, guid: 64891a0eb28db934898420d80ca07cb3, type: 3}
   shooter: {fileID: 0}
 --- !u!65 &3499655768687380449
 BoxCollider:

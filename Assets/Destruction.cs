@@ -11,18 +11,22 @@ public class Destruction : MonoBehaviour
     Animator animator;
     [SerializeField] ParticleSystem explosionParticles;
 
+    Health health;
+
     // Start is called before the first frame update
     void Start()
     {
     animator = GetComponent<Animator>();
-    //animator.Play("Base Layer.DropBuilding");
-    
+    health = GetComponent<Health>();    
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        if (health.CurrentHealth <= 0)
+        {
+            animator.SetTrigger("collision");
+        }
     }
 
     public void ExplosionParticles()
@@ -30,18 +34,21 @@ public class Destruction : MonoBehaviour
         Instantiate(explosionParticles, transform.position, transform.rotation);
     }
 
-    private void OnCollisionEnter(Collision collision)
+
+    // not doing this, going to use health system
+    /*private void OnCollisionEnter(Collision collision)
     {
         // trigger smoke
+        
 
         Debug.Log("BUILDING COLLISIONNNNNNNN");
         // drop into ground
-        animator.SetTrigger("collision");
+        
         Debug.Log("SHOULD HAVE DROPPED");
 
 
         Destroy(this, 10f);
         //Destroy(explosionParticles,10);
-    }
+    }*/
 
 }

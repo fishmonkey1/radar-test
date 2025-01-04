@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 2122144972995135447}
   - component: {fileID: -3350896841153736262}
   - component: {fileID: -5100918514000155366}
+  - component: {fileID: 1114897405118815889}
+  - component: {fileID: 2803510817263998599}
   m_Layer: 0
   m_Name: BigBuilding
   m_TagString: Untagged
@@ -63,9 +65,10 @@ Animation:
   m_Enabled: 1
   serializedVersion: 3
   m_Animation: {fileID: 7400000, guid: 2bbd5d9c139fabe499ae3483c05ba369, type: 2}
-  m_Animations: []
+  m_Animations:
+  - {fileID: 7400000, guid: 2bbd5d9c139fabe499ae3483c05ba369, type: 2}
   m_WrapMode: 0
-  m_PlayAutomatically: 1
+  m_PlayAutomatically: 0
   m_AnimatePhysics: 0
   m_CullingType: 0
 --- !u!95 &-5100918514000155366
@@ -89,6 +92,41 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1114897405118815889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3693667169851375011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f63365037180304badca42fd6743395, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  MaxHealth: 50
+  CurrentHealth: 0
+  OverrideDefaultDestruction: 1
+--- !u!114 &2803510817263998599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3693667169851375011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  _assetId: 938366044
+  serverOnly: 0
+  visibility: 0
+  hasSpawned: 0
 --- !u!1001 &59847734684949926
 PrefabInstance:
   m_ObjectHideFlags: 0
