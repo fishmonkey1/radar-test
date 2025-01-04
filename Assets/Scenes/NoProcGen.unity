@@ -5418,6 +5418,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: 1x1Block (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 6605159388724437031, guid: 71f7dfdc4e56fed4e902895078c081ba, type: 3}
+      propertyPath: m_Size.x
+      value: 1.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 6605159388724437031, guid: 71f7dfdc4e56fed4e902895078c081ba, type: 3}
+      propertyPath: m_Size.y
+      value: 1.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 6605159388724437031, guid: 71f7dfdc4e56fed4e902895078c081ba, type: 3}
+      propertyPath: m_Size.z
+      value: 1.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 6605159388724437031, guid: 71f7dfdc4e56fed4e902895078c081ba, type: 3}
+      propertyPath: m_Center.y
+      value: 0.7
+      objectReference: {fileID: 0}
     - target: {fileID: 6793357093323875094, guid: 71f7dfdc4e56fed4e902895078c081ba, type: 3}
       propertyPath: m_LocalPosition.x
       value: 13.3
