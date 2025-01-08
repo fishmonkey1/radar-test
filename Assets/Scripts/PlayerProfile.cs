@@ -55,7 +55,7 @@ public class PlayerProfile
     /// The HorniTank this profile has a role in. See <see cref="SetHorniTank(GameObject)"/>
     /// </summary>
     [JsonIgnore, NonSerialized] // Ignore GameObject references
-    GameObject HorniTank = null;
+    GameObject CrewedVehicle = null;
 
     /// <summary>
     /// Constructor assigns the static name to itself and subscribes to <see cref="RoomNetworking.OnChangeHorniTankEvent"/>
@@ -76,9 +76,9 @@ public class PlayerProfile
     /// <param name="horniTank">The tank spawned by the <see cref="TankRoomManager"/></param>
     void SetHorniTank(GameObject horniTank)
     {
-        if (HorniTank == null)
+        if (CrewedVehicle == null)
         { //A tank hasn't been assigned, so let's update our reference
-            HorniTank = horniTank; //And that's pretty much it
+            CrewedVehicle = horniTank; //And that's pretty much it
             //Attempt setting up the camera now that there's a tank to use
             Debug.Log("HorniTank was set via a SyncVar hook. Attempting to set up cameras");
             SelectRole(CurrentRole);
@@ -106,17 +106,17 @@ public class PlayerProfile
             Debug.Log($"Profile is in the game scene. isLocal is set to {isLocal}. Current role is {CurrentRole.Name} and profile name is {PlayerName}");
             if (isLocal)
             {
-                Debug.Log("Profile is local, setting up cameras and control scripts. HorniTank value is " + HorniTank);
+                Debug.Log("Profile is local, setting up cameras and control scripts. HorniTank value is " + CrewedVehicle);
                 CamCycle.Instance.ChangeRoles(oldRole, role);
-                if (HorniTank != null)
+                if (CrewedVehicle != null)
                 { //We can't set up our roles if a tank hasn't been spawned
                     Debug.Log("Assigning player to spawned tank");
                     if (role == CrewRoles.Gunner)
-                        HorniTank.GetComponent<Turret>().SetPlayer(this);
+                        CrewedVehicle.GetComponent<Turret>().SetPlayer(this);
                     if (role == CrewRoles.Driver)
-                        HorniTank.GetComponent<tankSteer>().SetPlayer(this);
+                        CrewedVehicle.GetComponent<tankSteer>().SetPlayer(this);
                     if (role == CrewRoles.Radar)
-                        HorniTank.GetComponent<RadarRole>().SetPlayer(this);
+                        CrewedVehicle.GetComponent<RadarRole>().SetPlayer(this);
                 }
             }
         }

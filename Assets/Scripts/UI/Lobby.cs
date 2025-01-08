@@ -34,6 +34,11 @@ namespace HorniTank
                 localPickedTeam = Teams.GetTeamByName("Friendly"); //In cooperative mode all players are on the Friendly team
                 ShowVehiclePicker();
             }
+            //Otherwise we need to have the player select their team first
+            else
+            {
+                ShowTeamPicker();
+            }
         }
 
         public void ShowVehiclePicker()
