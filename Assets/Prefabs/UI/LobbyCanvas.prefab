@@ -616,7 +616,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 42.000298}
   m_SizeDelta: {x: 0, y: 264.86}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &3330099496893851704
@@ -898,7 +898,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8101376822490144558}
   m_HandleRect: {fileID: 2156991853026865319}
   m_Direction: 2
-  m_Value: 1
+  m_Value: -0.000009082616
   m_Size: 0.8414257
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1348,6 +1348,7 @@ MonoBehaviour:
     PlayerProfiles: []
     VehiclePrefab: {fileID: 4283197213913971331, guid: cc463bf9a62b9234994922418126b6e2, type: 3}
     VehicleId: 0
+    VehicleName: 
 --- !u!223 &4456731233276219804
 Canvas:
   m_ObjectHideFlags: 0
@@ -1824,7 +1825,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -0.00000834465}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &6530698374559112695
@@ -2560,7 +2561,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.000015258789, y: -0.00001680851}
+  m_AnchoredPosition: {x: -0.000015258789, y: -0.000013589859}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &6910279031967597886

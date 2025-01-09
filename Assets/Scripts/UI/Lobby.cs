@@ -24,7 +24,7 @@ namespace HorniTank
 
         RectTransform currentScreen = null;
 
-        TeamInfo localPickedTeam;
+        public TeamInfo localPickedTeam { get; private set; }
 
         private void Start()
         {
