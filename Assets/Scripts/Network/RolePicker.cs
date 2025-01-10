@@ -4,6 +4,7 @@ using UnityEngine;
 using Mirror;
 using TMPro;
 using UnityEngine.SceneManagement;
+using HorniTank;
 
 /// <summary>
 /// Network UI screen that lets players pick which role they want to have.
@@ -63,6 +64,13 @@ public class RolePicker : NetworkBehaviour
     public void ReadyButton()
     {
         TankRoomPlayer player = NetworkClient.localPlayer.GetComponent<TankRoomPlayer>();
+
+        //TODO: Migrate this code to the Lobby script
+        //We need to let the Lobby know to grab the vehicle info out of the vehicle picker.
+        Lobby lobby = GameObject.FindFirstObjectByType<Lobby>(); //There should only be one lobby script
+        lobby.OnGameReady();
+
+
         player.CmdChangeReadyState(true);
         if (NetworkClient.localPlayer == null)
             NetworkClient.AddPlayer();

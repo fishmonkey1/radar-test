@@ -29,7 +29,7 @@ public class TankRoomManager : NetworkRoomManager
 
     public Dictionary<NetworkIdentity, PlayerProfile> connectedPlayers = new(); //Anybody added to the server gets stashed in here for me to use instead of Mirror's stuff. I know it's duplicated, but let me cook
 
-    public Dictionary<ProfileGroup, GameObject> GroupToVehicles = new(); //This is for supporting multiple tanks later on
+    public Dictionary<VehicleData, ProfileGroup> GroupToVehicles = new(); //This is for supporting multiple tanks later on
 
     public static new TankRoomManager singleton => NetworkManager.singleton as TankRoomManager;
 
@@ -130,7 +130,6 @@ public class TankRoomManager : NetworkRoomManager
             NetworkServer.Spawn(LobbyUI);
             //Let me spawn the RoomNetworking over the network too, just to be safe
             GroupToVehicles.Clear(); //Make sure this is empty when a room starts
-            GroupToVehicles.Add(new ProfileGroup(), null); //The gameobject is null until we go into the game scene
         }
         if (sceneName == GameplayScene)
         {
@@ -168,11 +167,15 @@ public class TankRoomManager : NetworkRoomManager
         else
         {
             connectedPlayers.Add(identity, profile); //Put them in the connected dictionary
-            ProfileGroup group = GroupToVehicles.Keys.First();
-            group.Group.Add(profile); //Stick their profile in the one and only group we have for now
         }
         //TODO: I want to add random connection messages like discord does with people joining a server. There is a trello card for this request.
         chatroom.SendServerMessage($"{profile.PlayerName} has connected!", new Chat.MessageContext(Chat.MessageTypes.SERVER, true, false));
+    }
+
+    public void SetVehicleSpawnData( Dictionary<VehicleData, ProfileGroup> data)
+    {
+        GroupToVehicles = data; //Set our dictionary to match the info passed in from the VehiclePicker
+        RoomNetworking.BroadcastVehicleSpawnData(data.Keys.ToArray(), data.Values.ToArray());
     }
 
     public override void OnGUI()

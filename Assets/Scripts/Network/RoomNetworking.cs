@@ -1,5 +1,6 @@
 using UnityEngine;
 using Mirror;
+using System.Collections.Generic;
 
 /// <summary>
 /// Since the TankRoomManager can't send messages, this is my workaround so room messages can be passed around.
@@ -27,6 +28,21 @@ public class RoomNetworking : NetworkBehaviour
     {
         Debug.Log("HorniTank has been updated, SyncVar hook called on client");
         OnChangeHorniTankEvent?.Invoke(newTank);
+    }
+
+    [ClientRpc]
+    public void BroadcastVehicleSpawnData(VehicleData[] vehicles, ProfileGroup[] groups)
+    {
+        //Match up the vehicles to the groups by index, since it was sent from a dictionary
+        //TODO: verify the dictionary is sent properly
+        Dictionary<VehicleData, ProfileGroup> data = new();
+        for (int i = 0; i < vehicles.Length; i++)
+        {
+            VehicleData vehicle = vehicles[i];
+            ProfileGroup group = groups[i];
+            data.Add(vehicle, group);
+        }
+        TankRoomManager.singleton.GroupToVehicles = data; //Set the local TankRoomManager's dictionary with the sent data
     }
 
 }

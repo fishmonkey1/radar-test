@@ -1,3 +1,4 @@
+using Mirror;
 using UnityEngine;
 
 namespace HorniTank
@@ -64,6 +65,13 @@ namespace HorniTank
             }
             rolePickerWindow.gameObject.SetActive(true);
             currentScreen = rolePickerWindow;
+        }
+
+        public void OnGameReady()
+        {
+            //We fire this after clicking the ready button. We pass the VehiclePicker's data into the TankRoomManager
+            TankRoomManager tankRoom = TankRoomManager.singleton;
+            tankRoom.SetVehicleSpawnData(vehiclePicker.VehicleToProfiles); //Hand over the vehicle spawn data
         }
 
     }
