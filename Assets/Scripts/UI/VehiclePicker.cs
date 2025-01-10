@@ -51,9 +51,12 @@ namespace HorniTank
 
         List<GameObject> CrewedVehiclesButtons = new(); //I'm gonna use this to update buttons when things change. Use it kinda like object pooling. Shhh, Mommy's cooking
 
+        bool initFinished = false;
+
         private void Start()
         {
-            CreatePrefabPickerButtons();
+            CreatePrefabPickerButtons(); //Populate the prefab picker
+            DrawCrewedVehiclesButtons(); //Then populate the vehicle crews UI
         }
 
         public void CreatePrefabPickerButtons()
@@ -73,11 +76,17 @@ namespace HorniTank
             //This makes a button for each vehicle a player has requested to use on this team
             //This function also updates all of the buttons when the crew number changes
 
-            //Make a button that requests a new vehicle to use on this team. It opens the VehiclePrefabPicker window
-            GameObject CreateVehicleButton = GameObject.Instantiate(ButtonPrefab, JoinCrewButtonPanel);
-            Button CreateVehicle = CreateVehicleButton.GetComponent<Button>();
-            CreateVehicle.onClick.AddListener(() => ShowPrefabPicker()); //Open the prefab picker when you click on the add new vehicle button
+            //We only need to make this button to open the prefab window once
+            if (!initFinished)
+            {
+                //Make a button that requests a new vehicle to use on this team. It opens the VehiclePrefabPicker window
+                GameObject CreateVehicleButton = GameObject.Instantiate(ButtonPrefab, JoinCrewButtonPanel);
+                Button CreateVehicle = CreateVehicleButton.GetComponent<Button>();
+                CreateVehicle.onClick.AddListener(() => ShowPrefabPicker()); //Open the prefab picker when you click on the add new vehicle button
+                initFinished = true;
+            }
 
+            //Fetch the local profile so the buttons know who is requesting vehicles
             PlayerProfile localProfile = NetworkClient.localPlayer.GetComponent<ProfileHolder>().Profile;
 
             if (VehicleToProfiles.Keys.Count > CrewedVehiclesButtons.Count)
@@ -97,7 +106,7 @@ namespace HorniTank
                 JoinVehicle.onClick.AddListener(() => RequestCrewVehicle(vehicle, localProfile)); //Request crewing a vehicle from the server
                 TextMeshProUGUI buttonText = JoinVehicleButton.GetComponentInChildren<TextMeshProUGUI>();
                 //Format the button text to read "Join Tank (1/4)" where Tank is vehicle's name, and the () contains current players out of max players
-                buttonText.text = $"Join {vehicle.VehicleName} (1/{vehicle.MaxPlayers})";
+                buttonText.text = $"Join {vehicle.VehicleName} ({VehicleToProfiles[vehicle]?.Group.Count}/{vehicle.MaxPlayers})";
                 index++;
             }
 
@@ -138,6 +147,8 @@ namespace HorniTank
             ProfileGroup newGroup = new ProfileGroup();
             newGroup.Group.Add(requestingPlayer);
             VehicleToProfiles.Add(vehicle, newGroup); //Stick the info into the dictionary. Now we need to update all the players
+            DrawCrewedVehiclesButtons(); //Refresh our buttons on the host
+            VehicleRequested(vehicle, requestingPlayer); //Tell the clients that we made a new vehicle
         }
 
         [ClientRpc]
@@ -149,6 +160,62 @@ namespace HorniTank
             ProfileGroup newGroup = new ProfileGroup();
             newGroup.Group.Add(requestingPlayer);
             VehicleToProfiles.Add(vehicle, newGroup);
+            DrawCrewedVehiclesButtons(); //Refresh the client's buttons afterwards
+        }
+
+        [Command(requiresAuthority =false)]
+        public void LeaveVehicleCrew(VehicleData vehicle, PlayerProfile requestingPlayer)
+        {
+            //Remove the player from the vehicle, and if they were the only crew in it then remove the vehicle too
+            ProfileGroup group = VehicleToProfiles[vehicle];
+            if (!group.Group.Contains(requestingPlayer))
+            {
+                Debug.LogWarning("Attempted to remove a player from a crew, but they are not present in the profile group. Investigate this Vicky, you've been a dumbass somewhere."); //Bully the programmer if things go wrong
+            }
+            else
+            {
+                group.Group.Remove(requestingPlayer);
+                ProfileRemoved(vehicle, requestingPlayer); //Tell the clients we removed a profile
+            }
+            if (group.Group.Count == 0)
+            { //We need to remove the tank as well
+                VehicleToProfiles.Remove(vehicle); //Yeet the entry from the dictionary
+                VehicleRemoved(vehicle); //Tell the clients we removed the vehicle
+            }
+            DrawCrewedVehiclesButtons(); //Refresh the buttons for the host
+        }
+
+        [ClientRpc]
+        public void ProfileRemoved(VehicleData vehicle, PlayerProfile player)
+        {
+            if (isServer)
+                return; //Don't let the host duplicate efforts
+            //Take the player out of the profile
+            if (!VehicleToProfiles.ContainsKey(vehicle))
+            {
+                Debug.LogWarning("Attempted to remove a profile from a crew, but the vehicle does not exist in our dictionary. Investigate this Vicky."); //Bully the programmer if something goes wrong
+            }
+            if (!VehicleToProfiles[vehicle].Group.Contains(player))
+            {
+                //More bullying
+                Debug.LogWarning("Attempted to remove a profile from a crew, but the player is not in the list of profiles linked to the vehicle. Investigate this Vicky, you done fucked up if you see this.");
+            }
+            VehicleToProfiles[vehicle].Group.Remove(player); //Get rid of the player on the client
+            DrawCrewedVehiclesButtons(); //Update the client buttons
+        }
+
+        [ClientRpc]
+        public void VehicleRemoved(VehicleData vehicle)
+        {
+            if (isServer)
+                return; //Don't let the host do this twice
+            if (!VehicleToProfiles.ContainsKey(vehicle))
+            {
+                //Bully Vicky
+                Debug.LogWarning("Attempted to remove a vehicle from our dictionary, but it does not exist there. Check your busted code Vicky, you shouldn't be seeing this!");
+            }
+            VehicleToProfiles.Remove(vehicle);
+            DrawCrewedVehiclesButtons(); //Update the client buttons with the new list
         }
 
     }
