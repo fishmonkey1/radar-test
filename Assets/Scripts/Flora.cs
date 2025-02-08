@@ -6,11 +6,13 @@ public class Flora : MonoBehaviour
 {
     [SerializeField] List<GameObject> floraPrefabs = new List<GameObject>();
 
-    [SerializeField] float radius = 2;
+    [SerializeField] [Range(5f, 30f)] float radius = 10;
     [SerializeField] Vector2 sampleRegionSize = Vector2.one;
     [SerializeField] int numSamplesBeforeRejection = 30;
 
     List<Vector2> points = new List<Vector2>();
+
+    public bool EditorAutoUpdate = true;
 
     private void Awake()
     {
@@ -18,8 +20,12 @@ public class Flora : MonoBehaviour
     }
     private void Start()
     {
+        GenPSD();
+    }
+
+    public void GenPSD()
+    {
         points = PoissonDiscSampling.GeneratePoints(radius, sampleRegionSize, numSamplesBeforeRejection);
-        Debug.Log(points.Count);
         foreach (Vector2 point in points)
         {
             int index = Random.Range(0, floraPrefabs.Count);
@@ -29,13 +35,13 @@ public class Flora : MonoBehaviour
         }
     }
 
-    private void DestroyExisting()
+    public void DestroyExisting()
     {
         // destroy existing
         GameObject[] clones = GameObject.FindGameObjectsWithTag("Flora");
         foreach (var clone in clones)
         {
-            Destroy(clone);
+            DestroyImmediate(clone);
         }
     }
 

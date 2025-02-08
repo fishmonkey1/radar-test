@@ -3,13 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - PlayerTank
-<<<<<<< Updated upstream
-=======
-  - Building
-  - Flora
->>>>>>> Stashed changes
+  tags: []
   layers:
   - Default
   - TransparentFX
@@ -18,13 +12,13 @@ TagManager:
   - Water
   - UI
   - 
-  - Terrain
-  - Minimap
-  - RadarCollider
-  - Enemy
-  - PlayerTank
-  - Barrel
-  - Projectile
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   - 
   - 
   - 
