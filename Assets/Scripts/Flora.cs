@@ -6,7 +6,7 @@ public class Flora : MonoBehaviour
 {
     [SerializeField] List<GameObject> floraPrefabs = new List<GameObject>();
 
-    [SerializeField] [Range(5f, 30f)] float radius = 10;
+    [SerializeField] [Range(2f, 30f)] float radius = 10;
     [SerializeField] Vector2 sampleRegionSize = Vector2.one;
     [SerializeField] int numSamplesBeforeRejection = 30;
 
