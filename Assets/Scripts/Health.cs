@@ -41,6 +41,7 @@ public class Health : NetworkBehaviour
     /// <param name="damager"></param>
     public void RemoveHealth(float health, GameObject damager)
     {
+        Debug.Log("current: " + CurrentHealth + "  Damage Taken: "+ health+ "  new: "+ (CurrentHealth -= health));
         CurrentHealth -= health;
 
         if (CurrentHealth <= 0)

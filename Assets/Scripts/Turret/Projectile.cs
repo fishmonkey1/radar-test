@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// Handles moving the projectile on the host, and doing damage when it impacts.
@@ -44,10 +45,11 @@ public class Projectile : MonoBehaviour
 
         if (damage.AreaDamageType == DamageInfo.AreaDamage.SPHERE)
         {
-            Collider[] hitTargets = Physics.OverlapSphere(transform.position, damage.SphereRadius);
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, damage.SphereRadius);
+
             //Now do damage stuff to everybody if they can be hurt
             //Use their distance from the projectile with the curve to determine amount of damage done
-            foreach (Collider collider in hitTargets)
+            foreach (Collider collider in hitColliders)
             {
                 Health health = collider.GetComponent<Health>();
                 if (health != null)
