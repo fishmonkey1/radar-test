@@ -5,6 +5,11 @@ TagManager:
   serializedVersion: 2
   tags:
   - PlayerTank
+<<<<<<< Updated upstream
+=======
+  - Building
+  - Flora
+>>>>>>> Stashed changes
   layers:
   - Default
   - TransparentFX
