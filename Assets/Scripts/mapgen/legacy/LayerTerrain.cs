@@ -82,7 +82,13 @@ public class LayerTerrain : MonoBehaviour
     }
 
     public void GenerateTerrain() //main entry
-    {
+    {   
+
+        /*
+         set the map size
+        create that map
+
+         */
         SetTerrainSize();
 
         finalMap = new Map(X, Y); //Change this to only create a new map if the sizes differ. It might be getting garbe collected each time, and there's no reason

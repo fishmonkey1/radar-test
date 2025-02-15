@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
+using ProcGenTiles;
 
 public class Flora : MonoBehaviour
 {
@@ -14,25 +15,35 @@ public class Flora : MonoBehaviour
     [SerializeField] float floraPrefabsScaleMax;
 
     List<Vector2> points = new List<Vector2>();
+    List<Vector3> gizmo = new List<Vector3>();
 
     LayerTerrain lt;
+    public Map biomeMap;
+    public float[,] meshHeights;
 
     public bool EditorAutoUpdate = true;
 
+    // highest() gets highest Y val on mesh, just going to use this to do quick and dirty elevation maffs for the spawner
+    [SerializeField] GameObject terrainPlaneObj;
+    float highestPoint = 50;
+
     private void Awake()
     {
-        DestroyExisting();
+        DestroyExisting();   
     }
     private void Start()
-    {
+    { 
         GenPSD();
     }
 
-    List<Vector3> gizmo = new List<Vector3>();
+   
 
     public void GenPSD()
     {
+        //highest();
         points = PoissonDiscSampling.GeneratePoints(minRadius, maxRadius, sampleRegionSize, numSamplesBeforeRejection);
+        
+        // do a raycast down to find surface, then select random prefab and place
         foreach (Vector2 point in points)
         {
             int index = Random.Range(0, floraPrefabs.Count); // select random prefab
@@ -40,9 +51,9 @@ public class Flora : MonoBehaviour
             RaycastHit hit;
             Ray ray = new Ray(new Vector3(point.x, 300, point.y), Vector3.down);
             if (Physics.Raycast(ray, out hit, 500))
-            {
-                Debug.Log("Hit point: " + hit.point);
-                gizmo.Add(hit.point);
+            {   
+                // for debug
+                 gizmo.Add(hit.point);
             }
 
             GameObject tree = Instantiate(floraPrefabs[index], this.transform.InverseTransformPoint(hit.point), Quaternion.identity, this.transform) as GameObject;
@@ -75,7 +86,21 @@ public class Flora : MonoBehaviour
         }
     }
 
-
+     public void highest() // gets highest point on the mesh in local space, using provided gameobject...
+    {
+        float highest = 0;
+        for (int y = 0; y < sampleRegionSize.y; y++){
+            for (int x = 0; x < sampleRegionSize.x; x++){
+                RaycastHit hit;
+                Ray ray = new Ray(new Vector3(x, 300, y), Vector3.down);
+                if (terrainPlaneObj.GetComponent<Collider>().Raycast(ray, out hit, 500)){
+                    if (terrainPlaneObj.transform.InverseTransformPoint(hit.point).y > highest) highest = terrainPlaneObj.transform.InverseTransformPoint(hit.point).y;
+                }
+            }
+        }
+        Debug.Log("highest y is:   "+highest);
+        highestPoint = highest;
+    }
 
 
 
