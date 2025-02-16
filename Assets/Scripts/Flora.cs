@@ -7,6 +7,8 @@ public class Flora : MonoBehaviour
 {
     [SerializeField] List<GameObject> floraPrefabs = new List<GameObject>();
 
+    [SerializeField] List<Zone> Zones = new List<Zone>();
+
     [SerializeField] [Range(4f, 30f)] int minRadius = 6;
     [SerializeField] [Range(4f, 30f)] int maxRadius = 20;
     [SerializeField] Vector2 sampleRegionSize = Vector2.one;
