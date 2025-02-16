@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public static class PoissonDiscSampling {
-	
 
-	public static List<Vector2> GeneratePoints(float minRadius, float maxRadius, Vector2 sampleRegionSize, int numSamplesBeforeRejection = 30, GameObject planeObj = null) {
+
+
+	public static List<Vector2> GeneratePoints(float minRadius, float maxRadius, Vector2 sampleRegionSize, int numSamplesBeforeRejection = 30,  GameObject planeObj = null, List<Zone> zones = null) {
 
 		// radius is diagonal of cell, we need the size of each edge of the square cell
 		float cellSize = minRadius/Mathf.Sqrt(2);
@@ -40,11 +41,17 @@ public static class PoissonDiscSampling {
 				// figure max radius based on underlying point
 				//Vector2 candidate = calculateCandidate(spawnCentre);
 
-				
+				(float, float) currentRadiusValues = GetZoneRadius(spawnCentre);
+				float currentMinRadius = currentRadiusValues.Item1;
+				float currentMaxRadius = currentRadiusValues.Item2;
 
-				Vector2 candidate = spawnCentre + dir * Random.Range(minRadius, maxRadius);
+				Vector2 candidate = spawnCentre + dir * Random.Range(currentMinRadius, currentMaxRadius);
 
-				if (IsValid(candidate, sampleRegionSize, cellSize, minRadius, maxRadius, points, grid)) 
+				(float, float) candidateRadiusValues = GetZoneRadius(spawnCentre);
+				float candidateMinRadius = currentRadiusValues.Item1;
+				float candidateMaxRadius = currentRadiusValues.Item2;
+
+				if (IsValid(candidate, sampleRegionSize, cellSize, candidateMinRadius, candidateMaxRadius, points, grid)) 
 				{
 					points.Add(candidate);
 					spawnPoints.Add(candidate);
@@ -61,39 +68,40 @@ public static class PoissonDiscSampling {
 
 		return points;
 
-		Vector2 calculateCandidate(Vector2 spawnCentre)
-		{	
-			float elevationYlocal = GetLocalY(spawnCentre.x, spawnCentre.y, planeObj);
-			float elevation = Mathf.InverseLerp(0f, 50f, elevationYlocal);
+		Zone GetZone(Vector2 location)
+        {
+			float elevationYlocal = GetLocalY(location.x, location.y, planeObj);
+			float candidateElevation = Mathf.InverseLerp(0f, 50f, elevationYlocal);
 
-			if (elevation <= .10f)
+			foreach (Zone zone in zones)
 			{
-
+				// for now selecting zone based on elevation
+				if (zone.elevationMin <= candidateElevation && candidateElevation <= zone.elevationMax)
+				{
+					(float, float) candidateRadius = (zone.minDensityPSD, zone.maxDensityPSD);
+					return zone;
+				}
 			}
-			else if (elevation > .10f && elevation <= .20f)
-            {
-				/*
-				 * 
-				 * 
-				Zone 2
-				60% grass
-				20% cacti
-				15%  trees
-				5%  rocks
-
-				Zone 3
-				50% grass
-				15% cacti
-				20%  trees
-				15%  rocks
-				 */
-			}
-
-			//Vector2 candidate = spawnCentre + dir * Random.Range(minRadius, maxRadius);
-			Vector2 candidate = spawnCentre;
-			return candidate;
+			return null;
 		}
 
+		(float, float) GetZoneRadius(Vector2 spawnCentre)
+		{
+			float elevationYlocal = GetLocalY(spawnCentre.x, spawnCentre.y, planeObj);
+			float candidateElevation = Mathf.InverseLerp(0f, 50f, elevationYlocal);
+
+			foreach (Zone zone in zones)
+			{
+				// for now selecting zone based on elevation
+				if (zone.elevationMin <= candidateElevation && candidateElevation <= zone.elevationMax)
+				{
+					(float, float) candidateRadius = (zone.minDensityPSD, zone.maxDensityPSD);
+					return candidateRadius;
+				}
+			}
+
+			return (-1f, -1f);
+		}
 	}
 
 
@@ -104,18 +112,21 @@ public static class PoissonDiscSampling {
 		// check if candidate is within the sample region on the map
 		if (candidate.x >=0 && candidate.x < sampleRegionSize.x && candidate.y >= 0 && candidate.y < sampleRegionSize.y) 
 		{	
-			
-			// find which cell the candidate point lies in	so we can search surrounding cells		
+			// find which cell the point lies in so we can search surrounding cells		
 			int cellX = (int)(candidate.x/cellSize);
 			int cellY = (int)(candidate.y/cellSize);
 
 			// this gets the bounds of the area we are searching.
 			// the min/max is to make sure points aren't off map
-			// Seb has it simply as -2, we would want that to be based on the Perlin noise underlying
-			int searchStartX = Mathf.Max(0,cellX -2);
-			int searchEndX = Mathf.Min(cellX+2,grid.GetLength(0)-1);
-			int searchStartY = Mathf.Max(0,cellY -2);
-			int searchEndY = Mathf.Min(cellY+2,grid.GetLength(1)-1);
+			// Seb has it simply as -2 or +2 because his range is fixed between radius and radius*2,
+			// We would want that to be based on the minRadius and maxRadius, so need to calculate number of squares for maxRadius (DONE!)
+			// min/max so that we don't try to get cells off the edge of the map
+			int searchSize = CalculateSearchArea(maxRadius);
+
+			int searchStartX = Mathf.Max(0, cellX-searchSize);
+			int searchEndX = Mathf.Min(cellX+searchSize, grid.GetLength(0)-1);
+			int searchStartY = Mathf.Max(0, cellY-searchSize);
+			int searchEndY = Mathf.Min(cellY+searchSize, grid.GetLength(1)-1);
 
 			for (int x = searchStartX; x <= searchEndX; x++) {
 				for (int y = searchStartY; y <= searchEndY; y++) {
@@ -123,10 +134,11 @@ public static class PoissonDiscSampling {
 					// if pointIndex = -1 there is NO point in that spot
 					int pointIndex = grid[x,y]-1;
 
-					// so if there is a point, check its distance
+					// so if there is a point in the cell,
+					// check its distance and return IsValid=false if point is less than minRadius 
 					if (pointIndex != -1) {
-						float sqrDst = (candidate - points[pointIndex]).sqrMagnitude; //sqrMag is less expensive than Magnitude
-						if (sqrDst < maxRadius*maxRadius) {
+						float sqrDst = (candidate - points[pointIndex]).sqrMagnitude; //sqrMagnitude is less expensive than Magnitude so doing this with squared values
+						if (sqrDst < minRadius*minRadius) {
 							return false;
 						}
 					}
@@ -135,6 +147,11 @@ public static class PoissonDiscSampling {
 			return true;
 		}
 		return false; //return false if point not on map
+
+		int CalculateSearchArea(float maxRadius)
+        {
+			return Mathf.CeilToInt(maxRadius / cellSize);
+        }
 	}
 
 
