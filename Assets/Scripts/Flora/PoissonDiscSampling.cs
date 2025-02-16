@@ -41,15 +41,17 @@ public static class PoissonDiscSampling {
 				// figure max radius based on underlying point
 				//Vector2 candidate = calculateCandidate(spawnCentre);
 
-				(float, float) currentRadiusValues = GetZoneRadius(spawnCentre);
-				float currentMinRadius = currentRadiusValues.Item1;
-				float currentMaxRadius = currentRadiusValues.Item2;
+				//(float, float) currentRadiusValues = GetZoneRadius(spawnCentre);
+				Zone currZone = GetZone(spawnCentre);
+				float currentMinRadius = currZone.minDensityPSD;
+				float currentMaxRadius = currZone.maxDensityPSD;
 
 				Vector2 candidate = spawnCentre + dir * Random.Range(currentMinRadius, currentMaxRadius);
 
-				(float, float) candidateRadiusValues = GetZoneRadius(spawnCentre);
-				float candidateMinRadius = currentRadiusValues.Item1;
-				float candidateMaxRadius = currentRadiusValues.Item2;
+				Zone candidateZone = GetZone(candidate);
+				float candidateMinRadius = candidateZone.minDensityPSD;
+				float candidateMaxRadius = candidateZone.maxDensityPSD;
+
 
 				if (IsValid(candidate, sampleRegionSize, cellSize, candidateMinRadius, candidateMaxRadius, points, grid)) 
 				{
@@ -78,7 +80,6 @@ public static class PoissonDiscSampling {
 				// for now selecting zone based on elevation
 				if (zone.elevationMin <= candidateElevation && candidateElevation <= zone.elevationMax)
 				{
-					(float, float) candidateRadius = (zone.minDensityPSD, zone.maxDensityPSD);
 					return zone;
 				}
 			}
