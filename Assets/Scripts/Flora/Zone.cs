@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using KaimiraGames;
 
 [System.Serializable]
 
@@ -12,4 +13,5 @@ public class Zone
     public float elevationMin;
     public float elevationMax;
     public List<ZoneObject> SpawnedObjects = new List<ZoneObject>();
+    public WeightedList<GameObject> weightedObjects = new();
 }

@@ -2,74 +2,43 @@
 using System.Collections;
 using UnityEngine;
 using ProcGenTiles;
+using KaimiraGames;
 
 public class Flora : MonoBehaviour
 {
-    [SerializeField] List<GameObject> floraPrefabs = new List<GameObject>();
 
-    [SerializeField] List<Zone> Zones = new List<Zone>();
-
-    [SerializeField] [Range(4f, 30f)] int minRadius = 6;
-    [SerializeField] [Range(4f, 30f)] int maxRadius = 20;
     [SerializeField] Vector2 sampleRegionSize = Vector2.one;
     [SerializeField] int numSamplesBeforeRejection = 30;
     [SerializeField] float floraPrefabsScaleMin;
     [SerializeField] float floraPrefabsScaleMax;
 
-    List<Vector3> gizmo = new List<Vector3>();
-
-    
-    LayerTerrain lt;
-    public Map biomeMap;
-    public float[,] meshHeights;
-
     public bool EditorAutoUpdate = true;
+    List<Vector3> gizmo = new List<Vector3>();
+    Dictionary<Vector3, Zone> gizmoDict = new Dictionary<Vector3, Zone>();
+
+    [SerializeField] GameObject terrainPlaneObj;
+
+    [SerializeField] List<Zone> Zones = new List<Zone>();
 
     // highest() gets highest Y val on mesh, just going to use this to do quick and dirty elevation maffs for the spawner
-    [SerializeField] GameObject terrainPlaneObj;
-    float highestPoint = 50;
+    float highestPoint = 50; 
 
     private void Awake()
     {
+        DestroyExisting();
         
-        DestroyExisting();   
     }
     private void Start()
-    { 
+    {
         GenPSD();
     }
 
-   
-
-   /* public void GenPSD2()    old dumb stupid code we're not using anymore cuz its stupid :3
-    {
-        //highest();
-        points = PoissonDiscSampling.GeneratePoints(minRadius, maxRadius, sampleRegionSize, numSamplesBeforeRejection, null, Zones);
-        
-        // do a raycast down to find surface, then select random prefab and place
-        foreach (Vector2 point in points)
-        {
-            int index = Random.Range(0, floraPrefabs.Count); // select random prefab
-
-            RaycastHit hit;
-            Ray ray = new Ray(new Vector3(point.x, 300, point.y), Vector3.down);
-            if (Physics.Raycast(ray, out hit, 500))
-            {   
-                // for debug
-                 gizmo.Add(hit.point);
-            }
-
-            GameObject tree = Instantiate(floraPrefabs[index], this.transform.InverseTransformPoint(hit.point), Quaternion.identity, this.transform) as GameObject;
-            tree.transform.Rotate(0, Random.Range(0, 360), 0);
-
-            tree.transform.localScale = Vector3.one * Random.Range(tree.transform.localScale.x * floraPrefabsScaleMin, tree.transform.localScale.x * floraPrefabsScaleMax); // add in some scaling randomness for size diffs
-            
-        }
-    }*/
-
+ 
     public void GenPSD()
     //public void CalculateSpawnFlora()
     {
+        InitZonesWeighted();
+
         List<Vector2> points = new List<Vector2>();
         List<Vector2> spawnPoints = new List<Vector2>(); //when added to points, added to spawnpoints, if fails removes spanpoint
 
@@ -110,6 +79,7 @@ public class Flora : MonoBehaviour
 
                 Vector2 candidate = spawnCentre + dir * Random.Range(currentMinRadius, currentMaxRadius);
 
+
                 Zone candidateZone = GetZone(candidate);
                 float candidateMinRadius = candidateZone.minDensityPSD;
                 float candidateMaxRadius = candidateZone.maxDensityPSD;
@@ -135,8 +105,6 @@ public class Flora : MonoBehaviour
             }
 
         }
-
-        //return points;
 
         // checks the surrounding cells around a candidate
         // to make sure there aren't any too close to it which would invalidate it
@@ -195,12 +163,12 @@ public class Flora : MonoBehaviour
         Zone GetZone(Vector2 location)
         {
             float elevationYlocal = GetLocalY(location.x, location.y, terrainPlaneObj);
-            float candidateElevation = Mathf.InverseLerp(0f, 50f, elevationYlocal);
+            float candidateElevation = Mathf.InverseLerp(0f, highestPoint, elevationYlocal);
 
             foreach (Zone zone in Zones)
             {
                 // for now selecting zone based on elevation
-                if (zone.elevationMin <= candidateElevation && candidateElevation <= zone.elevationMax)
+                if (zone.elevationMin <= candidateElevation && candidateElevation < zone.elevationMax)
                 {
                     return zone;
                 }
@@ -222,14 +190,20 @@ public class Flora : MonoBehaviour
 
             // for debug
             gizmo.Add(hit.point);
+            gizmoDict.Add(hit.point, zone);
         }
 
-        ZoneObject ChooseFlora()
-        {   
+        GameObject spawnedObject = Instantiate(ChooseFlora(), this.transform.InverseTransformPoint(hit.point), Quaternion.identity, this.transform) as GameObject;
+        spawnedObject.transform.Rotate(0, Random.Range(0, 360), 0);
+
+        spawnedObject.transform.localScale = Vector3.one * Random.Range(spawnedObject.transform.localScale.x * floraPrefabsScaleMin, spawnedObject.transform.localScale.x * floraPrefabsScaleMax); // add in some scaling randomness for size diffs
 
 
-
-            ZoneObject selected = zone.SpawnedObjects[0];
+        GameObject ChooseFlora()
+        {
+            // https://github.com/cdanek/KaimiraWeightedList/tree/main
+            GameObject selected = zone.weightedObjects.Next();
+            if (selected == null) Debug.Log("ChooseFlora() no object chosen :(");
             return selected;
         }
     }
@@ -258,12 +232,20 @@ public class Flora : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.DrawWireCube(sampleRegionSize / 2, sampleRegionSize);
-        if (gizmo != null)
+        foreach (KeyValuePair<Vector3, Zone> point in gizmoDict)
         {
-            foreach (Vector3 point in gizmo)
+            Gizmos.DrawWireSphere(point.Key, point.Value.minDensityPSD);
+        }
+
+    }
+
+    public void InitZonesWeighted()
+    {
+        foreach (Zone zone in Zones)
+        {
+            foreach (ZoneObject zoneObj in zone.SpawnedObjects)
             {
-                Gizmos.DrawSphere(point, 1);
+                zone.weightedObjects.Add(zoneObj.spawnObject, (int)zoneObj.probability * 100);
             }
         }
     }

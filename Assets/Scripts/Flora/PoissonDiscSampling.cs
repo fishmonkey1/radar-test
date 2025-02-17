@@ -86,23 +86,6 @@ public static class PoissonDiscSampling {
 			return null;
 		}
 
-		(float, float) GetZoneRadius(Vector2 spawnCentre)
-		{
-			float elevationYlocal = GetLocalY(spawnCentre.x, spawnCentre.y, planeObj);
-			float candidateElevation = Mathf.InverseLerp(0f, 50f, elevationYlocal);
-
-			foreach (Zone zone in zones)
-			{
-				// for now selecting zone based on elevation
-				if (zone.elevationMin <= candidateElevation && candidateElevation <= zone.elevationMax)
-				{
-					(float, float) candidateRadius = (zone.minDensityPSD, zone.maxDensityPSD);
-					return candidateRadius;
-				}
-			}
-
-			return (-1f, -1f);
-		}
 	}
 
 
