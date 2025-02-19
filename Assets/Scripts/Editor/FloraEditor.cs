@@ -13,14 +13,23 @@ public class FloraEditor : Editor
             if (script.EditorAutoUpdate)
             {
                 script.DestroyExisting();
-                script.GenPSD();
+                script.GenPSD(script.sampleRegionSize/2);
             }
         }
 
         if (GUILayout.Button("Spawn Flora"))
         {
+            //script.DestroyExisting();
+            script.GenPSD(script.sampleRegionSize / 2);
+        }
+        if (GUILayout.Button("Spawn Grass"))
+        {
+            //script.DestroyExisting();
+            script.GenGrass();
+        }
+        if (GUILayout.Button("Destroy All"))
+        {
             script.DestroyExisting();
-            script.GenPSD();
         }
 
     }
