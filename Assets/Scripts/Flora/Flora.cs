@@ -15,7 +15,7 @@ public class Flora : MonoBehaviour
     Map floraMap;
 
     public bool genFlora = false;
-    public bool EditorAutoUpdate = true;
+    public bool EditNoise = true;
     List<Vector3> gizmo = new List<Vector3>();
     Dictionary<Vector3, Zone> gizmoDict = new Dictionary<Vector3, Zone>();
 
@@ -29,9 +29,11 @@ public class Flora : MonoBehaviour
     public int[,] grassNoiseMap;
 
     private Texture2D noiseTex;
+    private Texture2D noNoiseTex;
     private Color[] pix;
     private Renderer rend;
 
+    Zone grassZone;
 
     [SerializeField] public GameObject terrainPlaneObj;
 
@@ -56,30 +58,19 @@ public class Flora : MonoBehaviour
 
     public void GenGrass()
     {
-        if (map == null) map = new Map((int)sampleRegionSize.x, (int)sampleRegionSize.y); 
-        grassNoiseMap = new int[(int)sampleRegionSize.x, (int)sampleRegionSize.y];
-        Zone grassZone = GetGrassZone();
-        Grass(grassZone);
+        if (floraMap == null) floraMap = new Map((int)sampleRegionSize.x, (int)sampleRegionSize.y); 
+        //grassNoiseMap = new int[(int)sampleRegionSize.x, (int)sampleRegionSize.y];
+        grassZone = GetGrassZone();
+        CaclulatePDSandPlaceGrass();
 
         //uncomment to do both grass and other
         //GenPSD(defaultStartPoint);
 
     }
  
-    public void GenPSD(Vector2 startPoint, Zone zoneFilter=null)
+    public void GenPDS(Vector2 startPoint, Zone zoneFilter=null)
     //public void CalculateSpawnFlora()
     {   
-        /*if (grassNoiseMap.Length != sampleRegionSize.x*sampleRegionSize.y)
-        {
-            grassNoiseMap = new int[(int)sampleRegionSize.x, (int)sampleRegionSize.y];
-        }*/
-        /*if (zoneFilter != null)
-        {
-            if (zoneFilter.IsGrassZone == false)
-            {
-                grassNoiseMap = new int[(int)sampleRegionSize.x, (int)sampleRegionSize.y];
-            }
-        }*/
 
         InitZonesWeighted();
 
@@ -103,7 +94,6 @@ public class Flora : MonoBehaviour
             //get random spawnCentre from spawnPoints
             int spawnIndex = Random.Range(0, spawnPoints.Count);
             Vector2 spawnCentre = spawnPoints[spawnIndex];
-            //Debug.Log("spawnCentre:  "+spawnCentre.x+"   "+spawnCentre.y);
 
             bool candidateAccepted = false;
 
@@ -299,19 +289,16 @@ public class Flora : MonoBehaviour
         return null;
     }
 
-    public void Grass(Zone grassZone)
+    public void CaclulatePDSandPlaceGrass()
     {
-
-        
-        Debug.Log(grassNoiseMap.Length);
-        grassTexture();
-
-        if (grassZone==null)
+        if (grassZone == null)
         {
-            Debug.Log("No grassZone, cannot spawn grass");
-            return;
+            grassZone = GetGrassZone();
         }
-
+        if (grassNoiseMap == null)
+        {
+            CalculateGrassNoise(false);
+        }
 
         for (int x = 0; x < sampleRegionSize.x; x+=8) 
         {
@@ -321,63 +308,85 @@ public class Flora : MonoBehaviour
                 if (grassNoiseMap[x,y] != 0)
                 {
                     // we got grass, now run PSD
-                    GenPSD(new Vector2(y,x), grassZone);
+                    GenPDS(new Vector2(y,x), grassZone);
  
                 } 
             }
         }
+    }
 
+    public void CalculateGrassNoise(bool DrawNoise=false, bool UndoDrawNoise=false)
+    {
+        if (UndoDrawNoise) { RevertTexture(); return; }
 
-
-
-        void grassTexture()
+        if (grassZone==null)
         {
-            int pixWidth = (int)sampleRegionSize.x;
-            int pixHeight = (int)sampleRegionSize.y;
-            rend = terrainPlaneObj.GetComponent<Renderer>();
-            // Set up the texture and a Color array to hold pixels during processing.
-            noiseTex = new Texture2D(pixWidth, pixHeight);
-            //pix = new Color[noiseTex.width * noiseTex.height];
-            //rend.sharedMaterial.mainTexture = noiseTex;
+            Debug.Log("No grassZone, cannot spawn grass");
+            return;
+        }
 
-            if (colorGrass == false)
-            {
-                grass = sand;
-            }
+        grassNoiseMap = new int[(int)sampleRegionSize.x, (int)sampleRegionSize.y];
 
-            // For each pixel in the texture...
-            for (float y = 0.0f; y < noiseTex.height; y++)
+        int pixWidth = (int)sampleRegionSize.x;
+        int pixHeight = (int)sampleRegionSize.y;
+        rend = terrainPlaneObj.GetComponent<Renderer>();
+
+        noiseTex = new Texture2D(pixWidth, pixHeight);
+        pix = new Color[noiseTex.width * noiseTex.height];
+        if (noNoiseTex == null && EditNoise == true) { noNoiseTex = (Texture2D)rend.sharedMaterial.mainTexture; } //nab and store original before changing
+        rend.sharedMaterial.mainTexture = noiseTex;
+        
+
+        
+
+        // For each pixel in the texture...
+        for (float y = 0.0f; y < noiseTex.height; y++)
+        {
+            for (float x = 0.0f; x < noiseTex.width; x++)
             {
-                for (float x = 0.0f; x < noiseTex.width; x++)
+                float xCoord = x / noiseTex.width * scale;
+                float yCoord = y / noiseTex.height * scale;
+                float sample = Mathf.PerlinNoise(xCoord, yCoord);
+
+
+                if (sample <= step)
                 {
-                    float xCoord = x / noiseTex.width * scale;
-                    float yCoord = y / noiseTex.height * scale;
-                    float sample = Mathf.PerlinNoise(xCoord, yCoord);
-                    
-
-                    if (sample <= step)
+                    pix[(int)y * noiseTex.width + (int)x] = grass;
+                    grassNoiseMap[(int)x, (int)y] = 1; // set from 0 --> 1 if grass
+                    if (DrawNoise)
                     {
-                        //pix[(int)y * noiseTex.width + (int)x] = grass;
                         grassNoiseMap[(int)x, (int)y] = 1; // set from 0 --> 1 if grass
                     }
-                    else
-                    {
-                        //pix[(int)y * noiseTex.width + (int)x] = sand;
-                    }
-
-
                 }
+                else
+                {
+                    if (DrawNoise)
+                    {
+                        pix[(int)y * noiseTex.width + (int)x] = sand;
+                    }
+                }
+
             }
-
-            // Copy the pixel data to the texture and load it into the GPU.
-            //.SetPixels(pix);
-            //noiseTex.Apply();
-
-            //for row in map, skipping 5
-            // iterate skipping 2
-            // if IsGrassZone
-            // Run PSD
         }
+
+        // Copy the pixel data to the texture and load it into the GPU.
+        noiseTex.SetPixels(pix);
+        noiseTex.Apply();
+
+        void RevertTexture()
+        {   
+            rend = terrainPlaneObj.GetComponent<Renderer>();
+            pix = new Color[noiseTex.width * noiseTex.height];
+            for (int i = 0; i < pix.Length; ++i)
+            {
+                pix[i] = sand;
+            }
+            noNoiseTex = new Texture2D(noiseTex.width, noiseTex.width);
+            rend.sharedMaterial.mainTexture = noNoiseTex;
+            noNoiseTex.SetPixels(pix);
+            noNoiseTex.Apply();
+        }
+
     }
 
     public void SpawnObjectInZone(Vector2 location, Zone zone)
