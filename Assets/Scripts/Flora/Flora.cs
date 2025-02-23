@@ -13,6 +13,7 @@ public class Flora : MonoBehaviour
     [SerializeField] float floraPrefabsScaleMax;
 
     Map floraMap;
+    
 
     public bool genFlora = false;
     public bool EditNoise = true;
@@ -86,6 +87,8 @@ public class Flora : MonoBehaviour
         // make array of ints (zeros) in size of sampleRegion. so if cell is 2 and region is 300, it would be 150x150 array 
         int[,] grid = new int[Mathf.CeilToInt(sampleRegionSize.x / cellSize), Mathf.CeilToInt(sampleRegionSize.y / cellSize)];
 
+
+        FloodfillZone(((int)startPoint.x,(int)startPoint.y));
 
         // main loop
         while (spawnPoints.Count > 0)
@@ -162,8 +165,10 @@ public class Flora : MonoBehaviour
                 spawnPoints.RemoveAt(spawnIndex);
             }
 
+            
+
         }
-        
+
 
         // checks the surrounding cells around a candidate
         // to make sure there aren't any too close to it which would invalidate it
@@ -241,9 +246,10 @@ public class Flora : MonoBehaviour
     }
 
 
-    public bool isGrassAtLocation(Vector2 location)
+    public bool isGrassAtLocation(Tile tile)
     {   
-        if (grassNoiseMap[(int)location.x, (int)location.y] != 0)
+        
+        if (grassNoiseMap[(int)tile.x, (int)tile.y] != 0)
         {
             return true;
         }
@@ -255,10 +261,11 @@ public class Flora : MonoBehaviour
 
     public Zone GetZone(Vector2 location)
     {
-        float elevationYlocal = GetLocalY(location.x, location.y, terrainPlaneObj);
+        Tile t = floraMap.GetTile(((int)location.x, (int)location.y));
+        float elevationYlocal = GetLocalY(t.x, t.y, terrainPlaneObj);
         float candidateElevation = Mathf.InverseLerp(0f, highestPoint, elevationYlocal);
 
-        if (isGrassAtLocation(location))
+        if (isGrassAtLocation(t))
         {
             return GetGrassZone();
         }
@@ -305,9 +312,9 @@ public class Flora : MonoBehaviour
             for (int y = 0; y < sampleRegionSize.y; y+=8)
             { 
 
-                if (grassNoiseMap[x,y] != 0)
+                if (grassNoiseMap[x,y] != 0 && !floraMap.GetTile(x,y).grassSpawned)
                 {
-                    // we got grass, now run PSD
+                    // we got grass and haven't run PDS, now run PSD
                     GenPDS(new Vector2(y,x), grassZone);
  
                 } 
@@ -425,6 +432,40 @@ public class Flora : MonoBehaviour
         }
     }
 
+    private void FloodfillZone((int,int)coords)
+    {
+        Pathfinding pf = new Pathfinding(floraMap);
+        Tile startTile = floraMap.GetTile(coords);
+        List<Tile> zoneTiles = new List<Tile>(); //For holding all the tiles that are found, 
+        Queue<Tile> frontier = new Queue<Tile>(); //All eligible neighbors we've found
+        frontier.Enqueue(startTile);
+
+        while (frontier.Count != 0)
+        { //time to start finding neighbors
+            Tile t = frontier.Dequeue();
+            zoneTiles.Add(t);
+
+            List<Tile> neighbors = pf.GetNeighbors(coords, isGrassAtLocation, eightNeighbors: false);
+
+            if (neighbors.Count == 0)
+            {
+                //Debug.Log($"No valid neighbors found during the floodfill at {t.x},{t.y}");
+                continue; //Keep going, we found nothing
+            }
+
+            foreach (Tile neighbor in neighbors)
+            {
+                if (frontier.Contains(neighbor) || zoneTiles.Contains(neighbor))
+                    continue; //Don't add tiles that have already been looked at
+                frontier.Enqueue(neighbor);
+            }
+        }
+
+        foreach (Tile t in zoneTiles)
+        {
+             t.grassSpawned = true;
+        }
+    }
 
     public static float GetLocalY(float x, float y, GameObject obj)
     {

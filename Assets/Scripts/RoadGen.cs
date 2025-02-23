@@ -282,7 +282,7 @@ public class RoadGen : MonoBehaviour
                 DrawColorAtPoint(points.Item1, points.Item2, Color.cyan);
 
                 Tile t = map.GetTile(points.x, points.y);
-                var border = pathFinding.GetNeighbors(points, pathFinding.TileOverElevation, true, null, -999f);
+                var border = pathFinding.GetNeighbors(points, null, true, null, -999f);
                 foreach (Tile tt in border) DrawColorAtPoint(tt.x, tt.y, Color.cyan);
             }
 

@@ -18,6 +18,8 @@ namespace ProcGenTiles
         public bool is420;
         public bool is42069;
 
+        public bool grassSpawned;
+
 
         public Tile(int x, int y)
         {

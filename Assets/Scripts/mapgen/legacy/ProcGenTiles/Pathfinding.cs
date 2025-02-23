@@ -119,7 +119,7 @@ namespace ProcGenTiles
                 t.ValuesHere.Add("Land", 1);               // Do we still need this ???
                 t.ValuesHere.Add("Region", regionNumber);  // Do we still need this ???
 
-                List<Tile> neighbors = GetNeighbors(t.x, t.y, TileOverElevation, eightNeighbors: false, checkFloat: elevationLimit);
+                List<Tile> neighbors = GetNeighbors(t.x, t.y, null , eightNeighbors: false, checkFloat: elevationLimit);
 
                 if (neighbors.Count == 0)
                 {
@@ -271,7 +271,7 @@ namespace ProcGenTiles
         /// <param name="checkFunction"></param>
         /// <param name="optionalAddList"></param>
         /// <returns>List<(int x, int y)></returns>
-        public List<Tile> GetNeighbors((int x, int y) coords, Func<Tile, float, bool> checkFunction, bool eightNeighbors, List<Tile> optionalAddList = null, float checkFloat = 0)
+        public List<Tile> GetNeighbors((int x, int y) coords, Func<Tile, bool> checkFunction, bool eightNeighbors, List<Tile> optionalAddList = null, float checkFloat = 0)
         {
             List<Tile> foundNeighbors = null;
             if (optionalAddList == null)
@@ -307,7 +307,7 @@ namespace ProcGenTiles
             {
                 if (direction != null)
                 {
-                    if (checkFunction(direction, checkFloat))
+                    if (checkFunction(direction))
                     {
                         foundNeighbors.Add(direction);
                     }
@@ -331,7 +331,7 @@ namespace ProcGenTiles
         /// <param name="checkFunction"></param>
         /// <param name="optionalAddList"></param>
         /// <returns></returns>
-        private List<Tile> GetNeighbors(int x, int y, Func<Tile, float, bool> checkFunction, bool eightNeighbors, List<Tile> optionalAddList = null, float checkFloat = 0 )
+        private List<Tile> GetNeighbors(int x, int y, Func<Tile, bool> checkFunction, bool eightNeighbors, List<Tile> optionalAddList = null, float checkFloat = 0 )
         {
             return GetNeighbors((x, y), checkFunction, eightNeighbors, optionalAddList, checkFloat);
         }
@@ -442,7 +442,7 @@ namespace ProcGenTiles
                     return finalPath;
                 }
 
-                List<Tile> neighbors = GetNeighbors(current.x, current.y, TileUnderElevation,eightNeighbors: true, checkFloat: elevationLimit);
+                List<Tile> neighbors = GetNeighbors(current.x, current.y, null,eightNeighbors: true, checkFloat: elevationLimit);
                 foreach (Tile neighbor in neighbors)
                 {
                     if (closedSet.Contains(neighbor)) continue;
