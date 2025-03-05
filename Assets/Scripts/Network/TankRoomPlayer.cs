@@ -75,7 +75,8 @@ public class TankRoomPlayer : NetworkRoomPlayer
     { //The server runs this on all connected clients, excluding the person who sent the message
         if (string.Equals(PlayerProfile.LoadedProfileName, profile.PlayerName))
         {
-            Debug.Log("Received broadcasted profile, but it matches our loaded profile.");
+            Debug.Log("Received broadcasted profile, but it matches our loaded profile. Setting local player variable.");
+            TankRoomManager.LocalPlayerProfile = profile;
         }
         else
         { //Otherwise we have somebody else's profile, so lets update things

@@ -33,6 +33,8 @@ public class TankRoomManager : NetworkRoomManager
 
     public static new TankRoomManager singleton => NetworkManager.singleton as TankRoomManager;
 
+    public static PlayerProfile LocalPlayerProfile;
+
     public override void ReadyStatusChanged()
     {
         base.ReadyStatusChanged();
@@ -133,14 +135,38 @@ public class TankRoomManager : NetworkRoomManager
         }
         if (sceneName == GameplayScene)
         {
+            // All of this section needs to be replaced with the spawning information we have in Spawner.cs, and we also need to link the information from the GroupToVehicles section here as well.
+
+            //We need to spawn every tank that was set up in the lobby
+            foreach (var data in GroupToVehicles)
+            {
+                VehicleData vehicle = data.Key;
+                ProfileGroup group = data.Value;
+
+                //Now we must try to spawn the vehicle itself
+                Spawner spawner = Spawner.instance; //Grab a reference to the spawner to save on typing later
+                SpawnResult result = spawner.TrySpawnVehicle(vehicle.VehiclePrefab); //Ask to spawn the vehicle in
+                //Now we check the result to see what to do next
+                if (result.WasSuccessful)
+                { //Yaaaay! We did it and spawned in the vehicle. Now we need to spawn it across the network and set up all the profiles with their correct roles
+                    NetworkServer.Spawn(result.SpawnedVehicle); //Spawn the vehicle across the network
+                    //Update the server's side of the group with their roles
+                    foreach (PlayerProfile profile in group.Group)
+                    {
+                        profile.SetHorniTank(result.SpawnedVehicle); //Set the vehicle on each profile on the server's side
+                    }
+                    RoomNetworking.RpcSpawnVehicle(result.SpawnedVehicle, group); //Alert the clients to the spawning and have them set up locally
+                }
+            }
+
             //Time to spawn the tank in
             //We'll worry about picking a proper spawn point later on
-            
+
             //Since the HorniTank is a syncvar we shouldn't need to manually invoke the event handler. This should just work
-            GameObject tank = GameObject.Instantiate(horniTankPrefab); //Double check this puts the tank at 0,0,0
+            /*GameObject tank = GameObject.Instantiate(horniTankPrefab); //Double check this puts the tank at 0,0,0
             NetworkServer.Spawn(tank); //Spawn the tank across the server for everyone
             RoomNetworking.HorniTank = tank;
-            Debug.Log($"Tank var is {tank} and RoomNetworking is {RoomNetworking} with its HorniTank set to {RoomNetworking.HorniTank}");
+            Debug.Log($"Tank var is {tank} and RoomNetworking is {RoomNetworking} with its HorniTank set to {RoomNetworking.HorniTank}");*/
 
             GameObject canvas = GameObject.Find("Canvas");
             GameObject chatroomObject = GameObject.Instantiate(chatroomPrefab, canvas.transform);
@@ -168,6 +194,8 @@ public class TankRoomManager : NetworkRoomManager
         {
             connectedPlayers.Add(identity, profile); //Put them in the connected dictionary
         }
+        if (profile.Holder.IsLocalPlayer())
+            LocalPlayerProfile = profile; //Set this profile up to be easily referenced from other scripts
         //TODO: I want to add random connection messages like discord does with people joining a server. There is a trello card for this request.
         chatroom.SendServerMessage($"{profile.PlayerName} has connected!", new Chat.MessageContext(Chat.MessageTypes.SERVER, true, false));
     }
@@ -175,7 +203,7 @@ public class TankRoomManager : NetworkRoomManager
     public void SetVehicleSpawnData( Dictionary<VehicleData, ProfileGroup> data)
     {
         GroupToVehicles = data; //Set our dictionary to match the info passed in from the VehiclePicker
-        RoomNetworking.BroadcastVehicleSpawnData(data.Keys.ToArray(), data.Values.ToArray());
+        RoomNetworking.RpcBroadcastVehicleSpawnData(data.Keys.ToArray(), data.Values.ToArray());
     }
 
     public override void OnGUI()

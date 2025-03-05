@@ -64,7 +64,7 @@ public class VehicleSpawnPosition : MonoBehaviour
         _gizmoSize = Mathf.Max(0.1f, _gizmoSize);
 
         // Update name in hierarchy if label is set
-        if (!string.IsNullOrEmpty(_spawnPointLabel)
+        if (!string.IsNullOrEmpty(_spawnPointLabel))
         {
             gameObject.name = $"SpawnPoint [{_spawnPointLabel}]";
         }

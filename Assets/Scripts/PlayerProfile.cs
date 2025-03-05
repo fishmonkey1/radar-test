@@ -74,7 +74,7 @@ public class PlayerProfile
     /// Called by the <see cref="TankRoomManager"/> when there is a tank spawned for this profile.
     /// </summary>
     /// <param name="horniTank">The tank spawned by the <see cref="TankRoomManager"/></param>
-    void SetHorniTank(GameObject horniTank)
+    public void SetHorniTank(GameObject horniTank)
     {
         if (CrewedVehicle == null)
         { //A tank hasn't been assigned, so let's update our reference

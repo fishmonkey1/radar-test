@@ -19,6 +19,9 @@ public class RoomNetworking : NetworkBehaviour
     public event OnChangeHorniTank OnChangeHorniTankEvent;
     public delegate void OnChangeHorniTank(GameObject HorniTank); //Delegate to fire when we change the tank reference
 
+    public event OnSpawnPlayerVehicle OnSpawnPlayerVehicleEvent;
+    public delegate void OnSpawnPlayerVehicle(GameObject SpawnedVehicle);
+
     void Awake()
     {
         roomManager = TankRoomManager.singleton; //In case we need to call things over there or set stuff
@@ -31,7 +34,21 @@ public class RoomNetworking : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void BroadcastVehicleSpawnData(VehicleData[] vehicles, ProfileGroup[] groups)
+    public void RpcSpawnVehicle(GameObject spawnedVehicle, ProfileGroup crew)
+    {
+        //Server made a vehicle, now the players need to be informed of it
+        PlayerProfile local = TankRoomManager.LocalPlayerProfile;
+        foreach (PlayerProfile profile in crew.Group)
+        {
+            if (profile.PlayerName == local.PlayerName)
+            { //This player signed up to be on this tank, so let's set them up with their role
+                profile.SetHorniTank(spawnedVehicle);
+            }
+        }
+    }
+
+    [ClientRpc]
+    public void RpcBroadcastVehicleSpawnData(VehicleData[] vehicles, ProfileGroup[] groups)
     {
         //Match up the vehicles to the groups by index, since it was sent from a dictionary
         //TODO: verify the dictionary is sent properly
