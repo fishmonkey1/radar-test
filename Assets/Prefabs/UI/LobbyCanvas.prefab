@@ -121,7 +121,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5006766158866082856}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1348,7 +1348,7 @@ MonoBehaviour:
     PlayerProfiles: []
     VehiclePrefab: {fileID: 4283197213913971331, guid: cc463bf9a62b9234994922418126b6e2, type: 3}
     VehicleId: 0
-    VehicleName: 
+    VehicleName: Dev Test Tank
 --- !u!223 &4456731233276219804
 Canvas:
   m_ObjectHideFlags: 0
@@ -2588,7 +2588,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.000015258789, y: 0.000006854534}
+  m_AnchoredPosition: {x: -0.000015258789, y: -0.000011920929}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &6910279031967597886
@@ -3816,6 +3816,8 @@ MonoBehaviour:
   syncInterval: 0
   buttonPrefab: {fileID: 7151781250998158829, guid: e12ca72b859f034499ea6e00f3a221ba, type: 3}
   ButtonPanel: {fileID: 6946485136432194630}
+  TeamsScriptableObjects:
+  - {fileID: 11400000, guid: 56385d7ead29b764b80d7a8e962064fc, type: 2}
 --- !u!222 &8419908772530966141
 CanvasRenderer:
   m_ObjectHideFlags: 0

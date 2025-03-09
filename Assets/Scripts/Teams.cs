@@ -14,12 +14,34 @@ namespace HorniTank
             {
                 if (instance == null)
                 {
+                    UnityEngine.Debug.Log("Creating requested new Teams instance ");
                     instance = new Teams();
                 }
                 return instance;
             }
         }
-        public List<TeamInfo> AllTeams = new();
+        List<TeamInfo> AllTeams = new();
+
+        public static void AddTeam(TeamInfo team)
+        {
+            UnityEngine.Debug.Log($"Adding team {team.TeamName} to Teams instance.");
+            if (!IsTeamInList(team))
+                Instance.AllTeams.Add(team);
+            else
+            {
+                UnityEngine.Debug.LogWarning($"Team {team.TeamName} already exists in the list of all teams. Investigate this Vicky, you done something fucky. >:c"); //Bully the programmer (we know its going to be Vicky that fucks this up)
+            }
+        }
+
+        static bool IsTeamInList(TeamInfo team)
+        {
+            for (int i = 0; i < Instance.AllTeams.Count; i++)
+            {
+                if (team.TeamId == Instance.AllTeams[i].TeamId)
+                    return true;
+            }
+            return false;
+        }
 
         public static TeamInfo GetTeamByID(uint id)
         {
@@ -78,7 +100,7 @@ namespace HorniTank
 
         public TeamInfo()
         {
-            Teams.Instance.AllTeams.Add(this); //Try to add ourselves to the team list
+            Teams.AddTeam(this); //Try to add ourselves to the team list
         }
 
         public string TeamName;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
- 
+
 namespace HorniTank
 {
     /// <summary>
@@ -12,9 +12,9 @@ namespace HorniTank
     public class VehiclePicker : NetworkBehaviour
     {
         /// <summary>
-        /// Synchronizes all of the vehicles that have been requested by players on this team, up to the vehicle limit defined by TeamInfo.
+        /// Synchronizes all of the vehicles that have been requested by players on this team, up to the vehicle limit defined by TeamInfo. The component is fetched off of the prefab
         /// </summary>
-        public VehicleSpawnData AllVehicles = new();
+        public VehicleSpawnData AllVehicles;
         /// <summary>
         /// The team that this picker is for, which is set by the Lobby script after the TeamPicker has been done.
         /// </summary>
@@ -102,7 +102,7 @@ namespace HorniTank
             }
 
             int index = 0;
-            foreach(VehicleData vehicle in VehicleToProfiles.Keys)
+            foreach (VehicleData vehicle in VehicleToProfiles.Keys)
             { //Go through each vehicle that has been requested and draw a button for them
                 GameObject JoinVehicleButton = CrewedVehiclesButtons[index]; //Nab the button out of our list
                 Button JoinVehicle = JoinVehicleButton.GetComponent<Button>();
@@ -166,7 +166,7 @@ namespace HorniTank
             DrawCrewedVehiclesButtons(); //Refresh the client's buttons afterwards
         }
 
-        [Command(requiresAuthority =false)]
+        [Command(requiresAuthority = false)]
         public void LeaveVehicleCrew(VehicleData vehicle, PlayerProfile requestingPlayer)
         {
             //Remove the player from the vehicle, and if they were the only crew in it then remove the vehicle too

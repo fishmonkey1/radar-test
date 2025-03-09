@@ -32,12 +32,16 @@ namespace HorniTank
             //If we're in cooperative mode, then there is only one team to join. We'll assign the friendly team to ourselves and then move on to the vehicle picker.
             if (GameModes.GetCurrentGameMode() == GameModes.Cooperative)
             {
-                localPickedTeam = Teams.GetTeamByName("Friendly"); //In cooperative mode all players are on the Friendly team
+                //We need to make sure the Teams section has been populated, which means we need to call the TeamPicker
+                teamPicker.InitializeTeams();
+                //TODO: Get rid of this hardcoding Vicky, its horrible! You need to put information in the Gamemode to list which teams are options, then move all of this stuff over there
+                localPickedTeam = Teams.GetTeamByName("Friendly"); //In cooperative mode all players are on the Friendly team. As long as the Teams.Instance.AllTeams list is populated, this will work. Possible that the teamPicker may not work.
                 ShowVehiclePicker();
             }
             //Otherwise we need to have the player select their team first
             else
             {
+                //TODO: Finished Team Picker when other gamemodes are implemented
                 ShowTeamPicker();
             }
         }
