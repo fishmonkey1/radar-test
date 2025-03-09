@@ -51,6 +51,9 @@ namespace HorniTank
 
         List<GameObject> CrewedVehiclesButtons = new(); //I'm gonna use this to update buttons when things change. Use it kinda like object pooling. Shhh, Mommy's cooking
 
+        /// <summary>
+        /// Once a button for each requested Vehicle is drawn, don't create them all again by setting this to true.
+        /// </summary>
         bool initFinished = false;
 
         private void Start()
