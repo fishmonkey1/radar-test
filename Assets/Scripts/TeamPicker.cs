@@ -13,6 +13,27 @@ public class TeamPicker : NetworkBehaviour
     List<GameObject> buttons = new();
     TeamInfo SelectedTeam = null;
 
+    /// <summary>
+    /// This is temporarily in place until I can have information about which teams are availible passed in from the Gamemode data. This is set by InitalizeTeams from the Lobby script.
+    /// </summary>
+    public List<TeamsScriptableObject> TeamScriptableObjects = new();
+
+    public void InitializeTeams()
+    {
+        Debug.Log("Initializing Teams list with temporary teams info");
+        if (TeamScriptableObjects.Count == 0)
+        {
+            Debug.Log("You forgot to assign teams to the TeamPicker component!"); //Bully the programmer
+        }
+        else
+        {
+            foreach (var team in TeamScriptableObjects)
+            {
+                Teams.AddTeam(team.Team);
+            }
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {

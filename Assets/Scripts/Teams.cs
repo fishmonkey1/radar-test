@@ -30,6 +30,7 @@ namespace HorniTank
             else
             {
                 UnityEngine.Debug.LogWarning($"Team {team.TeamName} already exists in the list of all teams. Investigate this Vicky, you done something fucky. >:c"); //Bully the programmer (we know its going to be Vicky that fucks this up)
+                UnityEngine.Debug.Log(team.GetDebugInfo());
             }
         }
 
@@ -98,11 +99,6 @@ namespace HorniTank
     public class TeamInfo
     {
 
-        public TeamInfo()
-        {
-            Teams.AddTeam(this); //Try to add ourselves to the team list
-        }
-
         public string TeamName;
         /// <summary>
         /// TeamId is used as a primary key when determining which team we're trying to find.
@@ -116,5 +112,10 @@ namespace HorniTank
         public uint TeamLimit = 32;
         public List<uint> EnemyTeamIds = new();
         public List<uint> FriendlyTeamIds = new();
+
+        public string GetDebugInfo()
+        {
+            return $"Team name: {TeamName}, ID: {TeamId}, Limit: {TeamLimit}";
+        }
     }
 }

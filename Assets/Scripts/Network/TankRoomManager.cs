@@ -35,6 +35,9 @@ public class TankRoomManager : NetworkRoomManager
 
     public static PlayerProfile LocalPlayerProfile;
 
+    public delegate void OnLocalPlayerChanged();
+    public static OnLocalPlayerChanged OnLocalPlayerChangedEvent;
+
     public override void ReadyStatusChanged()
     {
         base.ReadyStatusChanged();
@@ -195,7 +198,11 @@ public class TankRoomManager : NetworkRoomManager
             connectedPlayers.Add(identity, profile); //Put them in the connected dictionary
         }
         if (profile.Holder.IsLocalPlayer())
+        {
             LocalPlayerProfile = profile; //Set this profile up to be easily referenced from other scripts
+            Debug.Log($"Added profile named {profile.PlayerName} as the Local Player");
+            OnLocalPlayerChangedEvent?.Invoke(); //Invoke the event if anyone is listening
+        }
         //TODO: I want to add random connection messages like discord does with people joining a server. There is a trello card for this request.
         chatroom.SendServerMessage($"{profile.PlayerName} has connected!", new Chat.MessageContext(Chat.MessageTypes.SERVER, true, false));
     }

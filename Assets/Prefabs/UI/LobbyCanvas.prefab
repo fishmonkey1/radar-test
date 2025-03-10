@@ -899,7 +899,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2156991853026865319}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.9410547
+  m_Size: 0.94105476
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2588,7 +2588,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.000015258789, y: -0.000011920929}
+  m_AnchoredPosition: {x: -0.000015258789, y: -0.000014781952}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &6910279031967597886
@@ -3816,7 +3816,7 @@ MonoBehaviour:
   syncInterval: 0
   buttonPrefab: {fileID: 7151781250998158829, guid: e12ca72b859f034499ea6e00f3a221ba, type: 3}
   ButtonPanel: {fileID: 6946485136432194630}
-  TeamsScriptableObjects:
+  TeamScriptableObjects:
   - {fileID: 11400000, guid: 56385d7ead29b764b80d7a8e962064fc, type: 2}
 --- !u!222 &8419908772530966141
 CanvasRenderer:

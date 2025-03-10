@@ -58,13 +58,28 @@ namespace HorniTank
 
         private void Start()
         {
-            CreatePrefabPickerButtons(); //Populate the prefab picker
-            DrawCrewedVehiclesButtons(); //Then populate the vehicle crews UI
+            if (TankRoomManager.LocalPlayerProfile != null)
+            {
+                CreatePrefabPickerButtons(); //Populate the prefab picker
+                DrawCrewedVehiclesButtons(); //Then populate the vehicle crews UI
+            }
+            else
+            {
+                TankRoomManager.OnLocalPlayerChangedEvent += CreateButtonsAndDraw;
+            }
+        }
+
+        public void CreateButtonsAndDraw()
+        {
+            CreatePrefabPickerButtons();
+            DrawCrewedVehiclesButtons();
         }
 
         public void CreatePrefabPickerButtons()
         {
-            PlayerProfile localProfile = NetworkClient.localPlayer.GetComponent<ProfileHolder>().Profile;
+
+            PlayerProfile localProfile = TankRoomManager.LocalPlayerProfile;
+            Debug.Log($"Fetching LocalPlayerProfile with name of {localProfile.PlayerName}");
             foreach (VehicleData vehicle in AllVehicles.VehicleData)
             {
                 //Make button
