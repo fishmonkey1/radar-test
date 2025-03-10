@@ -69,6 +69,9 @@ namespace HorniTank
             }
         }
 
+        /// <summary>
+        /// Wrapper function for now as Victoria migrates away from Mirror's version of lobbies
+        /// </summary>
         public void CreateButtonsAndDraw()
         {
             CreatePrefabPickerButtons();
@@ -79,13 +82,16 @@ namespace HorniTank
         {
 
             PlayerProfile localProfile = TankRoomManager.LocalPlayerProfile;
-            Debug.Log($"Fetching LocalPlayerProfile with name of {localProfile.PlayerName}");
+            Debug.Log($"Fetching LocalPlayerProfile with name of {localProfile.PlayerName} for the vehicle picker");
             foreach (VehicleData vehicle in AllVehicles.VehicleData)
             {
-                //Make button
+                //Make button for the prefab
                 GameObject ButtonInstance = GameObject.Instantiate(ButtonPrefab, VehiclePrefabPanel);
                 Button ButtonScript = ButtonInstance.GetComponent<Button>();
                 ButtonScript.onClick.AddListener(() => RequestNewVehicle(vehicle, localProfile));
+                //Now fetch the button text so we can update it
+                TextMeshProUGUI buttonText = ButtonInstance.GetComponentInChildren<TextMeshProUGUI>();
+                buttonText.text = vehicle.VehicleName; //Set the button to the name of the VehicleData
             }
         }
 
