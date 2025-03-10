@@ -1,4 +1,5 @@
 using Mirror;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace HorniTank
@@ -85,10 +86,15 @@ namespace HorniTank
             currentScreen = rolePickerWindow;
         }
 
+        
         public void OnGameReady()
         {
             //We fire this after clicking the ready button. We pass the VehiclePicker's data into the TankRoomManager
             TankRoomManager tankRoom = TankRoomManager.singleton;
+            foreach (var vehicle in vehiclePicker.VehicleToProfiles.Keys)
+            {
+                Debug.Log($"Name: {vehicle.VehicleName}, Prefab value: {vehicle.VehiclePrefab}, value is prefab definition {vehicle.VehiclePrefab.IsPrefabDefinition()}");
+            }
             tankRoom.SetVehicleSpawnData(vehiclePicker.VehicleToProfiles); //Hand over the vehicle spawn data
         }
 

@@ -1,4 +1,5 @@
 using HorniTank;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,6 +36,7 @@ public class VehicleData
     /// <summary>
     /// The linked object to wire up when spawned
     /// </summary>
+    [NonSerialized]
     public GameObject VehiclePrefab; //The GameObject to instantiate for this vehicle
     /// <summary>
     /// The ID of this vehicle prefab.

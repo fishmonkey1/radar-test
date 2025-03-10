@@ -36,6 +36,12 @@ namespace HorniTank
         /// </summary>
         [SerializeField]
         RectTransform VehiclePrefabPanel;
+        
+        /// <summary>
+        /// The scroll area to place the buttons inside of
+        /// </summary>
+        [SerializeField]
+        RectTransform VehiclePrefabButtonPanel;
 
         /// <summary>
         /// A plain button prefab for linking up to this script
@@ -86,13 +92,14 @@ namespace HorniTank
             foreach (VehicleData vehicle in AllVehicles.VehicleData)
             {
                 //Make button for the prefab
-                GameObject ButtonInstance = GameObject.Instantiate(ButtonPrefab, VehiclePrefabPanel);
+                GameObject ButtonInstance = GameObject.Instantiate(ButtonPrefab, VehiclePrefabButtonPanel);
                 Button ButtonScript = ButtonInstance.GetComponent<Button>();
                 ButtonScript.onClick.AddListener(() => RequestNewVehicle(vehicle, localProfile));
                 //Now fetch the button text so we can update it
                 TextMeshProUGUI buttonText = ButtonInstance.GetComponentInChildren<TextMeshProUGUI>();
                 buttonText.text = vehicle.VehicleName; //Set the button to the name of the VehicleData
             }
+            VehiclePrefabPanel.gameObject.SetActive(false);
         }
 
         public void DrawCrewedVehiclesButtons()
@@ -107,20 +114,25 @@ namespace HorniTank
                 GameObject CreateVehicleButton = GameObject.Instantiate(ButtonPrefab, JoinCrewButtonPanel);
                 Button CreateVehicle = CreateVehicleButton.GetComponent<Button>();
                 CreateVehicle.onClick.AddListener(() => ShowPrefabPicker()); //Open the prefab picker when you click on the add new vehicle button
+                TextMeshProUGUI buttonText = CreateVehicleButton.GetComponentInChildren<TextMeshProUGUI>(); //Nab the text for this button
+                buttonText.text = "Crew New Vehicle"; //HACK: Just hardcoding the vehicle text for now, might want to consider changing this later on
                 initFinished = true;
             }
 
             //Fetch the local profile so the buttons know who is requesting vehicles
-            PlayerProfile localProfile = NetworkClient.localPlayer.GetComponent<ProfileHolder>().Profile;
+            PlayerProfile localProfile = TankRoomManager.LocalPlayerProfile;
 
-            if (VehicleToProfiles.Keys.Count > CrewedVehiclesButtons.Count)
+            if (VehicleToProfiles.Count > CrewedVehiclesButtons.Count)
             { //We've added more elements than we have buttons to render, let's fix that
-                for (int i = (VehicleToProfiles.Keys.Count - 1) - (CrewedVehiclesButtons.Count - 1); i < VehicleToProfiles.Keys.Count; i++)
+                for (int i = CrewedVehiclesButtons.Count - 1; i < VehicleToProfiles.Count - 1; i++)
                 { //Go through and add buttons for all of the missing ones
                     GameObject JoinButton = GameObject.Instantiate(ButtonPrefab, JoinCrewButtonPanel);
                     CrewedVehiclesButtons.Add(JoinButton);
+                    Debug.Log("Added a button for joining a vehicle crew.");
                 }
             }
+
+            Debug.Log($"Length of CrewedVehiclesButtons is {CrewedVehiclesButtons.Count} and VehicleToProfiles has {VehicleToProfiles.Count} elements");
 
             int index = 0;
             foreach (VehicleData vehicle in VehicleToProfiles.Keys)
@@ -147,7 +159,14 @@ namespace HorniTank
 
         void ShowPrefabPicker()
         {
-            VehiclePrefabPicker.SetActive(true);
+            Debug.Log("Showing Prefab Picker to pick vehicle to crew");
+            VehiclePrefabPanel.gameObject.SetActive(true);
+        }
+
+        void HidePrefabPicker()
+        {
+            Debug.Log("Hiding prefab picker");
+            VehiclePrefabPanel.gameObject.SetActive(false);
         }
 
         [Command(requiresAuthority = false)]
@@ -171,15 +190,26 @@ namespace HorniTank
             ProfileGroup newGroup = new ProfileGroup();
             newGroup.Group.Add(requestingPlayer);
             VehicleToProfiles.Add(vehicle, newGroup); //Stick the info into the dictionary. Now we need to update all the players
-            DrawCrewedVehiclesButtons(); //Refresh our buttons on the host
+            //DrawCrewedVehiclesButtons(); //Refresh our buttons on the host
+            Debug.Log("Informing clients of new vehicle that was created");
             VehicleRequested(vehicle, requestingPlayer); //Tell the clients that we made a new vehicle
         }
 
         [ClientRpc]
         public void VehicleRequested(VehicleData vehicle, PlayerProfile requestingPlayer)
         {
+            //First, let's check if this player is our local player, since we should show the RolePicker window if they requested a vehicle
+            Debug.Log($"Requesting player is {requestingPlayer.PlayerName} and LocalPlayerProfile is {TankRoomManager.LocalPlayerProfile.PlayerName}");
+            if (requestingPlayer.PlayerName == TankRoomManager.LocalPlayerProfile.PlayerName)
+            { //This is our local player, have the lobby open up the RolePicker window
+                HidePrefabPicker();
+                Lobby.Instance.ShowRolePicker();
+            }
             if (isServer)
+            {
+                DrawCrewedVehiclesButtons();
                 return; //Prevent the host from duplicating efforts
+            }
             //And we just duplicate the server stuff here for now
             ProfileGroup newGroup = new ProfileGroup();
             newGroup.Group.Add(requestingPlayer);

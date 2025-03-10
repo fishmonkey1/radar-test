@@ -65,10 +65,13 @@ public class RolePicker : NetworkBehaviour
     {
         TankRoomPlayer player = NetworkClient.localPlayer.GetComponent<TankRoomPlayer>();
 
-        //TODO: Migrate this code to the Lobby script
-        //We need to let the Lobby know to grab the vehicle info out of the vehicle picker.
-        Lobby lobby = GameObject.FindFirstObjectByType<Lobby>(); //There should only be one lobby script
-        lobby.OnGameReady();
+        if (isServer)
+        {
+            //TODO: Migrate this code to the Lobby script
+            //We need to let the Lobby know to grab the vehicle info out of the vehicle picker.
+            Lobby lobby = GameObject.FindFirstObjectByType<Lobby>(); //There should only be one lobby script
+            lobby.OnGameReady();
+        }
 
 
         player.CmdChangeReadyState(true);

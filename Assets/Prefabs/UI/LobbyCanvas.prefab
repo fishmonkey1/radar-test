@@ -121,7 +121,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 5006766158866082856}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -899,7 +899,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 2156991853026865319}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.94105476
+  m_Size: 0.9410547
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1287,7 +1287,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rolePicker: {fileID: 657328333328737988}
   teamPicker: {fileID: 8844330668221246396}
-  vehiclePicker: {fileID: 4056354126346784354}
+  vehiclePicker: {fileID: 4008993013854651551}
   rolePickerWindow: {fileID: 8053733798108062509}
   teamPickerWindow: {fileID: 7928091813925199618}
   vehiclePickerWindow: {fileID: 3254117868631423633}
@@ -1346,7 +1346,6 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 10530d43f8685f64e9f658f521371ade, type: 2}
     - {fileID: 11400000, guid: b532dded20aeaee41b81c57b1ac4cf32, type: 2}
     PlayerProfiles: []
-    VehiclePrefab: {fileID: 4283197213913971331, guid: cc463bf9a62b9234994922418126b6e2, type: 3}
     VehicleId: 0
     VehicleName: Dev Test Tank
 --- !u!223 &4456731233276219804
@@ -2172,7 +2171,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3254117868631423633}
-  - component: {fileID: 4056354126346784354}
   - component: {fileID: 7235180360770192391}
   - component: {fileID: 3693772595389680657}
   m_Layer: 5
@@ -2202,32 +2200,6 @@ RectTransform:
   m_AnchoredPosition: {x: -0.0000076293945, y: -182.19006}
   m_SizeDelta: {x: 355.0435, y: 364.38}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &4056354126346784354
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4519216603910491234}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2bf849d0779753c4da78cfee3ed10211, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
-  AllVehicles: {fileID: 6452972777191252163}
-  LinkedTeam:
-    TeamName: 
-    TeamId: 0
-    TeamLimit: 32
-    EnemyTeamIds: 
-    FriendlyTeamIds: 
-  JoinCrewButtonPanel: {fileID: 1146850253957767499}
-  VehiclePrefabPanel: {fileID: 8383076288235276792}
-  ButtonPrefab: {fileID: 7151781250998158829, guid: e12ca72b859f034499ea6e00f3a221ba, type: 3}
-  VehiclePrefabPicker: {fileID: 4519216603910491234}
 --- !u!222 &7235180360770192391
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2588,7 +2560,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -0.000015258789, y: -0.000014781952}
+  m_AnchoredPosition: {x: -0.000015258789, y: 0.000010728836}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &6910279031967597886
@@ -3316,6 +3288,7 @@ GameObject:
   - component: {fileID: 5241913535098929106}
   - component: {fileID: 4087980474503598863}
   - component: {fileID: 3399724988817312069}
+  - component: {fileID: 4008993013854651551}
   m_Layer: 5
   m_Name: VehicleCrewPicker
   m_TagString: Untagged
@@ -3381,6 +3354,33 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &4008993013854651551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7431119123487523308}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bf849d0779753c4da78cfee3ed10211, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  AllVehicles: {fileID: 6452972777191252163}
+  LinkedTeam:
+    TeamName: 
+    TeamId: 0
+    TeamLimit: 32
+    EnemyTeamIds: 
+    FriendlyTeamIds: 
+  JoinCrewButtonPanel: {fileID: 1146850253957767499}
+  VehiclePrefabPanel: {fileID: 3254117868631423633}
+  VehiclePrefabButtonPanel: {fileID: 8383076288235276792}
+  ButtonPrefab: {fileID: 7151781250998158829, guid: e12ca72b859f034499ea6e00f3a221ba, type: 3}
+  VehiclePrefabPicker: {fileID: 4519216603910491234}
 --- !u!1 &7553200890646206625
 GameObject:
   m_ObjectHideFlags: 0
