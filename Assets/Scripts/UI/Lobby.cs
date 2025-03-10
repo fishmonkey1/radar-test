@@ -91,11 +91,7 @@ namespace HorniTank
         {
             //We fire this after clicking the ready button. We pass the VehiclePicker's data into the TankRoomManager
             TankRoomManager tankRoom = TankRoomManager.singleton;
-            foreach (var vehicle in vehiclePicker.VehicleToProfiles.Keys)
-            {
-                Debug.Log($"Name: {vehicle.VehicleName}, Prefab value: {vehicle.VehiclePrefab}, value is prefab definition {vehicle.VehiclePrefab.IsPrefabDefinition()}");
-            }
-            tankRoom.SetVehicleSpawnData(vehiclePicker.VehicleToProfiles); //Hand over the vehicle spawn data
+            tankRoom.SetVehicleSpawnData(vehiclePicker.VehicleToProfiles, GetComponent<VehicleSpawnData>().VehicleDataAndPrefab); //Hand over the vehicle spawn data
         }
 
     }

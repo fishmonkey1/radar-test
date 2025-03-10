@@ -89,15 +89,15 @@ namespace HorniTank
 
             PlayerProfile localProfile = TankRoomManager.LocalPlayerProfile;
             Debug.Log($"Fetching LocalPlayerProfile with name of {localProfile.PlayerName} for the vehicle picker");
-            foreach (VehicleData vehicle in AllVehicles.VehicleData)
+            foreach (VehicleDataAndPrefab vehicle in AllVehicles.VehicleDataAndPrefab)
             {
                 //Make button for the prefab
                 GameObject ButtonInstance = GameObject.Instantiate(ButtonPrefab, VehiclePrefabButtonPanel);
                 Button ButtonScript = ButtonInstance.GetComponent<Button>();
-                ButtonScript.onClick.AddListener(() => RequestNewVehicle(vehicle, localProfile));
+                ButtonScript.onClick.AddListener(() => RequestNewVehicle(vehicle.VehicleData, localProfile));
                 //Now fetch the button text so we can update it
                 TextMeshProUGUI buttonText = ButtonInstance.GetComponentInChildren<TextMeshProUGUI>();
-                buttonText.text = vehicle.VehicleName; //Set the button to the name of the VehicleData
+                buttonText.text = vehicle.VehicleData.VehicleName; //Set the button to the name of the VehicleData
             }
             VehiclePrefabPanel.gameObject.SetActive(false);
         }

@@ -38,7 +38,21 @@ public class Spawner : MonoBehaviour
     [SerializeField] private List<VehicleSpawnPosition> _manualSpawnPoints = new List<VehicleSpawnPosition>();
     [SerializeField] private bool _showDebugGizmos = true;
 
-    public static Spawner instance;
+    static Spawner instance;
+    /// <summary>
+    /// There should only be one graph per gameplay scene.
+    /// </summary>
+    public static Spawner Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindObjectOfType<Spawner>();
+            }
+            return instance;
+        }
+    }
 
     private readonly List<SpawnPoint> _spawnPoints = new List<SpawnPoint>();
     private int _currentRoundRobinIndex;

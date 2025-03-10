@@ -31,6 +31,8 @@ public class TankRoomManager : NetworkRoomManager
 
     public Dictionary<VehicleData, ProfileGroup> GroupToVehicles = new(); //This is for supporting multiple tanks later on
 
+    public List<VehicleDataAndPrefab> VehicleDataAndPrefabList = new();
+
     public static new TankRoomManager singleton => NetworkManager.singleton as TankRoomManager;
 
     public static PlayerProfile LocalPlayerProfile;
@@ -146,9 +148,13 @@ public class TankRoomManager : NetworkRoomManager
                 VehicleData vehicle = data.Key;
                 ProfileGroup group = data.Value;
 
+                GameObject VehiclePrefab = FindPrefabByVehicleData(vehicle);
+
+                Debug.Log($"Attempting to spawn vehicle named {vehicle.VehicleName} and Spawner.instance is {Spawner.Instance}");
+
                 //Now we must try to spawn the vehicle itself
-                Spawner spawner = Spawner.instance; //Grab a reference to the spawner to save on typing later
-                SpawnResult result = spawner.TrySpawnVehicle(vehicle.VehiclePrefab); //Ask to spawn the vehicle in
+                Spawner spawner = Spawner.Instance; //Grab a reference to the spawner to save on typing later
+                SpawnResult result = spawner.TrySpawnVehicle(VehiclePrefab); //Ask to spawn the vehicle in
                 //Now we check the result to see what to do next
                 if (result.WasSuccessful)
                 { //Yaaaay! We did it and spawned in the vehicle. Now we need to spawn it across the network and set up all the profiles with their correct roles
@@ -182,6 +188,20 @@ public class TankRoomManager : NetworkRoomManager
         }
     }
 
+    GameObject FindPrefabByVehicleData(VehicleData data)
+    {
+        foreach( var vehicle in VehicleDataAndPrefabList)
+        {
+            if (vehicle.VehicleData.VehicleName == data.VehicleName)
+            {
+                return vehicle.prefab;
+            }
+        }
+        //TODO: Raise an error about this
+        Debug.LogError("Couldn't find matching vehicle data.");
+        return null;
+    }
+
     /// <summary>
     /// When a client connects to the game they send their profile across the network in TankRoomPlayer. This is called from TankRoomPlayer.CmdSendProfile so the server has this information.
     /// </summary>
@@ -207,9 +227,10 @@ public class TankRoomManager : NetworkRoomManager
         chatroom.SendServerMessage($"{profile.PlayerName} has connected!", new Chat.MessageContext(Chat.MessageTypes.SERVER, true, false));
     }
 
-    public void SetVehicleSpawnData( Dictionary<VehicleData, ProfileGroup> data)
+    public void SetVehicleSpawnData( Dictionary<VehicleData, ProfileGroup> data, List<VehicleDataAndPrefab> prefabs)
     {
         GroupToVehicles = data; //Set our dictionary to match the info passed in from the VehiclePicker
+        VehicleDataAndPrefabList = prefabs;
         RoomNetworking.RpcBroadcastVehicleSpawnData(data.Keys.ToArray(), data.Values.ToArray());
     }
 

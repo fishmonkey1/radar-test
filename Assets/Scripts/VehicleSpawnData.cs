@@ -5,7 +5,17 @@ using UnityEngine;
 
 public class VehicleSpawnData : MonoBehaviour
 {
-    public List<VehicleData> VehicleData = new();
+    public List<VehicleDataAndPrefab> VehicleDataAndPrefab = new();
+}
+
+/// <summary>
+/// Linking together the prefab to spawn with the network information about the tank.
+/// </summary>
+[Serializable]
+public class VehicleDataAndPrefab
+{
+    public GameObject prefab; //Spawn this on the server and replicate to clients
+    public VehicleData VehicleData;
 }
 
 [System.Serializable]
@@ -33,11 +43,6 @@ public class VehicleData
     /// The players that are crewing this vehicle
     /// </summary>
     public List<PlayerProfile> PlayerProfiles = new(); //The profiles that are assigned to this vehicle
-    /// <summary>
-    /// The linked object to wire up when spawned
-    /// </summary>
-    [NonSerialized]
-    public GameObject VehiclePrefab; //The GameObject to instantiate for this vehicle
     /// <summary>
     /// The ID of this vehicle prefab.
     /// </summary>
