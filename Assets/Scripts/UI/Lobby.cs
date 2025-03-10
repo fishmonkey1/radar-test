@@ -25,7 +25,21 @@ namespace HorniTank
 
         RectTransform currentScreen = null;
 
+        //HACK: This is just some hax0r singleton shit for now so the other UI elements can call ShowMenu functions on the Lobby
+        public static Lobby Instance;
+
         public TeamInfo localPickedTeam { get; private set; }
+
+        private void Awake()
+        {
+            if (Instance == null)
+                Instance = this;
+            else
+            {
+                Debug.LogWarning("You have more than one Lobby instance in your scene, dummy!"); //Bully the programmer for their stupidity
+                enabled = false; //Turn the script off so nothing bad happens
+            }
+        }
 
         private void Start()
         {
