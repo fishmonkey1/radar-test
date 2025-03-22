@@ -16,7 +16,7 @@ namespace HorniTank
         {
             Role = new Role(RoleName, RoleId, PlayerLimit);
             CrewRoles.TryAddRole(Role);
-            Debug.Log($"Created new Role Scriptable Object in Awake(). Values of the created role are ID: {Role.ID}, Name: {Role.Name}, PlayerLimit: {Role.PlayerLimit}");
+            Debug.Log($"Created new Role Scriptable Object in Awake(). Values of the created role are ID: {RoleId}, Name: {RoleName}, PlayerLimit: {PlayerLimit}");
         }
     }
 }

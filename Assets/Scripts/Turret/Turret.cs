@@ -96,7 +96,8 @@ public class Turret : NetworkBehaviour, IRoleNeeded
         if (newRole != RoleNeeded) return;
 
         //Otherwise we do any setup in here
-        currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded);
+        CamCycle cams = GetComponent<CamCycle>();
+        currentCam = cams.GetFirstCamera(RoleNeeded);
         Debug.Log($"Got first camera for {RoleNeeded.Name} role");
     }
 
@@ -110,7 +111,8 @@ public class Turret : NetworkBehaviour, IRoleNeeded
         if (!((IRoleNeeded)this).HaveRole(playerProfile.CurrentRole))
             return;
 
-        currentCam = CamCycle.Instance.GetNextCamera(RoleNeeded, currentCam);
+        CamCycle cams = GetComponent<CamCycle>();
+        currentCam = cams.GetNextCamera(RoleNeeded, currentCam);
     }
 
     /// <summary>
@@ -124,7 +126,8 @@ public class Turret : NetworkBehaviour, IRoleNeeded
         if (RoleNeeded.Name == profile.CurrentRole.Name)
         {
             Debug.Log("Local player's role matches for Turret");
-            currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded);
+            CamCycle cams = GetComponent<CamCycle>();
+            currentCam = cams.GetFirstCamera(RoleNeeded);
         }
         if (playerProfile.OnRoleChange == null)
         {

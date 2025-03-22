@@ -203,7 +203,7 @@ namespace HorniTank
             if (requestingPlayer.PlayerName == TankRoomManager.LocalPlayerProfile.PlayerName)
             { //This is our local player, have the lobby open up the RolePicker window
                 HidePrefabPicker();
-                Lobby.Instance.ShowRolePicker();
+                Lobby.Instance.ShowRolePicker(vehicle);
             }
             if (isServer)
             {

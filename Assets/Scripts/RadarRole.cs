@@ -64,7 +64,8 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
         if (newRole != RoleNeeded) return;
 
         //Otherwise we do any setup in here
-        currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded); //Fetch the camera for the driver so it's active
+        CamCycle cams = GetComponent<CamCycle>();
+        currentCam = cams.GetFirstCamera(RoleNeeded); //Fetch the camera for the driver so it's active
         Debug.Log($"Got first camera for {RoleNeeded.Name} role");
     }
 
@@ -78,7 +79,8 @@ public class RadarRole : NetworkBehaviour, IRoleNeeded
         if (RoleNeeded == profile.CurrentRole)
         {
             Debug.Log("Player's role matches for RadarRole");
-            currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded);
+            CamCycle cams = GetComponent<CamCycle>();
+            currentCam = cams.GetFirstCamera(RoleNeeded);
         }
         playerProfile = profile;
         if (playerProfile.OnRoleChange == null)

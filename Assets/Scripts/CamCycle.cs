@@ -15,15 +15,14 @@ public class CamCycle : MonoBehaviour
 
     Dictionary<Role, List<Camera>> roleCameras = new Dictionary<Role, List<Camera>>();
 
-    static CamCycle instance; //hopefully this won't need to be a singleton later. ;o;
+    //static CamCycle instance; //hopefully this won't need to be a singleton later. ;o;
     /// <summary>
     /// There should only be one active CamCycle script in a gameplay scene.
     /// </summary>
-    public static CamCycle Instance => instance;
+    //public static CamCycle Instance => instance;
 
     private void Awake()
     {
-        instance = this;
         roleCameras.Add(CrewRoles.Driver, driverCameras);
         roleCameras.Add(CrewRoles.Gunner, gunnerCameras);
         roleCameras.Add(CrewRoles.Radar, radarCameras);

@@ -80,7 +80,7 @@ public class PlayerProfile
         { //A tank hasn't been assigned, so let's update our reference
             CrewedVehicle = horniTank; //And that's pretty much it
             //Attempt setting up the camera now that there's a tank to use
-            Debug.Log("HorniTank was set via a SyncVar hook. Attempting to set up cameras");
+            Debug.Log("HorniTank was set for PlayerProfile. Attempting to set up cameras");
             SelectRole(CurrentRole);
         }
         //Otherwise we'll ignore this for now, since I only have one tank. TODO: Support other vehicles
@@ -107,7 +107,8 @@ public class PlayerProfile
             if (isLocal)
             {
                 Debug.Log("Profile is local, setting up cameras and control scripts. HorniTank value is " + CrewedVehicle);
-                CamCycle.Instance.ChangeRoles(oldRole, role);
+                CamCycle cams = CrewedVehicle.GetComponent<CamCycle>(); //Fetch the script off of the game object
+                cams.ChangeRoles(oldRole, role);
                 if (CrewedVehicle != null)
                 { //We can't set up our roles if a tank hasn't been spawned
                     Debug.Log("Assigning player to spawned tank");
@@ -194,4 +195,15 @@ public class PlayerProfile
 public class ProfileGroup
 {
     public List<PlayerProfile> Group = new();
+
+    public PlayerProfile FindProfileInGroup(PlayerProfile profile)
+    {
+        for (int i = 0;  i < Group.Count; i++)
+        {
+            PlayerProfile p = Group[i];
+            if (p.PlayerName == profile.PlayerName)
+                return p;
+        }
+        return null;
+    }
 }

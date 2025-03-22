@@ -15,7 +15,7 @@ namespace HorniTank
         [SerializeField]
         TeamPicker teamPicker; //Reference to the TeamPicker script for determining the scene. TODO: Read team information from the map information
         [SerializeField]
-        VehiclePicker vehiclePicker; //Reference for picking or making a new vehicle to use for your selected team
+        public VehiclePicker vehiclePicker; //Reference for picking or making a new vehicle to use for your selected team
 
         [SerializeField]
         RectTransform rolePickerWindow; //The UI transform of the window for picking roles.
@@ -76,13 +76,18 @@ namespace HorniTank
             //TODO: Add in the team picker stuff once a game mode selection method is made.
         }
 
-        public void ShowRolePicker()
+        public void ShowRolePicker(VehicleData data)
         {
             if (currentScreen != null)
             {
                 currentScreen.gameObject.SetActive(false);
             }
             rolePickerWindow.gameObject.SetActive(true);
+            RolePicker rolePicker = GetComponent<RolePicker>();
+            rolePicker.selectedVehicle = data;
+            rolePicker.DrawRoleButtons();
+
+
             currentScreen = rolePickerWindow;
         }
 

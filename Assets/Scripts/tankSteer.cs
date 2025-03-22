@@ -61,7 +61,8 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
         if(RoleNeeded == profile.CurrentRole)
         {
             Debug.Log("Player's role matches for tankSteer");
-            currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded);
+            CamCycle cams = GetComponent<CamCycle>();
+            currentCam = cams.GetFirstCamera(RoleNeeded);
         }
         playerProfile = profile;
         if (playerProfile.OnRoleChange == null)
@@ -132,7 +133,8 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
         if (newRole != RoleNeeded) return;
 
         //Otherwise we do any setup in here
-        currentCam = CamCycle.Instance.GetFirstCamera(RoleNeeded); //Fetch the camera for the driver so it's active
+        CamCycle cams = GetComponent<CamCycle>();
+        currentCam = cams.GetFirstCamera(RoleNeeded); //Fetch the camera for the driver so it's active
         Debug.Log($"Got first camera for {RoleNeeded.Name} role");
     }
 
@@ -174,7 +176,8 @@ public class tankSteer : NetworkBehaviour, IRoleNeeded
         if (!((IRoleNeeded)this).HaveRole(playerProfile.CurrentRole))
             return;
 
-        currentCam = CamCycle.Instance.GetNextCamera(RoleNeeded, currentCam);
+        CamCycle cams = GetComponent<CamCycle>();
+        currentCam = cams.GetNextCamera(RoleNeeded, currentCam);
     }
 
     /// <summary>

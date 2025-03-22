@@ -23,28 +23,38 @@ public class RolePicker : NetworkBehaviour
 
     List<GameObject> buttons = new List<GameObject>();
 
-    VehicleSpawnData VehicleSpawnData;
+    /// <summary>
+    /// Shuttled over by the lobby, this is the vehicle the local player asked to join
+    /// </summary>
+    public VehicleData selectedVehicle; //The vehicle we're picking roles from
 
     void Start()
     {
-        foreach (var role in CrewRoles.ImplementedRoles)
-        { // Make a button for each implemented role
-            GameObject newButton = GameObject.Instantiate(RoleButtonPrefab, RoleButtonPanel);
-            TextMeshProUGUI buttonText = newButton.GetComponentInChildren<TextMeshProUGUI>();
-            buttonText.text = role.Name;
-            Button buttonScript = newButton.GetComponent<Button>();
-            buttonScript.onClick.AddListener(() => SelectRole(role.Name));
-            if (role == CrewRoles.UnassignedRole)
-            { //If we're rendering the unassigned button, it should render as clicked here at Start.
-                buttonScript.interactable = false; //Can't assign yourself as unassigned when you start that way
-            }
-            buttons.Add(newButton);
-            //Debug.Log($"Added button for Role named {role.Name} and ID of {role.ID}");
-        }
-        VehicleSpawnData = GetComponent<VehicleSpawnData>(); //Fetch the componenet off of the RolePicker's prefab
         ReadyButtonObject.interactable = false; //Can't ready up until you pick a role
         //When the client enters the room we should update to reflect any roles that were picked before they joined
         CmdGetServerSelectedRoles(); //Ask for any roles that were picked so far
+    }
+
+    public void DrawRoleButtons()
+    {
+        //Render the Unassigned Role button seperate from the rest of the tank
+        GameObject unassignedButton = GameObject.Instantiate(RoleButtonPrefab, RoleButtonPanel);
+        TextMeshProUGUI unassignedText = unassignedButton.GetComponentInChildren<TextMeshProUGUI>();
+        unassignedText.text = CrewRoles.UnassignedRole.Name;
+        Button unassignedButtonScript = unassignedButton.GetComponent<Button>();
+        unassignedButtonScript.onClick.AddListener(() => SelectRole(CrewRoles.UnassignedRole.Name));
+        buttons.Add(unassignedButton);
+
+        foreach (RoleScriptableObject roleSO in selectedVehicle.VehicleRoles)
+        {
+            //Draw a button for each role listed in the VehicleData
+            GameObject newButton = GameObject.Instantiate(RoleButtonPrefab, RoleButtonPanel);
+            TextMeshProUGUI buttonText = newButton.GetComponentInChildren<TextMeshProUGUI>();
+            buttonText.text = roleSO.RoleName;
+            Button buttonScript = newButton.GetComponent<Button>();
+            buttonScript.onClick.AddListener(() => SelectRole(roleSO.RoleName));
+            buttons.Add(newButton);
+        }
     }
 
     public void BackToMenuButton()
@@ -83,7 +93,7 @@ public class RolePicker : NetworkBehaviour
     {
         Debug.Log("Called select role locally, attempting to select role name " + roleName);
         //We need the server to confirm we got the role, so we just convert to a Role object and yeet it over to the server
-        CmdSelectRole(CrewRoles.GetRoleByName(roleName), NetworkClient.localPlayer);
+        CmdSelectRole(CrewRoles.GetRoleByName(roleName), NetworkClient.localPlayer, selectedVehicle);
     }
 
     /// <summary>
@@ -92,7 +102,7 @@ public class RolePicker : NetworkBehaviour
     /// <param name="role">The role to be picked by the client</param>
     /// <param name="sender">The client that wants to take this role</param>
     [Command(requiresAuthority = false)]
-    public void CmdSelectRole(Role role, NetworkIdentity sender)
+    public void CmdSelectRole(Role role, NetworkIdentity sender, VehicleData vehicle)
     {
         //I'm gonna see if this works with using the sent Identity as a key. Maybe it will...
         PlayerProfile senderProfile = TankRoomManager.singleton.connectedPlayers[sender];
@@ -106,11 +116,15 @@ public class RolePicker : NetworkBehaviour
             }
             selectedRoles.Add(role); //And put your new role in the selected list
             senderProfile.SelectRole(role); //Make sure the server has you set up with the same role
-            Debug.Log("Server assigned role to player.");
+            Debug.Log($"VehicleToProfiles value: {Lobby.Instance.vehiclePicker.VehicleToProfiles} and value of vehicle is {vehicle}");
+            ProfileGroup group = Lobby.Instance.vehiclePicker.VehicleToProfiles[vehicle];
+            group.FindProfileInGroup(senderProfile).SelectRole(role);
+
+            Debug.Log($"Server assigned role {role.Name} to player.");
             if (!sender.isServer)
             {
                 //Actually give the client the role, provided that they are not the host so we prevent duplicate messages
-                TargetAssignRole(sender.connectionToClient, role);
+                TargetAssignRole(sender.connectionToClient, role, vehicle);
             }
             RpcBroadcastSelectedRoles(selectedRoles); //And then update all clients about the changed list
         }
@@ -122,10 +136,12 @@ public class RolePicker : NetworkBehaviour
     /// <param name="target">The client to receive the role</param>
     /// <param name="role">The role to give the client</param>
     [TargetRpc]
-    void TargetAssignRole(NetworkConnection target, Role role)
+    void TargetAssignRole(NetworkConnection target, Role role, VehicleData vehicle)
     { //The server has confirmed that you got your role assigned
         PlayerProfile profile = NetworkClient.localPlayer.GetComponent<ProfileHolder>().Profile;
         profile.SelectRole(role);
+        ProfileGroup group = Lobby.Instance.vehiclePicker.VehicleToProfiles[vehicle];
+        group.FindProfileInGroup(profile).SelectRole(role);
         Debug.Log("Client received a role from the server and assigned it.");
     }
 

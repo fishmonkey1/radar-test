@@ -98,7 +98,7 @@ public class TankRoomManager : NetworkRoomManager
                     {
                         //Role cleanup in here.
                         //Tell the rolePicker to set this player back to unassigned and free up their role
-                        rolePicker.CmdSelectRole(CrewRoles.UnassignedRole, conn.identity);
+                        //rolePicker.CmdSelectRole(CrewRoles.UnassignedRole, conn.identity);
                         //And for now, that appears to be it for cleanup
                     }
                 }
